@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/about/page": "app/about/page.js",
+  "/bulk-inquiry/page": "app/bulk-inquiry/page.js",
+  "/shop/[slug]/page": "app/shop/[slug]/page.js",
+  "/page": "app/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/shop/page": "app/shop/page.js",
+  "/checkout/page": "app/checkout/page.js"
+}
