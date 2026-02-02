@@ -1,195 +1,154 @@
 export interface Product {
-  id: number;
-  slug: string;
+  id: string;
   name: string;
-  category: 'fruit' | 'vegetable' | 'leafy';
+  slug: string;
+  description: string;
   price: number;
   originalPrice: number;
   discount: number;
   sizes: string[];
-  image: string;
-  description: string;
-  benefits: string[];
+  category: string;
   fssai: boolean;
-  featured?: boolean;
+  featured: boolean;
+  inStock: boolean;
 }
 
-export const products: Product[] = [
+const products: Product[] = [
   {
-    id: 1,
-    slug: 'beetroot-powder',
-    name: 'Beetroot Powder',
-    category: 'vegetable',
-    price: 238,
-    originalPrice: 280,
-    discount: 15,
-    sizes: ['50g', '150g', '250g'],
-    image: '/products/beetroot.jpg',
-    description: 'Made from carefully selected fresh raw materials and processed with utmost care to retain all nutrients.',
-    benefits: ['Rich in antioxidants', 'Supports heart health', 'Boosts stamina', 'Natural blood pressure support'],
-    fssai: true,
-    featured: true,
-  },
-  {
-    id: 2,
-    slug: 'moringa-powder',
-    name: 'Moringa Powder',
-    category: 'leafy',
-    price: 229,
-    originalPrice: 270,
-    discount: 15,
-    sizes: ['50g', '150g', '250g'],
-    image: '/products/moringa.jpg',
-    description: 'Premium organic moringa powder packed with essential vitamins and minerals.',
-    benefits: ['Nutrient-rich superfood', 'Boosts immunity', 'Natural energy enhancer', 'Anti-inflammatory properties'],
-    fssai: true,
-    featured: true,
-  },
-  {
-    id: 3,
-    slug: 'turmeric-powder',
-    name: 'Turmeric Powder',
-    category: 'vegetable',
-    price: 189,
-    originalPrice: 220,
-    discount: 14,
-    sizes: ['100g', '250g', '500g'],
-    image: '/products/turmeric.jpg',
-    description: 'Pure turmeric powder with high curcumin content. No additives, no preservatives.',
-    benefits: ['Anti-inflammatory', 'Immune support', 'Joint health', 'Natural antioxidant'],
-    fssai: true,
-    featured: true,
-  },
-  {
-    id: 4,
-    slug: 'amla-powder',
-    name: 'Amla Powder',
-    category: 'fruit',
-    price: 199,
-    originalPrice: 240,
-    discount: 17,
-    sizes: ['100g', '200g', '400g'],
-    image: '/products/amla.jpg',
-    description: 'Rich in Vitamin C, made from sun-dried Indian gooseberries.',
-    benefits: ['Vitamin C powerhouse', 'Hair and skin health', 'Digestive support', 'Immunity booster'],
-    fssai: true,
-    featured: true,
-  },
-  {
-    id: 5,
-    slug: 'spinach-powder',
-    name: 'Spinach Powder',
-    category: 'leafy',
-    price: 249,
-    originalPrice: 290,
-    discount: 14,
-    sizes: ['50g', '150g', '300g'],
-    image: '/products/spinach.jpg',
-    description: 'Nutrient-dense spinach powder, perfect for smoothies and cooking.',
-    benefits: ['Iron-rich', 'Bone health', 'Energy booster', 'Antioxidant support'],
-    fssai: true,
-  },
-  {
-    id: 6,
-    slug: 'carrot-powder',
-    name: 'Carrot Powder',
-    category: 'vegetable',
-    price: 219,
-    originalPrice: 260,
-    discount: 16,
-    sizes: ['100g', '200g', '350g'],
-    image: '/products/carrot.jpg',
-    description: 'Sweet and versatile carrot powder rich in beta-carotene.',
-    benefits: ['Eye health', 'Skin glow', 'Vitamin A source', 'Immune support'],
-    fssai: true,
-  },
-  {
-    id: 7,
-    slug: 'ginger-powder',
-    name: 'Ginger Powder',
-    category: 'vegetable',
-    price: 169,
-    originalPrice: 200,
-    discount: 15,
-    sizes: ['50g', '100g', '200g'],
-    image: '/products/ginger.jpg',
-    description: 'Sharp, aromatic ginger powder for wellness and cooking.',
-    benefits: ['Digestive aid', 'Anti-nausea', 'Anti-inflammatory', 'Metabolism boost'],
-    fssai: true,
-  },
-  {
-    id: 8,
-    slug: 'ashwagandha-powder',
-    name: 'Ashwagandha Powder',
-    category: 'vegetable',
+    id: '1',
+    name: 'Moringa Leaf Powder',
+    slug: 'moringa-leaf-powder',
+    description: 'Pure, nutrient-rich moringa leaf powder packed with vitamins and antioxidants. Perfect for smoothies and wellness drinks.',
     price: 299,
-    originalPrice: 350,
-    discount: 14,
-    sizes: ['100g', '200g', '400g'],
-    image: '/products/ashwagandha.jpg',
-    description: 'Premium ashwagandha root powder for stress relief and vitality.',
-    benefits: ['Stress reducer', 'Energy booster', 'Sleep support', 'Cognitive health'],
+    originalPrice: 399,
+    discount: 25,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'leafy-vegetables',
     fssai: true,
+    featured: true,
+    inStock: true,
   },
   {
-    id: 9,
-    slug: 'broccoli-powder',
-    name: 'Broccoli Powder',
-    category: 'vegetable',
-    price: 279,
-    originalPrice: 330,
-    discount: 15,
-    sizes: ['50g', '150g', '250g'],
-    image: '/products/broccoli.jpg',
-    description: 'Concentrated broccoli powder packed with nutrients.',
-    benefits: ['Detox support', 'Rich in fiber', 'Vitamin K source', 'Antioxidant power'],
+    id: '2',
+    name: 'Amla Powder',
+    slug: 'amla-powder',
+    description: 'Premium Indian gooseberry powder, rich in vitamin C and natural antioxidants. Supports immunity and skin health.',
+    price: 349,
+    originalPrice: 449,
+    discount: 22,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'fruits',
     fssai: true,
+    featured: true,
+    inStock: true,
   },
   {
-    id: 10,
-    slug: 'wheatgrass-powder',
+    id: '3',
     name: 'Wheatgrass Powder',
-    category: 'leafy',
-    price: 259,
-    originalPrice: 300,
-    discount: 13,
-    sizes: ['100g', '200g', '400g'],
-    image: '/products/wheatgrass.jpg',
-    description: 'Fresh, green wheatgrass powder for daily nutrition.',
-    benefits: ['Chlorophyll-rich', 'Alkalizing', 'Energy boost', 'Detoxification'],
+    slug: 'wheatgrass-powder',
+    description: 'Fresh wheatgrass powder, a powerhouse of chlorophyll and nutrients. Ideal for detox and daily wellness.',
+    price: 399,
+    originalPrice: 549,
+    discount: 27,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'leafy-vegetables',
     fssai: true,
+    featured: true,
+    inStock: true,
   },
   {
-    id: 11,
-    slug: 'pomegranate-powder',
-    name: 'Pomegranate Powder',
-    category: 'fruit',
-    price: 329,
-    originalPrice: 390,
-    discount: 15,
-    sizes: ['100g', '200g', '300g'],
-    image: '/products/pomegranate.jpg',
-    description: 'Tangy pomegranate powder rich in antioxidants.',
-    benefits: ['Heart health', 'Anti-aging', 'Blood sugar support', 'High antioxidants'],
+    id: '4',
+    name: 'Beetroot Powder',
+    slug: 'beetroot-powder',
+    description: 'Natural beetroot powder for vibrant color and nutrition. Rich in nitrates and antioxidants for athletic performance.',
+    price: 279,
+    originalPrice: 379,
+    discount: 26,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'vegetables',
     fssai: true,
+    featured: true,
+    inStock: true,
   },
   {
-    id: 12,
-    slug: 'tomato-powder',
-    name: 'Tomato Powder',
-    category: 'vegetable',
+    id: '5',
+    name: 'Spinach Powder',
+    slug: 'spinach-powder',
+    description: 'Dehydrated spinach powder, rich in iron and vitamins. Easy way to add greens to any meal or smoothie.',
+    price: 249,
+    originalPrice: 329,
+    discount: 24,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'leafy-vegetables',
+    fssai: true,
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: '6',
+    name: 'Turmeric Powder',
+    slug: 'turmeric-powder',
+    description: 'Pure turmeric powder with curcumin, known for anti-inflammatory properties. Perfect for golden milk and cooking.',
     price: 199,
-    originalPrice: 230,
-    discount: 13,
-    sizes: ['100g', '250g', '500g'],
-    image: '/products/tomato.jpg',
-    description: 'Rich tomato powder perfect for soups, sauces, and cooking.',
-    benefits: ['Lycopene source', 'Skin health', 'Heart support', 'Vitamin C'],
+    originalPrice: 259,
+    discount: 23,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'vegetables',
     fssai: true,
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: '7',
+    name: 'Mango Powder',
+    slug: 'mango-powder',
+    description: 'Dried raw mango powder (amchur) with tangy flavor. Rich in vitamin C and perfect for Indian cuisine.',
+    price: 229,
+    originalPrice: 299,
+    discount: 23,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'fruits',
+    fssai: true,
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: '8',
+    name: 'Carrot Powder',
+    slug: 'carrot-powder',
+    description: 'Nutrient-dense carrot powder, rich in beta-carotene and vitamin A. Great for natural color and nutrition.',
+    price: 259,
+    originalPrice: 339,
+    discount: 24,
+    sizes: ['100g', '250g', '500g', '1kg'],
+    category: 'vegetables',
+    fssai: true,
+    featured: false,
+    inStock: true,
   },
 ];
 
-export const getFeaturedProducts = () => products.filter(p => p.featured);
-export const getProductBySlug = (slug: string) => products.find(p => p.slug === slug);
-export const getProductsByCategory = (category: string) => 
-  category === 'all' ? products : products.filter(p => p.category === category);
+export function getFeaturedProducts(): Product[] {
+  return products.filter(product => product.featured);
+}
+
+export function getAllProducts(): Product[] {
+  return products;
+}
+
+export function getProductBySlug(slug: string): Product | undefined {
+  return products.find(product => product.slug === slug);
+}
+
+export function getProductsByCategory(category: string): Product[] {
+  return products.filter(product => product.category === category);
+}
+
+export function searchProducts(query: string): Product[] {
+  const lowercaseQuery = query.toLowerCase();
+  return products.filter(product =>
+    product.name.toLowerCase().includes(lowercaseQuery) ||
+    product.description.toLowerCase().includes(lowercaseQuery) ||
+    product.category.toLowerCase().includes(lowercaseQuery)
+  );
+}

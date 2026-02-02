@@ -1,101 +1,193 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product } from './products';
+import { createContext, useContext, useReducer, ReactNode } from "react";
 
-interface CartItem extends Product {
-  quantity: number;
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
   selectedSize: string;
+  quantity: number;
+}
+
+interface CartState {
+  items: CartItem[];
+  isCartOpen: boolean;
+}
+
+type CartAction =
+  | { type: "ADD_ITEM"; payload: Omit<CartItem, "quantity"> }
+  | { type: "REMOVE_ITEM"; payload: { id: string; selectedSize: string } }
+  | {
+      type: "UPDATE_QUANTITY";
+      payload: { id: string; selectedSize: string; quantity: number };
+    }
+  | { type: "TOGGLE_CART" }
+  | { type: "SET_CART_OPEN"; payload: boolean }
+  | { type: "CLEAR_CART" };
+
+const initialState: CartState = {
+  items: [],
+  isCartOpen: false,
+};
+
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case "ADD_ITEM": {
+      const existingItem = state.items.find(
+        (item) =>
+          item.id === action.payload.id &&
+          item.selectedSize === action.payload.selectedSize,
+      );
+
+      if (existingItem) {
+        return {
+          ...state,
+          items: state.items.map((item) =>
+            item.id === action.payload.id &&
+            item.selectedSize === action.payload.selectedSize
+              ? { ...item, quantity: item.quantity + 1 }
+              : item,
+          ),
+        };
+      }
+
+      return {
+        ...state,
+        items: [...state.items, { ...action.payload, quantity: 1 }],
+      };
+    }
+
+    case "REMOVE_ITEM":
+      return {
+        ...state,
+        items: state.items.filter(
+          (item) =>
+            !(
+              item.id === action.payload.id &&
+              item.selectedSize === action.payload.selectedSize
+            ),
+        ),
+      };
+
+    case "UPDATE_QUANTITY":
+      if (action.payload.quantity <= 0) {
+        return {
+          ...state,
+          items: state.items.filter(
+            (item) =>
+              !(
+                item.id === action.payload.id &&
+                item.selectedSize === action.payload.selectedSize
+              ),
+          ),
+        };
+      }
+
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload.id &&
+          item.selectedSize === action.payload.selectedSize
+            ? { ...item, quantity: action.payload.quantity }
+            : item,
+        ),
+      };
+
+    case "TOGGLE_CART":
+      return {
+        ...state,
+        isCartOpen: !state.isCartOpen,
+      };
+
+    case "SET_CART_OPEN":
+      return {
+        ...state,
+        isCartOpen: action.payload,
+      };
+
+    case "CLEAR_CART":
+      return {
+        ...state,
+        items: [],
+      };
+
+    default:
+      return state;
+  }
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, quantity: number, size: string) => void;
-  removeItem: (productId: number, size: string) => void;
-  updateQuantity: (productId: number, size: string, quantity: number) => void;
+  addItem: (item: Omit<CartItem, "quantity">) => void;
+  removeItem: (id: string, selectedSize: string) => void;
+  updateQuantity: (id: string, selectedSize: string, quantity: number) => void;
   clearCart: () => void;
-  totalItems: number;
   totalPrice: number;
+  totalItems: number;
   isCartOpen: boolean;
-  setIsCartOpen: (isOpen: boolean) => void;
+  setIsCartOpen: (open: boolean) => void;
+  toggleCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('blooms_cart');
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Failed to parse cart', e);
-      }
-    }
-  }, []);
+  const addItem = (item: Omit<CartItem, "quantity">) => {
+    dispatch({ type: "ADD_ITEM", payload: item });
+  };
 
-  // Save cart to localStorage on change
-  useEffect(() => {
-    localStorage.setItem('blooms_cart', JSON.stringify(items));
-  }, [items]);
+  const removeItem = (id: string, selectedSize: string) => {
+    dispatch({ type: "REMOVE_ITEM", payload: { id, selectedSize } });
+  };
 
-  const addItem = (product: Product, quantity: number, size: string) => {
-    setItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (item) => item.id === product.id && item.selectedSize === size
-      );
-
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id && item.selectedSize === size
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-
-      return [...prevItems, { ...product, quantity, selectedSize: size }];
+  const updateQuantity = (
+    id: string,
+    selectedSize: string,
+    quantity: number,
+  ) => {
+    dispatch({
+      type: "UPDATE_QUANTITY",
+      payload: { id, selectedSize, quantity },
     });
-    setIsCartOpen(true);
   };
 
-  const removeItem = (productId: number, size: string) => {
-    setItems((prevItems) => 
-      prevItems.filter((item) => !(item.id === productId && item.selectedSize === size))
-    );
+  const clearCart = () => {
+    dispatch({ type: "CLEAR_CART" });
   };
 
-  const updateQuantity = (productId: number, size: string, quantity: number) => {
-    if (quantity < 1) return;
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === productId && item.selectedSize === size
-          ? { ...item, quantity }
-          : item
-      )
-    );
+  const toggleCart = () => {
+    dispatch({ type: "TOGGLE_CART" });
   };
 
-  const clearCart = () => setItems([]);
+  const setIsCartOpen = (open: boolean) => {
+    dispatch({ type: "SET_CART_OPEN", payload: open });
+  };
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = state.items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+  const totalItems = state.items.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
 
   return (
     <CartContext.Provider
       value={{
-        items,
+        items: state.items,
         addItem,
         removeItem,
         updateQuantity,
         clearCart,
-        totalItems,
         totalPrice,
-        isCartOpen,
+        totalItems,
+        isCartOpen: state.isCartOpen,
         setIsCartOpen,
+        toggleCart,
       }}
     >
       {children}
@@ -106,7 +198,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 }
