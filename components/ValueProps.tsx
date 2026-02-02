@@ -1,49 +1,79 @@
-import { Tractor, FlaskConical, Leaf, Truck } from 'lucide-react';
-
-const valueProps = [
-  {
-    icon: Tractor,
-    title: 'Direct from Farmers',
-    description: 'Sourced directly from trusted local farmers for maximum freshness',
-  },
-  {
-    icon: FlaskConical,
-    title: 'Lab Tested',
-    description: 'Every batch rigorously tested for purity and quality standards',
-  },
-  {
-    icon: Leaf,
-    title: '100% Raw',
-    description: 'No additives, no preservatives, completely natural and pure',
-  },
-  {
-    icon: Truck,
-    title: 'Fast Delivery',
-    description: 'Quick and reliable shipping to ensure product freshness',
-  },
-];
-
-export default function ValueProps() {
-  return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {valueProps.map((prop, index) => (
-            <div
-              key={index}
-              className="text-center space-y-4 p-6 rounded-lg hover:bg-cream-50 transition-colors group"
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-forest/10 rounded-full group-hover:bg-forest group-hover:scale-110 transition-all duration-300">
-                <prop.icon className="w-8 h-8 text-forest group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="font-semibold text-lg text-forest">{prop.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {prop.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+'use client';
+ 
+ import { motion } from 'framer-motion';
+ import { Leaf, ShieldCheck, Truck, Award } from 'lucide-react';
+ 
+ export default function ValueProps() {
+   const features = [
+     {
+       icon: Leaf,
+       title: '100% Natural',
+       description: 'Zero additives, preservatives, or artificial colors',
+     },
+     {
+       icon: ShieldCheck,
+       title: 'Lab Tested',
+       description: 'Rigorous quality checks for purity and potency',
+     },
+     {
+       icon: Award,
+       title: 'FSSAI Certified',
+       description: 'Licensed and approved for highest safety standards',
+     },
+     {
+       icon: Truck,
+       title: 'Farm Direct',
+       description: 'Sourced directly from farmers to your doorstep',
+     },
+   ];
+ 
+   const container = {
+     hidden: { opacity: 0 },
+     show: {
+       opacity: 1,
+       transition: {
+         staggerChildren: 0.2
+       }
+     }
+   };
+ 
+   return (
+     <section className="py-20 bg-forest text-white overflow-hidden relative">
+       {/* Background Pattern */}
+       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
+       <div className="absolute top-0 right-0 w-96 h-96 bg-gold/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cream/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+ 
+       <div className="max-w-7xl mx-auto px-6 relative z-10">
+         <motion.div 
+           variants={container}
+           initial="hidden"
+           whileInView="show"
+           viewport={{ once: true }}
+           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12"
+         >
+           {features.map((feature, index) => (
+             <motion.div
+               key={index}
+               variants={{
+                 hidden: { opacity: 0, y: 20 },
+                 show: { opacity: 1, y: 0 }
+               }}
+               className="flex flex-col items-center text-center group"
+             >
+               <div className="mb-6 p-4 rounded-full bg-white/10 backdrop-blur-sm group-hover:bg-gold group-hover:text-forest-900 transition-all duration-300">
+                 <feature.icon className="w-8 h-8" />
+               </div>
+               <h3 className="font-sans text-xl font-bold mb-3 text-gold-200 group-hover:text-white transition-colors">
+                 {feature.title}
+               </h3>
+               <p className="text-cream-200 leading-relaxed max-w-xs">
+                 {feature.description}
+               </p>
+             </motion.div>
+           ))}
+         </motion.div>
+       </div>
+     </section>
+   );
+ }

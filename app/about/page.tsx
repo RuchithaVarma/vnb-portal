@@ -2,8 +2,8 @@ import { Leaf, HeartHandshake, Award, TrendingUp } from 'lucide-react';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-cream py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-cream pt-24 pb-12">
+      <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="section-title mb-4">About Blooms Energy</h1>

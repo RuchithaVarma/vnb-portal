@@ -36,8 +36,8 @@ export default function BulkInquiryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-cream pt-24 pb-12">
+      <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="section-title mb-4">Bulk Orders & Wholesale</h1>
@@ -83,7 +83,7 @@ export default function BulkInquiryPage() {
           {/* Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-card p-8">
-              <h2 className="font-serif text-2xl font-bold text-forest mb-6">
+              <h2 className="font-sans text-2xl font-bold text-forest mb-6">
                 Request a Quote
               </h2>
               

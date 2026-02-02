@@ -1,68 +1,90 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
+import { ShoppingCart, Heart } from 'lucide-react';
 import { Product } from '@/lib/products';
+import { useCart } from '@/lib/cart-context';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const discountPercentage = Math.round(
-    ((product.originalPrice - product.price) / product.originalPrice) * 100
-  );
+  const { addItem } = useCart();
 
   return (
-    <Link
-      href={`/shop/${product.slug}`}
-      className="product-card group block"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.4 }}
+      className="group bg-white rounded-2xl shadow-soft overflow-hidden border border-transparent hover:border-forest/5 hover:shadow-card h-full flex flex-col"
     >
-      {/* Image Container */}
-      <div className="relative aspect-square bg-cream-100 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-32 h-32 bg-gradient-to-br from-forest/20 to-gold/20 rounded-full"></div>
-        </div>
+      {/* Image Area */}
+      <div className="relative aspect-square bg-cream-50 overflow-hidden">
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-contain p-8 transition-transform duration-500 group-hover:scale-110"
+        />
         
-        {/* Discount Badge */}
+        {/* Badge */}
         {product.discount > 0 && (
-          <div className="absolute top-3 right-3 bg-gold text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-            {discountPercentage}% OFF
+          <div className="absolute top-3 left-3 bg-gold text-forest-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+            {product.discount}% OFF
           </div>
         )}
 
-        {/* Size Badge */}
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-forest text-xs font-semibold px-3 py-1 rounded-full">
-          {product.sizes[1]}
+        {/* Quick Actions Overlay */}
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+          <button 
+            className="bg-white text-forest-900 p-3 rounded-full shadow-lg hover:bg-forest hover:text-white transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300"
+            onClick={() => addItem({ ...product, id: String(product.id), selectedSize: product.sizes[0] })}
+            aria-label="Add to cart"
+          >
+            <ShoppingCart className="w-5 h-5" />
+          </button>
+          <Link 
+            href={`/shop/${product.slug}`}
+            className="bg-white text-forest-900 p-3 rounded-full shadow-lg hover:bg-forest hover:text-white transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-75"
+            aria-label="View details"
+          >
+            <Heart className="w-5 h-5" />
+          </Link>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="font-semibold text-forest text-lg mb-2 group-hover:text-forest-700 transition-colors">
-          {product.name}
-        </h3>
-        
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {product.description}
-        </p>
-
-        {/* Pricing */}
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-forest">
-            ₹{product.price}
-          </span>
+      {/* Details */}
+      <div className="p-5 flex flex-col flex-grow">
+        <div className="text-xs font-medium text-gold mb-1 uppercase tracking-wider">
+          {product.category}
+        </div>
+        <Link href={`/shop/${product.slug}`} className="block">
+          <h3 className="font-sans text-lg font-bold text-forest-900 mb-2 group-hover:text-gold transition-colors line-clamp-1">
+            {product.name}
+          </h3>
+        </Link>
+        <div className="flex items-baseline space-x-2 mb-3">
+          <span className="text-xl font-bold text-forest-800">₹{product.price}</span>
           {product.originalPrice > product.price && (
-            <span className="text-sm text-gray-400 line-through">
-              ₹{product.originalPrice}
-            </span>
+            <span className="text-sm text-gray-400 line-through">₹{product.originalPrice}</span>
           )}
         </div>
-
-        {/* FSSAI Badge */}
-        {product.fssai && (
-          <div className="mt-3 inline-flex items-center text-xs text-green-600 font-medium">
-            <span className="mr-1">✓</span> FSSAI Certified
-          </div>
-        )}
+        <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-grow">
+          {product.description}
+        </p>
+        
+        <button
+          onClick={() => addItem({ ...product, id: String(product.id), selectedSize: product.sizes[0] })}
+          className="w-full mt-auto py-2.5 rounded-full border border-forest/20 text-forest-800 font-medium hover:bg-forest hover:text-white hover:border-forest transition-all duration-300 text-sm"
+        >
+          Add to Cart
+        </button>
       </div>
-    </Link>
+    </motion.div>
   );
 }

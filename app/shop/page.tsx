@@ -21,8 +21,8 @@ export default function ShopPage() {
   });
 
   return (
-    <div className="min-h-screen bg-cream py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-cream pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="mb-8">
           <h1 className="section-title text-center mb-4">Shop All Products</h1>
