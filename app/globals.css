@@ -6,38 +6,43 @@
   html {
     @apply scroll-smooth;
   }
-  
+
   body {
     @apply bg-cream text-forest-800 font-sans antialiased;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-sans;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-forest hover:bg-forest-700 text-white font-medium px-8 py-4 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-forest/20 active:scale-95 text-lg tracking-wide shadow-md;
+    @apply bg-forest hover:bg-forest-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-forest/20 active:scale-95 text-base tracking-wide shadow-md;
   }
-  
+
   .btn-secondary {
-    @apply bg-transparent hover:bg-forest/5 text-forest border-2 border-forest font-medium px-8 py-4 rounded-full transition-all duration-300 active:scale-95 text-lg tracking-wide;
+    @apply bg-transparent hover:bg-forest/5 text-forest border-2 border-forest font-medium px-6 py-3 rounded-full transition-all duration-300 active:scale-95 text-base tracking-wide;
   }
-  
+
   .section-title {
-    @apply font-sans text-4xl md:text-5xl font-bold text-forest mb-6 tracking-tight;
+    @apply font-sans text-3xl md:text-4xl font-bold text-forest mb-4 tracking-tight;
   }
-  
+
   .card {
     @apply bg-white rounded-3xl shadow-soft overflow-hidden transition-all duration-500 hover:shadow-card hover:-translate-y-1 border border-transparent hover:border-forest/5;
   }
-  
+
   .product-card {
     @apply card cursor-pointer;
   }
-  
+
   .glass-panel {
     @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
   }
@@ -47,15 +52,15 @@
   .animate-fade-in {
     animation: fadeIn 0.8s ease-out forwards;
   }
-  
+
   .animate-fade-in-up {
     animation: fadeInUp 0.8s ease-out forwards;
   }
-  
+
   .animate-scale-in {
     animation: scaleIn 0.5s ease-out forwards;
   }
-  
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
@@ -66,8 +71,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
@@ -93,6 +102,11 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
 }

@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart-context';
-import { Shield, ChevronRight, Lock, MapPin, CreditCard, CheckCircle2 } from 'lucide-react';
+import { Shield, ChevronRight, Lock, MapPin, CreditCard, CheckCircle2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { createOrder } from '@/lib/firestore/orders';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, clearCart } = useCart();
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'whatsapp'>('razorpay');
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -22,12 +25,25 @@ export default function CheckoutPage() {
     phone: '',
   });
 
+  // Load Razorpay Script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   // Redirect if cart is empty
   useEffect(() => {
     if (items.length === 0 && step !== 3) {
       router.push('/shop');
     }
-  }, [items, router]);
+  }, [items, router, step]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,17 +55,147 @@ export default function CheckoutPage() {
     setStep(2);
   };
 
-  const handlePayment = () => {
+  const deliveryChargeValue = totalPrice > 500 ? 0 : 50;
+  const grandTotal = totalPrice + deliveryChargeValue;
+
+  const handlePayment = async () => {
     setIsProcessing(true);
-    // Simulate Razorpay / Payment Gateway experience
-    setTimeout(() => {
+    
+    try {
+      // 1. Create Order in Razorpay via our API
+      const response = await fetch('/api/razorpay/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: grandTotal,
+          currency: 'INR',
+          receipt: `rcpt_${Date.now()}`,
+        }),
+      });
+
+      const orderData = await response.json();
+
+      if (orderData.error) {
+        throw new Error(orderData.error);
+      }
+
+      // 2. Open Razorpay Checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Blooms Energy',
+        description: 'Raw Powders Purchase',
+        order_id: orderData.id,
+        handler: async function (paymentResponse: any) {
+          // 3. Handle Success - Map CartItems to OrderItems
+          const orderItems = items.map(item => ({
+            productId: String(item.id),
+            productSlug: item.slug || '',
+            productName: item.name,
+            productImage: item.image || '',
+            quantity: item.quantity,
+            size: item.selectedSize,
+            price: item.price
+          }));
+
+          const newOrderId = await createOrder({
+            customerName: `${formData.firstName} ${formData.lastName}`,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+            shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+            items: orderItems,
+            totalAmount: grandTotal,
+            status: 'processing',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            notes: `Razorpay Payment ID: ${paymentResponse.razorpay_payment_id}`
+          });
+          
+          setOrderId(newOrderId);
+          setStep(3);
+          clearCart();
+          setIsProcessing(false);
+        },
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#1A4D2E', // forest color
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (failedResponse: any) {
+        alert("Payment Failed: " + failedResponse.error.description);
+        setIsProcessing(false);
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Payment Error:", error);
+      alert("Something went wrong with the payment. Please try again.");
       setIsProcessing(false);
-      setStep(3);
-      clearCart();
-    }, 2500);
+    }
   };
 
-  const deliveryCharge = totalPrice > 500 ? 0 : 50;
+  const handleWhatsAppOrder = async () => {
+    setIsProcessing(true);
+    try {
+      // 1. Prepare Order Data
+      const orderItems = items.map(item => ({
+        productId: String(item.id),
+        productSlug: item.slug || '',
+        productName: item.name,
+        productImage: item.image || '',
+        quantity: item.quantity,
+        size: item.selectedSize,
+        price: item.price
+      }));
+
+      const newOrderId = await createOrder({
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+        items: orderItems,
+        totalAmount: grandTotal,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        notes: `WhatsApp Order Request`
+      });
+
+      // 2. Format WhatsApp Message
+      const message = `*New Order Request - Blooms Energy*%0A%0A` +
+        `*Order ID:* ${newOrderId}%0A` +
+        `*Customer:* ${formData.firstName} ${formData.lastName}%0A` +
+        `*Phone:* ${formData.phone}%0A%0A` +
+        `*Items:*%0A` +
+        items.map(item => `- ${item.name} (${item.selectedSize}) x ${item.quantity} - ₹${item.price * item.quantity}`).join('%0A') +
+        `%0A%0A*Order Total:* ₹${grandTotal}%0A` +
+        `*Shipping Address:* ${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}%0A%0A` +
+        `Please confirm this order and provide payment details.`;
+
+      const whatsappUrl = `https://wa.me/911234567890?text=${message}`;
+      
+      // 3. Complete Flow
+      setOrderId(newOrderId);
+      setStep(3);
+      clearCart();
+      
+      // Open WhatsApp in new tab
+      window.open(whatsappUrl, '_blank');
+      
+    } catch (error) {
+      console.error("WhatsApp Order Error:", error);
+      alert("Something went wrong. Please try again or use Razorpay.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
 
   if (step === 3) {
     return (
@@ -65,7 +211,7 @@ export default function CheckoutPage() {
           <div className="bg-cream-50 rounded-xl p-4 mb-8 text-left border border-forest/10">
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-500">Order Number</span>
-              <span className="font-semibold">#BE-{Math.floor(Math.random() * 900000) + 100000}</span>
+              <span className="font-semibold text-forest">#{orderId}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Estimated Delivery</span>
@@ -116,11 +262,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                      <label htmlFor="firstName" className="block text-sm font-bold text-gray-700 ml-2 mb-1">First Name</label>
                       <input
                         type="text"
                         id="firstName"
@@ -128,11 +274,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                      <label htmlFor="lastName" className="block text-sm font-bold text-gray-700 ml-2 mb-1">Last Name</label>
                       <input
                         type="text"
                         id="lastName"
@@ -140,11 +286,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address line 1</label>
+                      <label htmlFor="address" className="block text-sm font-bold text-gray-700 ml-2 mb-1">Address line 1</label>
                       <input
                         type="text"
                         id="address"
@@ -152,11 +298,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.address}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                      <label htmlFor="city" className="block text-sm font-bold text-gray-700 ml-2 mb-1">City</label>
                       <input
                         type="text"
                         id="city"
@@ -164,11 +310,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.city}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div>
-                      <label htmlFor="state" className="block text-sm font-medium text-gray-700">State</label>
+                      <label htmlFor="state" className="block text-sm font-bold text-gray-700 ml-2 mb-1">State</label>
                       <input
                         type="text"
                         id="state"
@@ -176,11 +322,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.state}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div>
-                      <label htmlFor="pincode" className="block text-sm font-medium text-gray-700">PIN Code</label>
+                      <label htmlFor="pincode" className="block text-sm font-bold text-gray-700 ml-2 mb-1">PIN Code</label>
                       <input
                         type="text"
                         id="pincode"
@@ -188,11 +334,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.pincode}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                      <label htmlFor="phone" className="block text-sm font-bold text-gray-700 ml-2 mb-1">Phone Number</label>
                       <input
                         type="tel"
                         id="phone"
@@ -200,7 +346,7 @@ export default function CheckoutPage() {
                         required
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-forest focus:border-forest py-2 px-3 border"
+                        className="mt-1 block w-full border-gray-200 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-forest/10 focus:border-forest py-4 px-5 border transition-all text-lg font-medium"
                       />
                     </div>
                     <div className="sm:col-span-2 pt-4">
@@ -236,34 +382,80 @@ export default function CheckoutPage() {
                       Payment Method
                     </h3>
                     <div className="space-y-4">
-                      <div className="relative border-2 border-forest rounded-xl p-4 bg-forest/5 flex items-center justify-between">
+                      {/* Razorpay Option */}
+                      <button
+                        onClick={() => setPaymentMethod('razorpay')}
+                        className={`w-full relative border-2 rounded-2xl p-4 flex items-center justify-between transition-all ${
+                          paymentMethod === 'razorpay' 
+                            ? 'border-forest bg-forest/5 shadow-md' 
+                            : 'border-gray-100 hover:border-forest/30'
+                        }`}
+                      >
                         <div className="flex items-center">
-                          <div className="w-4 h-4 border-4 border-forest rounded-full mr-3"></div>
-                          <div>
-                            <span className="block font-bold text-forest">Razorpay</span>
-                            <span className="text-xs text-forest/70">Cards, UPI, Netbanking, Wallets</span>
+                          <div className={`w-5 h-5 border-2 rounded-full mr-3 flex items-center justify-center ${
+                            paymentMethod === 'razorpay' ? 'border-forest' : 'border-gray-300'
+                          }`}>
+                            {paymentMethod === 'razorpay' && <div className="w-2.5 h-2.5 bg-forest rounded-full" />}
+                          </div>
+                          <div className="text-left">
+                            <span className="block font-bold text-forest">Pay Online (Razorpay)</span>
+                            <span className="text-xs text-forest/70">Cards, UPI, Wallets, Netbanking</span>
                           </div>
                         </div>
                         <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="h-6" />
-                      </div>
+                      </button>
+
+                      {/* WhatsApp Option */}
+                      <button
+                        onClick={() => setPaymentMethod('whatsapp')}
+                        className={`w-full relative border-2 rounded-2xl p-4 flex items-center justify-between transition-all ${
+                          paymentMethod === 'whatsapp' 
+                            ? 'border-forest bg-forest/5 shadow-md' 
+                            : 'border-gray-100 hover:border-forest/30'
+                        }`}
+                      >
+                        <div className="flex items-center">
+                          <div className={`w-5 h-5 border-2 rounded-full mr-3 flex items-center justify-center ${
+                            paymentMethod === 'whatsapp' ? 'border-forest' : 'border-gray-300'
+                          }`}>
+                            {paymentMethod === 'whatsapp' && <div className="w-2.5 h-2.5 bg-forest rounded-full" />}
+                          </div>
+                          <div className="text-left">
+                            <span className="block font-bold text-forest">Order via WhatsApp</span>
+                            <span className="text-xs text-forest/70">Confirm & pay on WhatsApp</span>
+                          </div>
+                        </div>
+                        <div className="p-2 bg-green-50 rounded-lg">
+                          <MessageSquare className="w-6 h-6 text-green-600" />
+                        </div>
+                      </button>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-gray-100">
                     <button 
-                      onClick={handlePayment}
+                      onClick={paymentMethod === 'razorpay' ? handlePayment : handleWhatsAppOrder}
                       disabled={isProcessing}
-                      className="w-full btn-primary py-4 text-lg flex items-center justify-center space-x-2"
+                      className="w-full btn-primary py-5 text-lg flex items-center justify-center space-x-3 shadow-xl shadow-forest/10 hover:shadow-forest/20 group"
                     >
                       {isProcessing ? (
                         <div className="flex items-center space-x-2">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          <span>Securing Payment...</span>
+                          <span>Processing...</span>
                         </div>
                       ) : (
                         <>
-                          <Lock className="w-4 h-4" />
-                          <span>Pay ₹{totalPrice + deliveryCharge} & Complete Order</span>
+                          {paymentMethod === 'razorpay' ? (
+                            <>
+                              <Lock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                              <span>Secure Checkout • ₹{grandTotal}</span>
+                            </>
+                          ) : (
+                            <>
+                              <MessageSquare className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                              <span>Order on WhatsApp • ₹{grandTotal}</span>
+                            </>
+                          )}
                         </>
                       )}
                     </button>
@@ -312,15 +504,15 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-semibold text-gray-900">
-                    {deliveryCharge === 0 ? <span className="text-green-600 font-bold italic">FREE</span> : `₹${deliveryCharge}`}
+                    {deliveryChargeValue === 0 ? <span className="text-green-600 font-bold italic">FREE</span> : `₹${deliveryChargeValue}`}
                   </span>
                 </div>
-                {deliveryCharge > 0 && (
+                {deliveryChargeValue > 0 && (
                   <p className="text-[10px] text-gray-500 italic">Add ₹{500 - totalPrice} more for Free Delivery</p>
                 )}
                 <div className="flex items-center justify-between border-t border-forest/10 pt-4">
                   <span className="text-lg font-bold text-forest">Total</span>
-                  <span className="text-2xl font-bold text-forest">₹{totalPrice + deliveryCharge}</span>
+                  <span className="text-2xl font-bold text-forest">₹{totalPrice + deliveryChargeValue}</span>
                 </div>
               </div>
             </div>

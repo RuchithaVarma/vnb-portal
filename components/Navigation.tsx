@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ShoppingCart, Menu, X } from 'lucide-react';
-import { useCart } from '@/lib/cart-context';
-import CartDrawer from './CartDrawer';
-import { useState, useEffect } from 'react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ShoppingCart, Menu, X } from "lucide-react";
+import { useCart } from "@/lib/cart-context";
+import CartDrawer from "./CartDrawer";
+import { useState, useEffect } from "react";
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -13,53 +13,58 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
 
-  const isHome = pathname === '/';
+  const isHome = pathname === "/";
   const isTransparent = isHome && !scrolled;
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/shop', label: 'Shop' },
-    { href: '/about', label: 'Our Story' },
-    { href: '/bulk-inquiry', label: 'Bulk Orders' },
-    { href: '/contact', label: 'Contact' },
+    { href: "/", label: "Home" },
+    { href: "/shop", label: "Shop" },
+    { href: "/account/orders", label: "My Orders" },
+    { href: "/about", label: "Our Story" },
+    { href: "/bulk-inquiry", label: "Bulk Orders" },
+    { href: "/contact", label: "Contact" },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <CartDrawer />
-      <nav 
+      <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          !isTransparent ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-forest/5' : 'bg-transparent border-transparent'
+          !isTransparent
+            ? "bg-white/90 backdrop-blur-md shadow-sm border-b border-forest/5"
+            : "bg-transparent border-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-20">
+        <div className="max-w-7xl mx-auto px-1">
+          <div className="flex items-center justify-between h-8">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3 group">
-              <span className={`text-2xl font-bold tracking-tight transition-colors ${
-                !isTransparent ? 'text-forest' : 'text-white'
-              }`}>
+            <Link href="/" className="flex items-center space-x-1 group">
+              <span
+                className={`text-lg font-bold tracking-tight transition-colors ${
+                  !isTransparent ? "text-forest" : "text-white"
+                }`}
+              >
                 Blooms<span className="text-gold">Energy</span>
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-10">
+            <div className="hidden md:flex items-center space-x-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={`font-medium transition-colors hover:text-gold ${
-                    !isTransparent ? 'text-forest-800' : 'text-white/90'
-                  } ${pathname === link.href ? 'text-gold' : ''}`}
+                    !isTransparent ? "text-forest-800" : "text-white/90"
+                  } ${pathname === link.href ? "text-gold" : ""}`}
                 >
                   {link.label}
                 </Link>
@@ -67,11 +72,13 @@ export default function Navigation() {
             </div>
 
             {/* Cart & Mobile Menu Button */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => setIsCartOpen(true)}
                 className={`relative p-2 transition-colors ${
-                  !isTransparent ? 'text-forest hover:text-forest-700' : 'text-white hover:text-white/80'
+                  !isTransparent
+                    ? "text-forest hover:text-forest-700"
+                    : "text-white hover:text-white/80"
                 }`}
                 aria-label="Shopping cart"
               >
@@ -86,7 +93,7 @@ export default function Navigation() {
               {/* Mobile menu button */}
               <button
                 className={`md:hidden p-2 transition-colors ${
-                  !isTransparent ? 'text-forest' : 'text-white'
+                  !isTransparent ? "text-forest" : "text-white"
                 }`}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"

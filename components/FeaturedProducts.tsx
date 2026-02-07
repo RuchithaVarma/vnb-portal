@@ -1,22 +1,40 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import ProductCard from './ProductCard';
-import { getFeaturedProducts } from '@/lib/products';
-import { ArrowRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import ProductCard from "./ProductCard";
+import { getProducts } from "@/lib/firestore/products";
+import { Product } from "@/lib/products";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 export default function FeaturedProducts() {
-  const products = getFeaturedProducts();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFeatured() {
+      try {
+        const allProducts = await getProducts();
+        const featured = allProducts.filter((p) => p.featured).slice(0, 4);
+        setProducts(featured);
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchFeatured();
+  }, []);
 
   const container = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
-      }
-    }
+        staggerChildren: 0.2,
+      },
+    },
   };
 
   return (
@@ -33,8 +51,8 @@ export default function FeaturedProducts() {
               Hand-picked from our monthly bestsellers.
             </p>
           </div>
-          <Link 
-            href="/shop" 
+          <Link
+            href="/shop"
             className="hidden md:flex items-center space-x-2 text-forest font-semibold hover:text-gold transition-colors group mt-4 md:mt-0"
           >
             <span>View All Products</span>
@@ -42,21 +60,36 @@ export default function FeaturedProducts() {
           </Link>
         </div>
 
-        <motion.div 
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-        >
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </motion.div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <Loader2 className="w-10 h-10 text-forest animate-spin" />
+            <p className="text-forest font-bold animate-pulse">
+              Curating our best for you...
+            </p>
+          </div>
+        ) : products.length > 0 ? (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </motion.div>
+        ) : (
+          <div className="text-center py-20 bg-cream/30 rounded-3xl border-2 border-dashed border-gray-100">
+            <p className="text-gray-400 font-medium">
+              New collection coming soon.
+            </p>
+          </div>
+        )}
 
         <div className="mt-12 text-center md:hidden">
-          <Link 
-            href="/shop" 
+          <Link
+            href="/shop"
             className="btn-secondary inline-flex items-center space-x-2"
           >
             <span>View All Products</span>

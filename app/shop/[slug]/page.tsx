@@ -1,24 +1,28 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { products, getProductBySlug } from '@/lib/products';
+import { getProduct, getProducts } from '@/lib/firestore/products';
 import { CheckCircle, ShieldCheck, Leaf } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import ProductClient from '@/components/ProductClient';
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const products = await getProducts();
   return products.map((product) => ({
     slug: product.slug,
   }));
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const product = await getProduct(params.slug);
 
   if (!product) {
     notFound();
   }
 
-  const relatedProducts = products
+  // Fetch all products for "Related Products"
+  // optimization: could create a dedicated firestore query for this
+  const allProducts = await getProducts();
+  const relatedProducts = allProducts
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 

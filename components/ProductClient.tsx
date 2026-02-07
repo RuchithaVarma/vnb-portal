@@ -80,7 +80,7 @@ export default function ProductClient({ product }: ProductClientProps) {
 
       {/* Add to Cart */}
       <button 
-        onClick={() => addItem(product, quantity, selectedSize)}
+        onClick={() => addItem({ ...product, id: String(product.id), selectedSize })}
         className="w-full btn-primary text-lg py-4 flex items-center justify-center space-x-2"
       >
         <ShoppingCart className="w-5 h-5" />

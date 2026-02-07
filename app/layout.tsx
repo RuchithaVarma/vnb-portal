@@ -11,11 +11,30 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Blooms Energy Raw Powders | Raw. Real. Truly Pure.",
+  title: {
+    default: "Blooms Energy | Raw. Real. Truly Pure.",
+    template: "%s | Blooms Energy"
+  },
   description: "Experience nature's potency with our clean, chemical-free powders. Direct from farmers, 100% additive-free, and lab-tested for your wellness.",
-  keywords: "raw powders, organic supplements, blooms energy, chemical free, fruit powders, vegetable powders",
+  keywords: ["raw powders", "organic supplements", "blooms energy", "chemical free", "fruit powders", "vegetable powders", "wellness", "natural energy"],
+  authors: [{ name: "Blooms Energy Team" }],
+  creator: "Blooms Energy",
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://bloomsenergy.in",
+    title: "Blooms Energy | Raw. Real. Truly Pure.",
+    description: "Pure, lab-tested raw powders direct from farmers.",
+    siteName: "Blooms Energy",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blooms Energy | Raw. Real. Truly Pure.",
+    description: "Pure, lab-tested raw powders direct from farmers.",
+  },
 };
 
+import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from "@/lib/cart-context";
 
 export default function RootLayout({
@@ -29,13 +48,15 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="font-sans bg-cream-100 text-forest-900 antialiased selection:bg-gold-200">
-        <CartProvider>
-          <Navigation />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Navigation />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
