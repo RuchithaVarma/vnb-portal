@@ -3,86 +3,108 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Leaf } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-      {/* Background with modern overlay */}
+    <section className="relative min-h-screen lg:min-h-[100vh] flex items-center justify-center overflow-hidden bg-forest-900">
+      {/* Aesthetic Background with Subtle Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/hero_background.png"
           alt="Premium Raw Powders"
           fill
-          className="object-cover"
+          className="object-cover object-center opacity-40 scale-105"
           priority
           quality={100}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-forest-900/60 via-forest-900/40 to-forest-900/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-forest-900/60 via-transparent to-forest-900/80"></div>
       </div>
 
-      {/* Floating Elements Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {/* Minimalism-focused Background Elements */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <motion.div
-          animate={{ y: [0, -20, 0] }}
+          animate={{ opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-20 right-[10%] w-64 h-64 bg-gold/10 rounded-full blur-3xl opacity-50"
+          className="absolute top-[10%] right-[20%] w-64 h-64 bg-gold/5 rounded-full blur-[100px]"
         />
         <motion.div
-          animate={{ y: [0, 20, 0] }}
+          animate={{ opacity: [0.2, 0.4, 0.2] }}
           transition={{
-            duration: 7,
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 1,
+            delay: 2,
           }}
-          className="absolute bottom-20 left-[10%] w-96 h-96 bg-cream/10 rounded-full blur-3xl opacity-30"
+          className="absolute bottom-[20%] left-[20%] w-96 h-96 bg-cream/5 rounded-full blur-[120px]"
         />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      {/* Hero Content */}
+      <div className="relative z-20 text-center px-6 max-w-5xl mx-auto py-20">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8 }}
         >
-          <span className="inline-block py-1 px-3 rounded-full bg-white/10 backdrop-blur-md text-gold font-medium text-xs tracking-wider mb-3 border border-white/20">
-            100% PURE & NATURAL
-          </span>
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight drop-shadow-lg leading-tight">
-            Raw. Real. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500">
-              Truly Pure.
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <motion.div
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="flex items-center justify-center"
+            >
+              <Leaf className="w-5 h-5 text-gold" />
+            </motion.div>
+            <div className="h-px w-8 bg-gold/50"></div>
+            <span className="text-gold font-bold text-xs tracking-[0.4em] uppercase">
+              100% Raw & Natural
             </span>
+            <div className="h-px w-8 bg-gold/50"></div>
+            <motion.div
+              animate={{ rotate: [0, -5, 5, 0] }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2,
+              }}
+              className="flex items-center justify-center"
+            >
+              <Leaf className="w-5 h-5 text-gold" />
+            </motion.div>
+          </div>
+
+          <h1 className="font-serif text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[1.05]">
+            Raw. Real. <br />
+            <span className="text-gold italic font-light">Truly Pure.</span>
           </h1>
         </motion.div>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="text-base sm:text-lg text-cream-100 mb-6 max-w-3xl mx-auto leading-relaxed font-light"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-lg sm:text-xl text-cream-100/90 mb-12 max-w-2xl mx-auto leading-relaxed font-light"
         >
-          Experience nature's potency with our clean, chemical-free powders.
-          Fresh farm produce, lab-tested quality, and zero additives.
+          Premium chemical-free powders sourced directly from fresh farm
+          produce. Experience the potent simplicity of nature.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3"
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6"
         >
           <Link
             href="/shop"
-            className="group relative px-6 py-3 bg-gold hover:bg-gold-400 text-forest-900 font-bold text-base rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:-translate-y-1 overflow-hidden"
+            className="group relative px-12 py-5 bg-gold text-forest-900 font-black text-lg rounded-2xl transition-all duration-300 shadow-[0_20px_40px_-15px_rgba(212,175,55,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(212,175,55,0.6)] hover:-translate-y-1 active:scale-95"
           >
-            <span className="relative z-10">Shop All Products</span>
-            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            Explore Shop
           </Link>
           <Link
             href="/about"
-            className="group px-6 py-3 bg-white/10 backdrop-blur-md border border-white/30 hover:bg-white/20 text-white font-semibold text-base rounded-full transition-all duration-300 hover:-translate-y-1"
+            className="group px-12 py-5 bg-transparent border-2 border-white/20 hover:border-white/40 text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:bg-white/5 active:scale-95"
           >
             Our Story
           </Link>

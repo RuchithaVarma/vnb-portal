@@ -62,6 +62,14 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     
     try {
+      // 0. Check for valid keys
+      const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!rzpKey || rzpKey.includes('YourKeyIdHere')) {
+        alert("Razorpay Key is not configured correctly. Please update NEXT_PUBLIC_RAZORPAY_KEY_ID in your environment variables.");
+        setIsProcessing(false);
+        return;
+      }
+
       // 1. Create Order in Razorpay via our API
       const response = await fetch('/api/razorpay/order', {
         method: 'POST',
@@ -81,41 +89,64 @@ export default function CheckoutPage() {
 
       // 2. Open Razorpay Checkout
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: rzpKey,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Blooms Energy',
         description: 'Raw Powders Purchase',
         order_id: orderData.id,
         handler: async function (paymentResponse: any) {
-          // 3. Handle Success - Map CartItems to OrderItems
-          const orderItems = items.map(item => ({
-            productId: String(item.id),
-            productSlug: item.slug || '',
-            productName: item.name,
-            productImage: item.image || '',
-            quantity: item.quantity,
-            size: item.selectedSize,
-            price: item.price
-          }));
+          try {
+            // 3. Verify Payment Server-Side
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+              }),
+            });
 
-          const newOrderId = await createOrder({
-            customerName: `${formData.firstName} ${formData.lastName}`,
-            customerEmail: formData.email,
-            customerPhone: formData.phone,
-            shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
-            items: orderItems,
-            totalAmount: grandTotal,
-            status: 'processing',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            notes: `Razorpay Payment ID: ${paymentResponse.razorpay_payment_id}`
-          });
-          
-          setOrderId(newOrderId);
-          setStep(3);
-          clearCart();
-          setIsProcessing(false);
+            const verifyData = await verifyRes.json();
+
+            if (!verifyData.verified) {
+              throw new Error("Payment verification failed");
+            }
+
+            // 4. Handle Success - Map CartItems to OrderItems
+            const orderItems = items.map(item => ({
+              productId: String(item.id),
+              productSlug: item.slug || '',
+              productName: item.name,
+              productImage: item.image || '',
+              quantity: item.quantity,
+              size: item.selectedSize,
+              price: item.price
+            }));
+
+            const newOrderId = await createOrder({
+              customerName: `${formData.firstName} ${formData.lastName}`,
+              customerEmail: formData.email,
+              customerPhone: formData.phone,
+              shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+              items: orderItems,
+              totalAmount: grandTotal,
+              status: 'processing',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              notes: `Razorpay Payment ID: ${paymentResponse.razorpay_payment_id}`
+            });
+            
+            setOrderId(newOrderId);
+            setStep(3);
+            clearCart();
+          } catch (err) {
+            console.error("Verification Error:", err);
+            alert("Payment verification failed. Please contact support.");
+          } finally {
+            setIsProcessing(false);
+          }
         },
         prefill: {
           name: `${formData.firstName} ${formData.lastName}`,
@@ -133,9 +164,9 @@ export default function CheckoutPage() {
         setIsProcessing(false);
       });
       rzp.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment Error:", error);
-      alert("Something went wrong with the payment. Please try again.");
+      alert(error.message || "Something went wrong with the payment. Please try again.");
       setIsProcessing(false);
     }
   };
@@ -429,6 +460,21 @@ export default function CheckoutPage() {
                           <MessageSquare className="w-6 h-6 text-green-600" />
                         </div>
                       </button>
+
+                      {/* Test Mode Info */}
+                      {process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.includes('test') && (
+                        <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+                          <p className="text-xs text-amber-800 font-medium mb-1 flex items-center">
+                            <Shield className="w-3 h-3 mr-1" /> Test Mode Active
+                          </p>
+                          <p className="text-[10px] text-amber-700">
+                            Use card: <span className="font-bold">4111 1111 1111 1111</span> • CVV: <span className="font-bold">123</span> • Expiry: Any future date
+                          </p>
+                          <a href="https://razorpay.com/docs/payments/payments/test-cards/" target="_blank" rel="noopener noreferrer" className="text-[10px] text-amber-900 underline mt-1 block">
+                            View more test cards
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 

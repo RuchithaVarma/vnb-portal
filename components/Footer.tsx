@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Instagram, Facebook, Leaf } from 'lucide-react';
 import { useState } from 'react';
+import Logo from './Logo';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -20,14 +21,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="bg-gold p-2 rounded-lg">
-                <Leaf className="w-5 h-5 text-forest-900" />
-              </div>
-              <span className="font-serif text-xl font-bold text-white">
-                Blooms Energy
-              </span>
-            </div>
+            <Logo variant="white" size="md" />
             <p className="text-sm text-cream-200 leading-relaxed">
               Clean, raw, chemical-free powders made from fresh farm produce — naturally pure. 
               Lab-tested quality, FSSAI certified, direct from farmers.

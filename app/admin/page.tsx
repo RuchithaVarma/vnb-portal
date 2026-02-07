@@ -17,6 +17,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -68,11 +69,11 @@ export default function AdminDashboard() {
 
   const statCards = [
     { 
-      label: 'Total Revenue', 
-      value: `₹${stats.totalRevenue.toLocaleString()}`, 
-      icon: TrendingUp, 
-      color: 'bg-green-500',
-      trend: '+12.5%',
+      label: 'Products', 
+      value: stats.totalProducts, 
+      icon: Package, 
+      color: 'bg-gold',
+      trend: 'Total Assets',
       isUp: true
     },
     { 
@@ -80,81 +81,64 @@ export default function AdminDashboard() {
       value: stats.totalOrders, 
       icon: ShoppingBag, 
       color: 'bg-forest',
-      trend: '+5.2%',
+      trend: 'Order History',
       isUp: true
-    },
-    { 
-      label: 'Products', 
-      value: stats.totalProducts, 
-      icon: Package, 
-      color: 'bg-gold',
-      trend: '0%',
-      isUp: true
-    },
-    { 
-      label: 'Pending Actions', 
-      value: stats.pendingOrders, 
-      icon: AlertCircle, 
-      color: 'bg-red-500',
-      trend: '-2',
-      isUp: false
     },
   ];
 
   return (
-    <div className="p-6">
-      <div className="mb-10">
-        <h1 className="text-4xl font-black text-forest tracking-tight">Executive Dashboard</h1>
-        <p className="text-gray-500 font-bold uppercase tracking-widest text-xs mt-2">Business Overview & Performance</p>
+    <div className="p-4">
+      <div className="mb-6">
+        <h1 className="text-xl font-black text-forest tracking-tight">Executive Dashboard</h1>
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px] mt-0.5">Store Overview</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {statCards.map((stat, i) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white rounded-3xl p-8 border border-gray-100 shadow-soft hover:shadow-2xl transition-all group"
+            className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
           >
-            <div className="flex justify-between items-start mb-6">
-              <div className={`${stat.color} p-4 rounded-2xl shadow-lg ring-4 ring-offset-0 ring-gray-50`}>
-                <stat.icon className="w-6 h-6 text-white" />
+            <div className="flex justify-between items-start mb-3">
+              <div className={`${stat.color} p-2 rounded-lg shadow-sm`}>
+                <stat.icon className="w-4 h-4 text-white" />
               </div>
-              <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${stat.isUp ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                {stat.isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              <div className="flex items-center space-x-1 px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter bg-gray-50 text-gray-400">
                 <span>{stat.trend}</span>
               </div>
             </div>
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">{stat.label}</p>
-            <h3 className="text-3xl font-black text-forest group-hover:scale-105 transition-transform origin-left">{stat.value}</h3>
+            <p className="text-gray-400 font-bold uppercase tracking-widest text-[8px] mb-0.5">{stat.label}</p>
+            <h3 className="text-xl font-black text-forest group-hover:scale-105 transition-transform origin-left">{stat.value}</h3>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Orders */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-soft p-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-black text-forest tracking-tight">Recent Orders</h2>
-            <button className="text-xs font-black text-forest uppercase tracking-widest hover:underline decoration-gold decoration-2 underline-offset-4">View All</button>
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="text-lg font-black text-forest tracking-tight">Recent Orders</h2>
+            <Link href="/admin/orders" className="text-[9px] font-black text-forest uppercase tracking-widest hover:underline decoration-gold decoration-2 underline-offset-4">View All</Link>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {stats.recentOrders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-xl bg-forest/5 flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-forest" />
+              <div key={order.id} className="flex items-center justify-between p-2 pl-3 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-forest/5 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-forest" />
                   </div>
                   <div>
-                    <p className="font-black text-forest tracking-tight">{order.customerName}</p>
-                    <p className="text-xs text-gray-400 font-bold tracking-widest">{order.id}</p>
+                    <p className="font-bold text-xs text-forest tracking-tight">{order.customerName}</p>
+                    <p className="text-[8px] text-gray-400 font-bold tracking-widest">{order.id.slice(0, 12)}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-black text-forest">₹{order.totalAmount}</p>
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${
+                  <p className="font-bold text-xs text-forest">₹{order.totalAmount}</p>
+                  <span className={`text-[8px] font-black uppercase tracking-widest ${
                     order.status === 'delivered' ? 'text-green-600' : 
                     order.status === 'pending' ? 'text-yellow-600' : 'text-blue-600'
                   }`}>
@@ -172,42 +156,41 @@ export default function AdminDashboard() {
         </div>
 
         {/* System Health */}
-        <div className="bg-forest rounded-3xl shadow-xl p-8 text-white relative overflow-hidden">
+        <div className="bg-forest rounded-2xl shadow-md p-6 text-white relative overflow-hidden">
           <div className="relative z-10">
-            <h2 className="text-2xl font-black tracking-tight mb-8">System Status</h2>
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <CheckCircle2 className="w-5 h-5 text-gold" />
+            <h2 className="text-xl font-black tracking-tight mb-6">System Status</h2>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <CheckCircle2 className="w-4 h-4 text-gold" />
                 <div>
-                  <p className="font-bold text-sm">Inventory Sync</p>
-                  <p className="text-[10px] text-white/60 font-medium tracking-widest uppercase">Everything up to date</p>
+                  <p className="font-bold text-xs">Inventory Sync</p>
+                  <p className="text-[8px] text-white/60 font-medium tracking-widest uppercase">Up to date</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <CheckCircle2 className="w-5 h-5 text-gold" />
+              <div className="flex items-center space-x-3">
+                <CheckCircle2 className="w-4 h-4 text-gold" />
                 <div>
-                  <p className="font-bold text-sm">Razorpay Gateway</p>
-                  <p className="text-[10px] text-white/60 font-medium tracking-widest uppercase">Live Connection Ready</p>
+                  <p className="font-bold text-xs">Razorpay Gateway</p>
+                  <p className="text-[8px] text-white/60 font-medium tracking-widest uppercase">Live Ready</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <CheckCircle2 className="w-5 h-5 text-gold" />
+              <div className="flex items-center space-x-3">
+                <CheckCircle2 className="w-4 h-4 text-gold" />
                 <div>
-                  <p className="font-bold text-sm">Firebase Storage</p>
-                  <p className="text-[10px] text-white/60 font-medium tracking-widest uppercase">Operational 99.9%</p>
+                  <p className="font-bold text-xs">Firebase Storage</p>
+                  <p className="text-[8px] text-white/60 font-medium tracking-widest uppercase">Operational</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-12 p-6 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-sm">
-              <p className="text-xs font-bold text-white/80 mb-2">PRO TIP</p>
-              <p className="text-sm font-medium leading-relaxed">
-                Check the "Products" tab to mark new items as featured for the home screen gallery.
+            <div className="mt-8 p-4 bg-white/10 rounded-xl border border-white/10 backdrop-blur-sm">
+              <p className="text-[9px] font-bold text-white/80 mb-1 uppercase tracking-wider">Pro Tip</p>
+              <p className="text-xs font-medium leading-relaxed opacity-90">
+                Mark items as featured to highlight them on the home screen.
               </p>
             </div>
           </div>
-          {/* Decorative background circle */}
-          <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-gold/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-gold/10 rounded-full blur-3xl"></div>
         </div>
       </div>
     </div>

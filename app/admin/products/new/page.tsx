@@ -5,9 +5,17 @@ import { useRouter } from "next/navigation";
 import { addProduct } from "@/lib/firestore/products";
 import { Product } from "@/lib/products";
 import Link from "next/link";
-import { ArrowLeft, Save, X, Package, LayoutDashboard, PlusCircle, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  X,
+  Package,
+  LayoutDashboard,
+  PlusCircle,
+  Loader2,
+} from "lucide-react";
 import SimpleImageUpload from "@/components/admin/SimpleImageUpload";
-import CategoryDropdown from '@/components/admin/CategoryDropdown';
+import CategoryDropdown from "@/components/admin/CategoryDropdown";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -127,8 +135,12 @@ export default function AddProductPage() {
             <ArrowLeft className="w-6 h-6 text-forest group-hover:text-white transition-colors" />
           </Link>
           <div>
-            <h1 className="text-3xl font-extrabold text-forest tracking-tight">Add New Product</h1>
-            <p className="text-gray-500 font-medium">Create a fresh entry for your store</p>
+            <h1 className="text-3xl font-extrabold text-forest tracking-tight">
+              Add New Product
+            </h1>
+            <p className="text-gray-500 font-medium">
+              Create a fresh entry for your store
+            </p>
           </div>
         </div>
         <div className="hidden md:flex items-center space-x-2 bg-forest/10 px-4 py-2 rounded-full border border-forest/20">
@@ -137,10 +149,7 @@ export default function AddProductPage() {
         </div>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-8"
-      >
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Column */}
           <div className="lg:col-span-2 space-y-8">
@@ -150,9 +159,11 @@ export default function AddProductPage() {
                 <div className="p-2 bg-forest/10 rounded-lg">
                   <Package className="w-5 h-5 text-forest" />
                 </div>
-                <h2 className="text-xl font-bold text-forest">Basic Information</h2>
+                <h2 className="text-xl font-bold text-forest">
+                  Basic Information
+                </h2>
               </div>
-              
+
               <div className="space-y-6">
                 <div>
                   <label className="block text-base font-bold text-gray-800 mb-2">
@@ -175,7 +186,9 @@ export default function AddProductPage() {
                       Price (₹)
                     </label>
                     <div className="relative">
-                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
+                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                        ₹
+                      </span>
                       <input
                         type="number"
                         name="price"
@@ -191,7 +204,9 @@ export default function AddProductPage() {
                       Original Price (₹)
                     </label>
                     <div className="relative">
-                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
+                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                        ₹
+                      </span>
                       <input
                         type="number"
                         name="originalPrice"
@@ -216,13 +231,17 @@ export default function AddProductPage() {
                         onChange={handleChange}
                         className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-forest/10 focus:border-forest outline-none transition-all text-lg font-bold text-gold"
                       />
-                      <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gold font-bold">% OFF</span>
+                      <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gold font-bold">
+                        % OFF
+                      </span>
                     </div>
                   </div>
                   <div>
-                    <CategoryDropdown 
-                      value={formData.category || ''} 
-                      onChange={(val) => setFormData(prev => ({ ...prev, category: val }))} 
+                    <CategoryDropdown
+                      value={formData.category || ""}
+                      onChange={(val) =>
+                        setFormData((prev) => ({ ...prev, category: val }))
+                      }
                     />
                   </div>
                 </div>
@@ -235,7 +254,9 @@ export default function AddProductPage() {
                 <div className="p-2 bg-gold/10 rounded-lg">
                   <LayoutDashboard className="w-5 h-5 text-gold" />
                 </div>
-                <h2 className="text-xl font-bold text-forest">Product Details</h2>
+                <h2 className="text-xl font-bold text-forest">
+                  Product Details
+                </h2>
               </div>
 
               <div className="space-y-6">
@@ -282,8 +303,8 @@ export default function AddProductPage() {
                           className="flex items-center space-x-2 bg-forest/5 text-forest px-4 py-2 rounded-xl text-sm font-bold border border-forest/10 animate-scale-in"
                         >
                           <span>{size}</span>
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             onClick={() => handleRemoveSize(index)}
                             className="hover:text-red-500 transition-colors bg-white/50 rounded-full p-0.5"
                           >
@@ -349,20 +370,29 @@ export default function AddProductPage() {
                   setFormData((prev) => ({ ...prev, image: url }))
                 }
               />
-              <input type="hidden" name="image" value={formData.image} required />
+              <input
+                type="hidden"
+                name="image"
+                value={formData.image}
+                required
+              />
             </div>
 
             {/* Publishing Settings */}
             <div className="bg-white rounded-3xl shadow-soft p-8 border border-gray-100">
-              <h3 className="text-lg font-bold text-forest mb-6 pb-2 border-b border-gray-50">Publishing Settings</h3>
-              
+              <h3 className="text-lg font-bold text-forest mb-6 pb-2 border-b border-gray-50">
+                Publishing Settings
+              </h3>
+
               <div className="space-y-6">
                 <label className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl cursor-pointer group hover:bg-forest/5 transition-colors">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-white rounded-lg shadow-sm group-hover:bg-forest group-hover:text-white transition-all">
                       <PlusCircle className="w-5 h-5" />
                     </div>
-                    <span className="text-base font-bold text-gray-700">Featured</span>
+                    <span className="text-base font-bold text-gray-700">
+                      Featured
+                    </span>
                   </div>
                   <input
                     type="checkbox"
@@ -374,9 +404,11 @@ export default function AddProductPage() {
                 </label>
 
                 <div className="p-4 bg-forest/5 rounded-2xl border border-forest/10">
-                  <p className="text-xs text-forest/60 font-medium mb-3">Live URL Preview:</p>
+                  <p className="text-xs text-forest/60 font-medium mb-3">
+                    Live URL Preview:
+                  </p>
                   <p className="text-sm font-mono text-gray-400 truncate">
-                    /shop/{formData.slug || '...'}
+                    /shop/{formData.slug || "..."}
                   </p>
                 </div>
               </div>
@@ -415,4 +447,3 @@ export default function AddProductPage() {
     </div>
   );
 }
-

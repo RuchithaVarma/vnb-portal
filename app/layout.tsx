@@ -36,6 +36,7 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from "@/lib/cart-context";
+import ClientLayout from "@/components/ClientLayout";
 
 export default function RootLayout({
   children,
@@ -50,11 +51,7 @@ export default function RootLayout({
       <body className="font-sans bg-cream-100 text-forest-900 antialiased selection:bg-gold-200">
         <AuthProvider>
           <CartProvider>
-            <Navigation />
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <Footer />
+            <ClientLayout>{children}</ClientLayout>
           </CartProvider>
         </AuthProvider>
       </body>
