@@ -1,30 +1,52 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { useState } from "react";
+import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for contacting us! We will get back to you soon.');
+
+    // Construct WhatsApp message for contact form
+    const whatsappMessage =
+      `💬 *Contact Form Inquiry* 💬%0A%0A` +
+      `*Name:* ${formData.name}%0A` +
+      `*Email:* ${formData.email}%0A` +
+      `*Phone:* ${formData.phone || "Not provided"}%0A` +
+      `*Subject:* ${formData.subject}%0A%0A` +
+      `*Message:* ${formData.message}%0A%0A` +
+      `*Sent from:* Blooms Energy Website`;
+
+    // WhatsApp number
+    const whatsappNumber = "919876543210"; // Replace with your actual WhatsApp number
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+    window.open(whatsappUrl, "_blank");
+
+    // Reset form
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: '',
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -38,7 +60,8 @@ export default function ContactPage() {
         <div className="text-center mb-12">
           <h1 className="section-title mb-4">Get In Touch</h1>
           <p className="text-xl text-gray-600 leading-relaxed">
-            We'd love to hear from you. Reach out with any questions or feedback.
+            We'd love to hear from you. Reach out with any questions or
+            feedback.
           </p>
         </div>
 
@@ -87,8 +110,10 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-forest mb-1">Visit Us</h3>
                   <p className="text-gray-600">
-                    Blooms Energy Raw Powders<br />
-                    Farm Fresh Lane<br />
+                    Blooms Energy Raw Powders
+                    <br />
+                    Farm Fresh Lane
+                    <br />
                     Bangalore, Karnataka 560001
                   </p>
                 </div>
@@ -101,9 +126,12 @@ export default function ContactPage() {
                   <Clock className="w-6 h-6 text-forest" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-forest mb-1">Business Hours</h3>
+                  <h3 className="font-semibold text-forest mb-1">
+                    Business Hours
+                  </h3>
                   <p className="text-gray-600">
-                    Monday - Saturday<br />
+                    Monday - Saturday
+                    <br />
                     9:00 AM - 6:00 PM IST
                   </p>
                 </div>
@@ -117,7 +145,7 @@ export default function ContactPage() {
               <h2 className="font-sans text-2xl font-bold text-forest mb-6">
                 Send Us a Message
               </h2>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -199,8 +227,12 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <button type="submit" className="w-full btn-primary text-lg py-4">
-                  Send Message
+                <button
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold text-lg py-4 rounded-md transition-colors duration-200 flex items-center justify-center gap-3"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Send via WhatsApp
                 </button>
               </form>
             </div>

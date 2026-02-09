@@ -1,17 +1,39 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Mail, Phone, MapPin, Instagram, Facebook, Leaf } from 'lucide-react';
-import { useState } from 'react';
-import Logo from './Logo';
+import Link from "next/link";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Facebook,
+  Leaf,
+  MessageCircle,
+} from "lucide-react";
+import { useState } from "react";
+import Logo from "./Logo";
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for subscribing!');
-    setEmail('');
+
+    // Construct WhatsApp message for newsletter subscription
+    const whatsappMessage =
+      `📧 *Newsletter Subscription* 📧%0A%0A` +
+      `*Email:* ${email}%0A` +
+      `*Type:* New Subscriber%0A%0A` +
+      `*Sent from:* Blooms Energy Website`;
+
+    // WhatsApp number
+    const whatsappNumber = "919876543210"; // Replace with your actual WhatsApp number
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+    window.open(whatsappUrl, "_blank");
+
+    setEmail("");
   };
 
   return (
@@ -23,8 +45,9 @@ export default function Footer() {
           <div className="space-y-4">
             <Logo variant="white" size="md" />
             <p className="text-sm text-cream-200 leading-relaxed">
-              Clean, raw, chemical-free powders made from fresh farm produce — naturally pure. 
-              Lab-tested quality, FSSAI certified, direct from farmers.
+              Clean, raw, chemical-free powders made from fresh farm produce —
+              naturally pure. Lab-tested quality, FSSAI certified, direct from
+              farmers.
             </p>
             <div className="flex space-x-4">
               <a
@@ -48,30 +71,47 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-white text-lg mb-4">Quick Links</h3>
+            <h3 className="font-semibold text-white text-lg mb-4">
+              Quick Links
+            </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <Link
+                  href="/"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <Link
+                  href="/shop"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Shop All Products
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <Link
+                  href="/about"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/bulk-inquiry" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <Link
+                  href="/bulk-inquiry"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Bulk Orders
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <Link
+                  href="/contact"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Contact Us
                 </Link>
               </li>
@@ -80,25 +120,39 @@ export default function Footer() {
 
           {/* Customer Service */}
           <div>
-            <h3 className="font-semibold text-white text-lg mb-4">Customer Service</h3>
+            <h3 className="font-semibold text-white text-lg mb-4">
+              Customer Service
+            </h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <a
+                  href="#"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   FAQs
                 </a>
               </li>
               <li>
-                <a href="#" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <a
+                  href="#"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Shipping Policy
                 </a>
               </li>
               <li>
-                <a href="#" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <a
+                  href="#"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Return & Refund
                 </a>
               </li>
               <li>
-                <a href="#" className="text-cream-200 hover:text-gold transition-colors text-sm">
+                <a
+                  href="#"
+                  className="text-cream-200 hover:text-gold transition-colors text-sm"
+                >
                   Track Order
                 </a>
               </li>
@@ -107,7 +161,9 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="font-semibold text-white text-lg mb-4">Stay Connected</h3>
+            <h3 className="font-semibold text-white text-lg mb-4">
+              Stay Connected
+            </h3>
             <p className="text-sm text-cream-200 mb-4">
               Subscribe to get special offers and updates.
             </p>
@@ -122,9 +178,10 @@ export default function Footer() {
               />
               <button
                 type="submit"
-                className="w-full bg-gold hover:bg-gold-600 text-forest-900 font-semibold py-2 px-4 rounded-md transition-colors"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-colors flex items-center justify-center gap-2"
               >
-                Subscribe
+                <MessageCircle className="w-4 h-4" />
+                Subscribe via WhatsApp
               </button>
             </form>
           </div>
@@ -136,13 +193,19 @@ export default function Footer() {
             <div className="flex flex-wrap gap-6 text-sm text-cream-200">
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:info@bloomsenergy.com" className="hover:text-gold transition-colors">
+                <a
+                  href="mailto:info@bloomsenergy.com"
+                  className="hover:text-gold transition-colors"
+                >
                   info@bloomsenergy.com
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
-                <a href="tel:+911234567890" className="hover:text-gold transition-colors">
+                <a
+                  href="tel:+911234567890"
+                  className="hover:text-gold transition-colors"
+                >
                   +91-1234567890
                 </a>
               </div>
@@ -171,7 +234,8 @@ export default function Footer() {
             </div>
           </div>
           <div className="mt-4 text-center text-cream-200/60 text-sm">
-            © {new Date().getFullYear()} Blooms Energy Raw Powders. All rights reserved.
+            © {new Date().getFullYear()} Blooms Energy Raw Powders. All rights
+            reserved.
           </div>
         </div>
       </div>

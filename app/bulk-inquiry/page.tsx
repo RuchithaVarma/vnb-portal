@@ -1,34 +1,58 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Building2, Mail, Phone, Package } from 'lucide-react';
+import { useState } from "react";
+import { Building2, Mail, Phone, Package, MessageCircle } from "lucide-react";
 
 export default function BulkInquiryPage() {
   const [formData, setFormData] = useState({
-    companyName: '',
-    contactPerson: '',
-    email: '',
-    phone: '',
-    product: '',
-    quantity: '',
-    message: '',
+    companyName: "",
+    contactPerson: "",
+    email: "",
+    phone: "",
+    product: "",
+    quantity: "",
+    message: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for your inquiry! We will contact you shortly.');
+
+    // Construct WhatsApp message
+    const whatsappMessage =
+      `🌱 *Bulk Order Inquiry* 🌱%0A%0A` +
+      `*Company Name:* ${formData.companyName}%0A` +
+      `*Contact Person:* ${formData.contactPerson}%0A` +
+      `*Email:* ${formData.email}%0A` +
+      `*Phone:* ${formData.phone}%0A` +
+      `*Product Interest:* ${formData.product}%0A` +
+      `*Estimated Quantity:* ${formData.quantity}%0A` +
+      `*Additional Details:* ${formData.message || "N/A"}%0A%0A` +
+      `*Sent from:* Blooms Energy Website`;
+
+    // WhatsApp number (replace with your business WhatsApp number)
+    const whatsappNumber = "919876543210"; // Replace with your actual WhatsApp number
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+    window.open(whatsappUrl, "_blank");
+
+    // Reset form
     setFormData({
-      companyName: '',
-      contactPerson: '',
-      email: '',
-      phone: '',
-      product: '',
-      quantity: '',
-      message: '',
+      companyName: "",
+      contactPerson: "",
+      email: "",
+      phone: "",
+      product: "",
+      quantity: "",
+      message: "",
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -86,7 +110,7 @@ export default function BulkInquiryPage() {
               <h2 className="font-sans text-2xl font-bold text-forest mb-6">
                 Request a Quote
               </h2>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -198,8 +222,12 @@ export default function BulkInquiryPage() {
                   />
                 </div>
 
-                <button type="submit" className="w-full btn-primary text-lg py-4">
-                  Submit Inquiry
+                <button
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold text-lg py-4 rounded-md transition-colors duration-200 flex items-center justify-center gap-3"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Send via WhatsApp
                 </button>
               </form>
             </div>
