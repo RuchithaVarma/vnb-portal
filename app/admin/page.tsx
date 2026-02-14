@@ -25,6 +25,7 @@ export default function AdminDashboard() {
     totalOrders: 0,
     totalProducts: 0,
     pendingOrders: 0,
+    totalVisitors: 0,
     recentOrders: [] as Order[],
   });
   const [loading, setLoading] = useState(true);
@@ -32,9 +33,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [orders, products] = await Promise.all([
+        const [orders, products, visitorStats] = await Promise.all([
           getOrders(),
-          getProducts()
+          getProducts(),
+          import('@/lib/firestore/analytics').then(mod => mod.getVisitorStats())
         ]);
 
         const revenue = orders
@@ -48,6 +50,7 @@ export default function AdminDashboard() {
           totalOrders: orders.length,
           totalProducts: products.length,
           pendingOrders: pending,
+          totalVisitors: visitorStats.total || 0,
           recentOrders: orders.slice(0, 5),
         });
       } catch (error) {
@@ -84,6 +87,14 @@ export default function AdminDashboard() {
       trend: 'Order History',
       isUp: true
     },
+    { 
+      label: 'Total Visitors', 
+      value: stats.totalVisitors, 
+      icon: Users, 
+      color: 'bg-blue-600',
+      trend: 'Traffic',
+      isUp: true
+    },
   ];
 
   return (
@@ -94,7 +105,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {statCards.map((stat, i) => (
           <motion.div
             key={stat.label}

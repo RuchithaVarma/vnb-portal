@@ -29,3 +29,25 @@ export const uploadImage = (file: File): Promise<string> => {
     );
   });
 };
+
+export const uploadMedia = (file: File, folder: string = 'uploads'): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const filename = `${Date.now()}-${file.name}`;
+    const storageRef = ref(storage, `${folder}/${filename}`);
+    
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {},
+      (error) => {
+        reject(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          resolve(downloadURL);
+        });
+      }
+    );
+  });
+};

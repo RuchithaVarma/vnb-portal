@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Package, LayoutDashboard, ShoppingBag, LogOut } from "lucide-react";
+import { Package, LayoutDashboard, ShoppingBag, LogOut, Instagram } from "lucide-react";
 import Logo from "@/components/Logo";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -163,6 +163,27 @@ export default function AdminLayout({
               />
             </div>
             <span className="font-semibold text-sm">Orders</span>
+          </Link>
+          <Link
+            href="/admin/social-feed"
+            className={`flex items-center space-x-3 px-4 py-2 rounded-xl transition-all duration-200 group ${
+              pathname === "/admin/social-feed"
+                ? "bg-forest text-white shadow-soft"
+                : "text-gray-600 hover:bg-forest/5 hover:text-forest"
+            }`}
+          >
+            <div
+              className={`p-1.5 rounded-lg transition-colors ${
+                pathname === "/admin/social-feed"
+                  ? "bg-white/10"
+                  : "bg-gray-50 group-hover:bg-forest/10"
+              }`}
+            >
+              <Instagram
+                className={`w-4 h-4 ${pathname === "/admin/social-feed" ? "text-white" : "text-gray-500 group-hover:text-forest"}`}
+              />
+            </div>
+            <span className="font-semibold text-sm">Social Feed</span>
           </Link>
           <div className="pt-3 mt-1 border-t border-gray-50">
             <p className="px-4 text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">
