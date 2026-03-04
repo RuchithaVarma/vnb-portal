@@ -21,7 +21,7 @@ export default function Home() {
       {/* Stats & Trust Indicators */}
       <StatsSection />
       
-      {/* Why Choose Vedantu */}
+      {/* Why Choose Brilliant Roots */}
       <FeaturesSection />
       
       {/* Results & Toppers */}
@@ -56,7 +56,7 @@ export default function Home() {
             Ready to Transform Your Learning Experience?
           </h2>
           <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-            Join millions of students learning with Vedantu. Book a FREE trial class and experience the difference!
+            Join millions of students learning with Brilliant Roots. Book a FREE trial class and experience the difference!
           </p>
           
           <div className="flex flex-wrap justify-center gap-6 animate-fadeInUp" style={{animationDelay: '0.4s'}}>

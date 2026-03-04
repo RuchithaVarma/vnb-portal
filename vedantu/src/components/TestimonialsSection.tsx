@@ -5,28 +5,28 @@ const testimonials = [
     name: "Priya Sharma",
     achievement: "JEE Advanced AIR 45",
     score: "99.8%ile",
-    quote: "Vedantu's live classes and personalized doubt solving helped me crack JEE. The teachers are amazing and always available to help!",
+    quote: "Brilliant Roots's live classes and personalized doubt solving helped me crack JEE. The teachers are amazing and always available to help!",
     color: "from-blue-400 to-cyan-500"
   },
   {
     name: "Arjun Patel",
     achievement: "NEET AIR 120",
     score: "720/720",
-    quote: "The structured curriculum and regular tests kept me on track. I'm grateful to my Vedantu teachers for their constant support.",
+    quote: "The structured curriculum and regular tests kept me on track. I'm grateful to my Brilliant Roots teachers for their constant support.",
     color: "from-purple-400 to-pink-500"
   },
   {
     name: "Sneha Reddy",
     achievement: "Class 12 CBSE",
     score: "98.4%",
-    quote: "I improved from 75% to 98% with Vedantu! The interactive classes made learning fun and the study materials were excellent.",
+    quote: "I improved from 75% to 98% with Brilliant Roots! The interactive classes made learning fun and the study materials were excellent.",
     color: "from-green-400 to-teal-500"
   },
   {
     name: "Rahul Kumar",
     achievement: "Class 10 ICSE",
     score: "96.8%",
-    quote: "Vedantu helped me build strong fundamentals. The teachers explain concepts so clearly that even difficult topics become easy!",
+    quote: "Brilliant Roots helped me build strong fundamentals. The teachers explain concepts so clearly that even difficult topics become easy!",
     color: "from-orange-400 to-red-500"
   }
 ];
@@ -48,7 +48,7 @@ const TestimonialsSection = () => {
             Stories That <span className="gradient-text">Inspire</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Hear from students who transformed their learning journey with Vedantu
+            Hear from students who transformed their learning journey with Brilliant Roots
           </p>
         </div>
 

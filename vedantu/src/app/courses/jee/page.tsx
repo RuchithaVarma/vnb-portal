@@ -168,7 +168,7 @@ export default function JEECoursePage() {
             {/* Course Highlights */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Why Choose Vedantu for JEE?
+                Why Choose Brilliant Roots for JEE?
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex gap-4">

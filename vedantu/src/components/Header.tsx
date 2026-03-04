@@ -143,7 +143,7 @@ const Header = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
               <Sparkles className="text-white" size={20} />
             </div>
-            <span className="text-2xl font-bold gradient-text">Vedantu</span>
+            <span className="text-2xl font-bold gradient-text">Brilliant Roots</span>
           </Link>
 
           {/* Desktop Navigation */}

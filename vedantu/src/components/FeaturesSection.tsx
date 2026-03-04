@@ -50,7 +50,7 @@ const FeaturesSection = () => {
         <div className="text-center mb-12 animate-fadeInUp">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-pink-50 px-6 py-3 rounded-full shadow-lg mb-4 border-2 border-orange-200">
             <Target className="text-[var(--primary)]" size={24} />
-            <span className="font-bold text-gray-700">Why Choose Vedantu</span>
+            <span className="font-bold text-gray-700">Why Choose Brilliant Roots</span>
           </div>
           <h2 className="section-title">
             What Makes Us <span className="gradient-text">Different</span>
@@ -89,7 +89,7 @@ const FeaturesSection = () => {
 
         {/* Bottom CTA */}
         <div className="mt-16 bg-gradient-to-r from-[var(--primary)] to-orange-600 rounded-3xl p-12 text-white text-center animate-fadeInUp" style={{animationDelay: '0.7s'}}>
-          <h3 className="text-3xl font-bold mb-4">Experience the Vedantu Difference</h3>
+          <h3 className="text-3xl font-bold mb-4">Experience the Brilliant Roots Difference</h3>
           <p className="text-xl mb-8 text-white/90">Join thousands of students achieving their dreams</p>
           <button className="bg-white text-[var(--primary)] px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-2xl hover:scale-105">
             Start Your Free Trial Today

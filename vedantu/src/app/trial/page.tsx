@@ -144,7 +144,7 @@ export default function TrialPage() {
               </h1>
             </div>
             <p className="text-xl mb-8 text-white/90">
-              Experience the Vedantu difference with a complimentary 60-minute trial class. No obligations, just quality education!
+              Experience the Brilliant Roots difference with a complimentary 60-minute trial class. No obligations, just quality education!
             </p>
             
             {/* Trust Indicators */}

@@ -25,7 +25,7 @@ const Footer = () => {
               <li><Link href="/live-classes" className="hover:text-white">Free Live Classes</Link></li>
               <li><Link href="/wave" className="hover:text-white">WAVE Platform</Link></li>
               <li><Link href="/vip" className="hover:text-white">VIP Program</Link></li>
-              <li><Link href="/store" className="hover:text-white">Vedantu Store</Link></li>
+              <li><Link href="/store" className="hover:text-white">Brilliant Roots Store</Link></li>
             </ul>
           </div>
 
@@ -72,7 +72,7 @@ const Footer = () => {
             <Link href="#" className="text-gray-400 hover:text-[var(--primary)]"><Youtube size={20} /></Link>
             <Link href="#" className="text-gray-400 hover:text-[var(--primary)]"><Instagram size={20} /></Link>
           </div>
-          <p className="text-sm text-gray-400">&copy; 2026 Vedantu. All Rights Reserved.</p>
+          <p className="text-sm text-gray-400">&copy; 2026 Brilliant Roots. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

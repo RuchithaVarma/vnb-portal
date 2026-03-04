@@ -148,7 +148,9 @@ export default function SignUp() {
             <div className="w-12 h-12 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
               <Sparkles className="text-white" size={28} />
             </div>
-            <span className="text-3xl font-bold gradient-text">Vedantu</span>
+            <span className="text-3xl font-bold gradient-text">
+              Brilliant Roots
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Start Learning Today!
@@ -230,7 +232,7 @@ export default function SignUp() {
                   className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all ${
                     errors.email ? "border-red-500" : "border-gray-300"
                   }`}
-                  placeholder="student@vedantu.com"
+                  placeholder="student@brilliantroots.com"
                 />
               </div>
               {errors.email && (
@@ -453,7 +455,7 @@ export default function SignUp() {
         {/* Benefits */}
         <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
           <h3 className="font-semibold text-gray-900 mb-3">
-            Why join Vedantu?
+            Why join Brilliant Roots?
           </h3>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
