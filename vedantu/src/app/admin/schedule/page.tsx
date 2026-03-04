@@ -16,15 +16,10 @@ import {
   Trash2,
   Eye,
   Bell,
-  CheckCircle,
   XCircle,
-  AlertCircle,
   User,
   BookOpen,
   MapPin,
-  Phone,
-  Mail,
-  MoreVertical,
 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 
@@ -121,7 +116,7 @@ export default function ScheduleManagement() {
     },
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "scheduled":
         return "bg-blue-100 text-blue-800";
@@ -136,7 +131,7 @@ export default function ScheduleManagement() {
     }
   };
 
-  const getTypeIcon = (type) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case "live":
         return <Video className="w-4 h-4" />;
@@ -151,7 +146,7 @@ export default function ScheduleManagement() {
     }
   };
 
-  const getDaysInMonth = (date) => {
+  const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const firstDay = new Date(year, month, 1);
@@ -288,12 +283,14 @@ export default function ScheduleManagement() {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="grid grid-cols-8 gap-px bg-gray-200">
           <div className="bg-gray-50 p-4"></div>
-          {weekDays.map((day, index) => (
+          {currentWeek.map((date, index) => (
             <div key={index} className="bg-gray-50 p-4 text-center">
               <p className="text-sm font-medium text-gray-700">
                 {weekDays[index]}
               </p>
-              <p className="text-lg font-bold text-gray-900">{day.getDate()}</p>
+              <p className="text-lg font-bold text-gray-900">
+                {date.getDate()}
+              </p>
             </div>
           ))}
         </div>
@@ -429,7 +426,7 @@ export default function ScheduleManagement() {
   const renderDayView = () => {
     return (
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold mb-4">Today's Schedule</h3>
+        <h3 className="text-lg font-semibold mb-4">Today&apos;s Schedule</h3>
         <div className="space-y-4">
           {timeSlots.map((slot) => (
             <div
@@ -457,40 +454,6 @@ export default function ScheduleManagement() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderStats = () => {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">Total Classes</p>
-              <p className="text-2xl font-bold mt-1">24</p>
-            </div>
-            <Calendar className="w-8 h-8 text-blue-500" />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">Today's Classes</p>
-              <p className="text-2xl font-bold mt-1">6</p>
-            </div>
-            <CheckCircle className="w-8 h-8 text-green-500" />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">Pending</p>
-              <p className="text-2xl font-bold mt-1">5</p>
-            </div>
-            <Clock className="w-8 h-8 text-orange-500" />
-          </div>
         </div>
       </div>
     );
@@ -562,7 +525,7 @@ export default function ScheduleManagement() {
           <div className="bg-white rounded-xl shadow-sm p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Today's Classes</p>
+                <p className="text-gray-500 text-sm">Today&apos;s Classes</p>
                 <p className="text-2xl font-bold mt-1">8</p>
               </div>
               <Calendar className="w-8 h-8 text-blue-500" />
