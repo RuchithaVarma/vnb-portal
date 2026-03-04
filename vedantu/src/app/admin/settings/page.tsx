@@ -440,49 +440,48 @@ export default function AdminSettings() {
   return (
     <AdminLayout title="Settings">
       <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-gray-500 mt-1">Manage your platform settings</p>
-        </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
-          <Save className="w-4 h-4 mr-2" />
-          Save Changes
-        </button>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar */}
-        <div className="lg:w-64">
-          <nav className="bg-white rounded-xl shadow-sm p-4">
-            <ul className="space-y-1">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                
-    <AdminLayout title="usettings Management">
-      <div className="p-6 space-y-6">
-                  <li key={tab.id}>
-                    <button
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
-                        activeTab === tab.id
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      <Icon className="w-5 h-5 mr-3" />
-                      {tab.label}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">Settings</h1>
+            <p className="text-gray-500 mt-1">Manage your platform settings</p>
+          </div>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+            <Save className="w-4 h-4 mr-2" />
+            Save Changes
+          </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1">{renderContent()}</div>
-      </div>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Sidebar */}
+          <div className="lg:w-64">
+            <nav className="bg-white rounded-xl shadow-sm p-4">
+              <ul className="space-y-1">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+
+                  return (
+                    <li key={tab.id}>
+                      <button
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
+                          activeTab === tab.id
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        <Icon className="w-5 h-5 mr-3" />
+                        {tab.label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1">{renderContent()}</div>
+        </div>
       </div>
     </AdminLayout>
   );
