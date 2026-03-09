@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "cd vedantu && npm run dev",
+    "build": "cd vedantu && npm install && npm run build",
+    "start": "cd vedantu && npm start",
+    "lint": "cd vedantu && npm run lint"
   },
   "dependencies": {
     "clsx": "^2.1.1",
