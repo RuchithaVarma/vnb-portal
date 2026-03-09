@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove experimental.appDir as it's now stable in Next.js 13.4+
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 module.exports = nextConfig;

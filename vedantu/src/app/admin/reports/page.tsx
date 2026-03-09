@@ -86,7 +86,7 @@ export default function Reports() {
     totalDownloads: 892,
   };
 
-  const getReportIcon = (type) => {
+  const getReportIcon = (type: string) => {
     switch (type) {
       case "financial":
         return <DollarSign className="w-5 h-5 text-green-600" />;
@@ -103,7 +103,7 @@ export default function Reports() {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "ready":
         return "bg-green-100 text-green-800";

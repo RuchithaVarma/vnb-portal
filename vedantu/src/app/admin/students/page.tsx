@@ -102,7 +102,7 @@ export default function StudentsManagement() {
     },
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
         return "bg-green-100 text-green-800";
@@ -115,7 +115,7 @@ export default function StudentsManagement() {
     }
   };
 
-  const getFeesColor = (fees) => {
+  const getFeesColor = (fees: string) => {
     return fees === "Paid" ? "text-green-600" : "text-orange-600";
   };
 

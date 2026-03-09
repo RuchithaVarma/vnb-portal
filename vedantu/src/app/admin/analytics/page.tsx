@@ -3,19 +3,15 @@
 import React, { useState } from "react";
 import {
   BarChart,
-  BarChart3,
   PieChart,
   DollarSign,
   Users,
   BookOpen,
   Activity,
   Download,
-  RefreshCw,
   ArrowUp,
   ArrowDown,
   Minus,
-  FileText,
-  MoreVertical,
   Star,
   Clock,
   Target,
@@ -142,7 +138,7 @@ export default function Analytics() {
     },
   ];
 
-  const getTrendIcon = (trend) => {
+  const getTrendIcon = (trend: string) => {
     switch (trend) {
       case "up":
         return <ArrowUp className="w-4 h-4 text-green-600" />;
@@ -153,7 +149,7 @@ export default function Analytics() {
     }
   };
 
-  const getTrendColor = (trend) => {
+  const getTrendColor = (trend: string) => {
     switch (trend) {
       case "up":
         return "text-green-600";
@@ -196,7 +192,7 @@ export default function Analytics() {
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Object.entries(metrics).map(([key, metric]) => {
-            const icons = {
+            const icons: { [key: string]: React.ComponentType<React.SVGProps<SVGSVGElement>> } = {
               revenue: DollarSign,
               students: Users,
               courses: BookOpen,

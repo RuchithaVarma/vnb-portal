@@ -52,7 +52,7 @@ import {
 
 export default function AdminPortal() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("students");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
 
@@ -162,12 +162,12 @@ export default function AdminPortal() {
       icon: UserCheck,
       href: "/admin/teachers",
     },
-    // {
-    //   id: "payments",
-    //   label: "Payments",
-    //   icon: CreditCard,
-    //   href: "/admin/payments",
-    // },
+    {
+      id: "payments",
+      label: "Payments",
+      icon: CreditCard,
+      href: "/admin/payments",
+    },
     // {
     //   id: "schedule",
     //   label: "Schedule",
