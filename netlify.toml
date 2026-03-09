@@ -1,7 +1,7 @@
 [build]
   base = "vedantu/"
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -9,6 +9,11 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/_next/static/:splat"
   status = 200
 
 [[redirects]]
