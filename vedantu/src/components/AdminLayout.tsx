@@ -4,14 +4,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart,
   Users,
-  BookOpen,
   UserCheck,
+  BookOpen,
   CreditCard,
-  Calendar,
-  TrendingUp,
-  FileText,
   Settings,
   LogOut,
   Menu,
@@ -22,40 +18,11 @@ import {
 import { handleLogout, handleNotification } from "@/utils/adminHandlers";
 
 const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: BarChart, href: "/admin" },
   { id: "students", label: "Students", icon: Users, href: "/admin/students" },
+  { id: "teachers", label: "Teachers", icon: UserCheck, href: "/admin/teachers" },
   { id: "courses", label: "Courses", icon: BookOpen, href: "/admin/courses" },
-  {
-    id: "teachers",
-    label: "Teachers",
-    icon: UserCheck,
-    href: "/admin/teachers",
-  },
-  {
-    id: "payments",
-    label: "Payments",
-    icon: CreditCard,
-    href: "/admin/payments",
-  },
-  {
-    id: "schedule",
-    label: "Schedule",
-    icon: Calendar,
-    href: "/admin/schedule",
-  },
-  {
-    id: "analytics",
-    label: "Analytics",
-    icon: TrendingUp,
-    href: "/admin/analytics",
-  },
-  { id: "reports", label: "Reports", icon: FileText, href: "/admin/reports" },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: Settings,
-    href: "/admin/settings",
-  },
+  { id: "payments", label: "Payments", icon: CreditCard, href: "/admin/payments" },
+  { id: "settings", label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 export default function AdminLayout({

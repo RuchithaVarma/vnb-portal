@@ -153,7 +153,7 @@ export default function AdminPortal() {
   ];
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: BarChart, href: "/admin" },
+    // { id: "dashboard", label: "Dashboard", icon: BarChart, href: "/admin" },
     { id: "students", label: "Students", icon: Users, href: "/admin/students" },
     { id: "courses", label: "Courses", icon: BookOpen, href: "/admin/courses" },
     {
@@ -162,25 +162,25 @@ export default function AdminPortal() {
       icon: UserCheck,
       href: "/admin/teachers",
     },
-    {
-      id: "payments",
-      label: "Payments",
-      icon: CreditCard,
-      href: "/admin/payments",
-    },
-    {
-      id: "schedule",
-      label: "Schedule",
-      icon: Calendar,
-      href: "/admin/schedule",
-    },
-    {
-      id: "analytics",
-      label: "Analytics",
-      icon: TrendingUp,
-      href: "/admin/analytics",
-    },
-    { id: "reports", label: "Reports", icon: FileText, href: "/admin/reports" },
+    // {
+    //   id: "payments",
+    //   label: "Payments",
+    //   icon: CreditCard,
+    //   href: "/admin/payments",
+    // },
+    // {
+    //   id: "schedule",
+    //   label: "Schedule",
+    //   icon: Calendar,
+    //   href: "/admin/schedule",
+    // },
+    // {
+    //   id: "analytics",
+    //   label: "Analytics",
+    //   icon: TrendingUp,
+    //   href: "/admin/analytics",
+    // },
+    // { id: "reports", label: "Reports", icon: FileText, href: "/admin/reports" },
     {
       id: "settings",
       label: "Settings",

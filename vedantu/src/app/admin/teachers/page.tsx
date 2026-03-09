@@ -22,6 +22,13 @@ import {
   Video,
 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
+import {
+  handleExport,
+  handleDelete,
+  handleEdit,
+  handleView,
+  handleAddNew,
+} from "@/utils/adminHandlers";
 
 export default function TeachersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -156,7 +163,10 @@ export default function TeachersManagement() {
               Manage your teaching staff and track their performance
             </p>
           </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+          <button
+            onClick={() => handleAddNew("teacher")}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Teacher
           </button>
