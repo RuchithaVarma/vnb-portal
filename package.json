@@ -6,7 +6,8 @@
     "dev": "cd vedantu && npm run dev",
     "build": "cd vedantu && npm install && npm run build",
     "start": "cd vedantu && npm start",
-    "lint": "cd vedantu && npm run lint"
+    "lint": "cd vedantu && npm run lint",
+    "seed": "npx tsx src/scripts/seed.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

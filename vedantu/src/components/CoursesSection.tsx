@@ -1,47 +1,47 @@
-import { Code, Calculator, Globe, Palette, BookOpen, Zap } from 'lucide-react';
+import { Calculator, Globe, BookOpen, Zap, Award, GraduationCap } from 'lucide-react';
 
 const courses = [
   { 
-    title: "JEE/NEET Preparation", 
-    icon: Calculator, 
+    title: "Olympiad Exams", 
+    icon: Award, 
     color: "from-red-400 to-pink-500",
-    grades: "Class 11-12",
-    features: ["Live Classes", "Doubt Solving", "Test Series"]
+    grades: "Class 3-10",
+    features: ["Competitive Prep", "Live Classes", "Doubt Solving"]
+  },
+  { 
+    title: "Vedic Maths", 
+    icon: Zap, 
+    color: "from-yellow-400 to-orange-500",
+    grades: "All Ages",
+    features: ["1-Year & Crash Courses", "Live Sessions", "Certification"]
+  },
+  { 
+    title: "Telugu (Basic & Advanced)", 
+    icon: BookOpen, 
+    color: "from-blue-400 to-cyan-500",
+    grades: "All Ages",
+    features: ["75 Live Sessions", "Daily/Weekly", "Certification"]
+  },
+  { 
+    title: "Phonics", 
+    icon: Globe, 
+    color: "from-green-400 to-teal-500",
+    grades: "Level 1-4",
+    features: ["4-6 Months Course", "Live Sessions", "Worksheets"]
+  },
+  { 
+    title: "Abacus Crash Course", 
+    icon: Calculator, 
+    color: "from-purple-400 to-indigo-500",
+    grades: "All Ages",
+    features: ["45 Live Sessions", "Worksheets", "Certification"]
   },
   { 
     title: "CBSE School Tuition", 
-    icon: BookOpen, 
-    color: "from-blue-400 to-cyan-500",
+    icon: GraduationCap, 
+    color: "from-pink-400 to-rose-500",
     grades: "Class 1-12",
     features: ["All Subjects", "NCERT Based", "Board Prep"]
-  },
-  { 
-    title: "Coding for Kids", 
-    icon: Code, 
-    color: "from-purple-400 to-indigo-500",
-    grades: "Class 1-8",
-    features: ["Scratch", "Python", "Web Dev"]
-  },
-  { 
-    title: "Spoken English", 
-    icon: Globe, 
-    color: "from-green-400 to-teal-500",
-    grades: "All Ages",
-    features: ["Fluency", "Grammar", "Confidence"]
-  },
-  { 
-    title: "Mathematics", 
-    icon: Zap, 
-    color: "from-yellow-400 to-orange-500",
-    grades: "Class 1-12",
-    features: ["Vedic Math", "Olympiad", "Advanced"]
-  },
-  { 
-    title: "Creative Arts", 
-    icon: Palette, 
-    color: "from-pink-400 to-rose-500",
-    grades: "Class 1-8",
-    features: ["Drawing", "Music", "Dance"]
   }
 ];
 

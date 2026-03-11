@@ -42,16 +42,6 @@ const Hero = () => {
                 📚 School Tuition
               </button>
               <button
-                onClick={() => setActiveTab('competitive')}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  activeTab === 'competitive'
-                    ? 'bg-[var(--primary)] text-white shadow-xl scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
-                }`}
-              >
-                🎯 JEE/NEET
-              </button>
-              <button
                 onClick={() => setActiveTab('kids')}
                 className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   activeTab === 'kids'

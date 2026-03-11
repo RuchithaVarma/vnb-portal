@@ -14,6 +14,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 const Header = () => {
@@ -82,9 +83,9 @@ const Header = () => {
       icon: <Award size={20} />,
       items: [
         {
-          name: "JEE Preparation",
-          href: "/courses/jee",
-          description: "Engineering entrance exam coaching",
+          name: "Olympiad Exams",
+          href: "/courses/olympiad",
+          description: "Competitive exam preparation for young achievers",
         },
         {
           name: "NEET Preparation",
@@ -140,8 +141,13 @@ const Header = () => {
             href="/"
             className="flex items-center gap-2 group cursor-pointer"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-              <Sparkles className="text-white" size={20} />
+            <div className="w-10 h-10 relative overflow-hidden rounded-lg shadow-md group-hover:scale-110 transition-transform duration-300">
+              <Image
+                src="/logo.jpeg"
+                alt="Brilliant Roots Logo"
+                fill
+                className="object-cover"
+              />
             </div>
             <span className="text-2xl font-bold gradient-text">Brilliant Roots</span>
           </Link>
