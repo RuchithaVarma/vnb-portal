@@ -89,12 +89,7 @@ export default function SignUp() {
     setTimeout(() => {
       setIsLoading(false);
       // Use the auth context login function
-      login({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        grade: formData.grade,
-      });
+      login({ email: formData.email, password: formData.password });
       router.push("/");
     }, 1500);
   };
