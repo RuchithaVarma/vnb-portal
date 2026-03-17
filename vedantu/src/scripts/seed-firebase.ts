@@ -3,13 +3,13 @@ import { getFirestore, collection, doc, setDoc, writeBatch } from "firebase/fire
 
 // Firebase configuration - using the same config from the project
 const firebaseConfig = {
-  apiKey: "AIzaSyAcCgHfU9nXzz0GxSGbcvMrQwQ5FFAq1aQ",
-  authDomain: "brilliantroots-27ce3.firebaseapp.com",
-  projectId: "brilliantroots-27ce3",
-  storageBucket: "brilliantroots-27ce3.firebasestorage.app",
-  messagingSenderId: "429371611993",
-  appId: "1:429371611993:web:df4f67b279c69683db8a48",
-  measurementId: "G-37477X5F69"
+  apiKey: "AIzaSyDtM1PN2kZX8mghjUIq8yQ5A5trHxlRCGw",
+  authDomain: "brilliantroots-541a2.firebaseapp.com",
+  projectId: "brilliantroots-541a2",
+  storageBucket: "brilliantroots-541a2.firebasestorage.app",
+  messagingSenderId: "446712229144",
+  appId: "1:446712229144:web:ce7c30c8ce5c4ea085426d",
+  measurementId: "G-YKGPNY7KWD"
 };
 
 // Initialize Firebase
@@ -120,7 +120,7 @@ async function seedDatabase() {
     console.log('  - courses: 3 documents');
     console.log('  - stats: 4 documents');
     console.log('  - teachers: 3 documents');
-    console.log('\n🔥 Firebase project: brilliantroots-27ce3');
+    console.log('\n🔥 Firebase project: brilliantroots-541a2');
     
   } catch (error) {
     console.error('\n❌ Seeding failed:', error);

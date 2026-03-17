@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "npx tsx src/scripts/seed.ts",
+    "import": "npx tsx src/scripts/import-data.ts",
+    "emulator": "firebase emulators:start",
+    "seed:emulator": "firebase emulators:start --only firestore & sleep 5 && npx tsx src/scripts/import-data.ts && firebase emulators:stop",
+    "import:emulator": "firebase emulators:start --only firestore & sleep 5 && npx tsx src/scripts/import-data.ts && firebase emulators:stop",
+    "import:simple": "npx tsx src/scripts/import-data.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.1",
