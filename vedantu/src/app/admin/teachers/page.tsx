@@ -20,6 +20,7 @@ import {
   BookOpen,
   UserCheck,
   Video,
+  Edit,
 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import {
@@ -29,101 +30,118 @@ import {
   handleView,
   handleAddNew,
 } from "@/utils/adminHandlers";
+import { getItems, addItem, updateItem, deleteItem } from "@/lib/firestoreService";
+import { Teacher } from "@/types";
+import { useEffect } from "react";
 
 export default function TeachersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const teachers = [
-    {
-      id: 1,
-      name: "Dr. Rajesh Kumar",
-      email: "rajesh.kumar@edu.com",
-      phone: "+91 98765 43210",
-      specialization: "Mathematics",
-      experience: "15 years",
-      rating: 4.9,
-      students: 1234,
-      revenue: 234567,
-      courses: 5,
-      status: "active",
-      joinedDate: "2023-01-15",
-      nextClass: "2024-03-16 10:00 AM",
-      avatar: "RK",
-    },
-    {
-      id: 2,
-      name: "Prof. Sarah Williams",
-      email: "sarah.williams@edu.com",
-      phone: "+91 98765 43211",
-      specialization: "Physics",
-      experience: "12 years",
-      rating: 4.8,
-      students: 987,
-      revenue: 198765,
-      courses: 4,
-      status: "active",
-      joinedDate: "2023-02-20",
-      nextClass: "2024-03-16 2:00 PM",
-      avatar: "SW",
-    },
-    {
-      id: 3,
-      name: "Dr. Michael Chen",
-      email: "michael.chen@edu.com",
-      phone: "+91 98765 43212",
-      specialization: "Chemistry",
-      experience: "10 years",
-      rating: 4.7,
-      students: 756,
-      revenue: 154321,
-      courses: 3,
-      status: "on_leave",
-      joinedDate: "2023-03-10",
-      nextClass: "2024-03-20 11:00 AM",
-      avatar: "MC",
-    },
-    {
-      id: 4,
-      name: "Prof. Emily Johnson",
-      email: "emily.johnson@edu.com",
-      phone: "+91 98765 43213",
-      specialization: "Biology",
-      experience: "8 years",
-      rating: 4.6,
-      students: 543,
-      revenue: 123456,
-      courses: 3,
-      status: "active",
-      joinedDate: "2023-04-05",
-      nextClass: "2024-03-16 3:00 PM",
-      avatar: "EJ",
-    },
-    {
-      id: 5,
-      name: "Dr. James Wilson",
-      email: "james.wilson@edu.com",
-      phone: "+91 98765 43214",
-      specialization: "English Literature",
-      experience: "20 years",
-      rating: 4.9,
-      students: 432,
-      revenue: 98765,
-      courses: 2,
-      status: "inactive",
-      joinedDate: "2023-05-12",
-      nextClass: "N/A",
-      avatar: "JW",
-    },
-  ];
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [formState, setFormState] = useState<Partial<Teacher>>({
+    name: "",
+    email: "",
+    phone: "",
+    specialization: "",
+    experience: "",
+    rating: 0,
+    students: 0,
+    revenue: 0,
+    courses: 0,
+    status: "active",
+    nextClass: "",
+    avatar: "",
+  });
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  useEffect(() => {
+    if (selectedTeacher) {
+      setFormState(selectedTeacher);
+    } else {
+      setFormState({
+        name: "",
+        email: "",
+        phone: "",
+        specialization: "",
+        experience: "",
+        rating: 0,
+        students: 0,
+        revenue: 0,
+        courses: 0,
+        status: "active",
+        nextClass: "",
+        avatar: "",
+      });
+    }
+  }, [selectedTeacher]);
+
+  const fetchTeachers = async () => {
+    setLoading(true);
+    try {
+      const data = await getItems<Teacher>("teachers");
+      setTeachers(data);
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteItem = async (id?: string) => {
+    if (!id) return;
+    if (confirm("Are you sure you want to delete this teacher?")) {
+      try {
+        await deleteItem("teachers", id);
+        alert("Teacher deleted successfully!");
+        fetchTeachers();
+      } catch (error) {
+        alert("Failed to delete teacher.");
+      }
+    }
+  };
+
+  const handleSaveItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      ...formState,
+      students: Number(formState.students),
+      revenue: Number(formState.revenue),
+      courses: Number(formState.courses),
+      rating: Number(formState.rating),
+      avatar: formState.name ? formState.name.split(" ").map(n => n[0]).join("") : "T",
+      joinedDate: formState.joinedDate || new Date().toISOString().split('T')[0],
+    };
+
+    try {
+      if (selectedTeacher?.id) {
+        await updateItem("teachers", selectedTeacher.id, payload);
+        alert("Teacher updated successfully!");
+      } else {
+        await addItem("teachers", payload);
+        alert("Teacher added successfully!");
+      }
+      setIsModalOpen(false);
+      fetchTeachers();
+    } catch (error) {
+      alert("Failed to save teacher.");
+    }
+  };
 
   const stats = {
-    totalTeachers: 156,
-    activeTeachers: 134,
-    onLeave: 12,
-    inactive: 10,
-    avgRating: 4.7,
-    totalRevenue: 2456789,
+    totalTeachers: teachers.length,
+    activeTeachers: teachers.filter(t => (t.status || "active") === "active").length,
+    onLeave: teachers.filter(t => t.status === "on_leave").length,
+    inactive: teachers.filter(t => t.status === "inactive").length,
+    avgRating: teachers.length > 0 ? (teachers.reduce((acc, t) => acc + (t.rating || 0), 0) / teachers.length).toFixed(1) : "0",
+    totalRevenue: teachers.reduce((acc, t) => acc + (t.revenue || 0), 0),
   };
 
   const getStatusColor = (status: string) => {
@@ -139,18 +157,7 @@ export default function TeachersManagement() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="w-4 h-4" />;
-      case "on_leave":
-        return <Clock className="w-4 h-4" />;
-      case "inactive":
-        return <XCircle className="w-4 h-4" />;
-      default:
-        return null;
-    }
-  };
+  const avgRatingNum = Number(stats.avgRating);
 
   return (
     <AdminLayout title="Teachers Management">
@@ -160,11 +167,11 @@ export default function TeachersManagement() {
           <div>
             <h1 className="text-2xl font-bold">Teachers Management</h1>
             <p className="text-gray-500 mt-1">
-              Manage your teaching staff and track their performance
+              Manage your teaching staff and track their performance {loading && "(Loading...)"}
             </p>
           </div>
           <button
-            onClick={() => handleAddNew("teacher")}
+            onClick={() => { setSelectedTeacher(null); setIsModalOpen(true); }}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -192,10 +199,8 @@ export default function TeachersManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Now</p>
-                <p className="text-2xl font-bold mt-1">
-                  {stats.activeTeachers}
-                </p>
-                <p className="text-gray-500 text-sm mt-2">86% of total</p>
+                <p className="text-2xl font-bold mt-1">{stats.activeTeachers}</p>
+                <p className="text-gray-500 text-sm mt-2">Active</p>
               </div>
               <UserCheck className="w-10 h-10 text-green-500" />
             </div>
@@ -205,12 +210,12 @@ export default function TeachersManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Avg Rating</p>
-                <p className="text-2xl font-bold mt-1">{stats.avgRating}</p>
+                <p className="text-2xl font-bold mt-1">{avgRatingNum.toFixed(1)}</p>
                 <div className="flex items-center mt-2">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${i <= Math.floor(stats.avgRating) ? "text-yellow-500 fill-current" : "text-gray-300"}`}
+                      className={`w-4 h-4 ${i <= Math.floor(avgRatingNum) ? "text-yellow-500 fill-current" : "text-gray-300"}`}
                     />
                   ))}
                 </div>
@@ -259,24 +264,20 @@ export default function TeachersManagement() {
               <option value="on_leave">On Leave</option>
               <option value="inactive">Inactive</option>
             </select>
-            <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </button>
           </div>
         </div>
 
         {/* Teachers Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {teachers.map((teacher) => (
+          {teachers.map((teacher, idx) => (
             <div
-              key={teacher.id}
+              key={teacher.id || idx}
               className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
-                    {teacher.avatar}
+                    {teacher.avatar || "T"}
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">{teacher.name}</h3>
@@ -287,11 +288,10 @@ export default function TeachersManagement() {
                   </div>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${getStatusColor(teacher.status)}`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${getStatusColor(teacher.status || "active")}`}
                 >
-                  {getStatusIcon(teacher.status)}
                   <span className="ml-1">
-                    {teacher.status.replace("_", " ")}
+                    {(teacher.status || "active").replace("_", " ")}
                   </span>
                 </span>
               </div>
@@ -299,22 +299,22 @@ export default function TeachersManagement() {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="flex items-center text-sm">
                   <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                  <span className="text-gray-600">{teacher.email}</span>
+                  <span className="text-gray-600">{teacher.email || "N/A"}</span>
                 </div>
                 <div className="flex items-center text-sm">
                   <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                  <span className="text-gray-600">{teacher.phone}</span>
+                  <span className="text-gray-600">{teacher.phone || "N/A"}</span>
                 </div>
                 <div className="flex items-center text-sm">
                   <Users className="w-4 h-4 text-gray-400 mr-2" />
                   <span className="text-gray-600">
-                    {teacher.students} students
+                    {teacher.students || 0} students
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
                   <BookOpen className="w-4 h-4 text-gray-400 mr-2" />
                   <span className="text-gray-600">
-                    {teacher.courses} courses
+                    {teacher.courses || 0} courses
                   </span>
                 </div>
               </div>
@@ -322,12 +322,12 @@ export default function TeachersManagement() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
-                  <span className="font-medium">{teacher.rating}</span>
+                  <span className="font-medium">{teacher.rating || 0}</span>
                   <span className="text-gray-500 ml-1">rating</span>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">
-                    ₹{teacher.revenue.toLocaleString()}
+                    ₹{(teacher.revenue || 0).toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-500">revenue</p>
                 </div>
@@ -337,19 +337,22 @@ export default function TeachersManagement() {
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm text-gray-500">Next Class</span>
                   <span className="text-sm font-medium">
-                    {teacher.nextClass}
+                    {teacher.nextClass || "N/A"}
                   </span>
                 </div>
                 <div className="flex space-x-2">
-                  <button className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center justify-center">
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Profile
+                  <button
+                    onClick={() => { setSelectedTeacher(teacher); setIsModalOpen(true); }}
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center justify-center"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Details
                   </button>
-                  <button className="px-3 py-2 border rounded-lg hover:bg-gray-50">
-                    <MessageSquare className="w-4 h-4" />
-                  </button>
-                  <button className="px-3 py-2 border rounded-lg hover:bg-gray-50">
-                    <Video className="w-4 h-4" />
+                  <button
+                    onClick={() => teacher.id && handleDeleteItem(teacher.id)}
+                    className="px-3 py-2 border rounded-lg hover:bg-red-50 text-red-600"
+                  >
+                    <XCircle className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -357,76 +360,117 @@ export default function TeachersManagement() {
           ))}
         </div>
 
-        {/* Performance Overview */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4">Performance Overview</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm text-gray-500 mb-2">Top Performers</p>
-              <div className="space-y-2">
-                {teachers.slice(0, 3).map((teacher, index) => (
-                  <div
-                    key={teacher.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center">
-                      <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold mr-2">
-                        {index + 1}
-                      </span>
-                      <span className="text-sm">{teacher.name}</span>
-                    </div>
-                    <span className="text-sm font-medium">
-                      ₹{(teacher.revenue / 1000).toFixed(0)}K
-                    </span>
+        {/* Modal Form */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg overflow-y-auto max-h-[90vh]">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">{selectedTeacher ? "Edit Teacher" : "Add Teacher"}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="text-gray-500">&times;</button>
+              </div>
+              <form onSubmit={handleSaveItem} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.name || ""}
+                    onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={formState.email || ""}
+                      onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500 mb-2">Highest Rated</p>
-              <div className="space-y-2">
-                {teachers
-                  .filter((t) => t.rating >= 4.8)
-                  .slice(0, 3)
-                  .map((teacher) => (
-                    <div
-                      key={teacher.id}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="text-sm">{teacher.name}</span>
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                        <span className="text-sm font-medium ml-1">
-                          {teacher.rating}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500 mb-2">Most Students</p>
-              <div className="space-y-2">
-                {teachers
-                  .sort((a, b) => b.students - a.students)
-                  .slice(0, 3)
-                  .map((teacher) => (
-                    <div
-                      key={teacher.id}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="text-sm">{teacher.name}</span>
-                      <span className="text-sm font-medium">
-                        {teacher.students}
-                      </span>
-                    </div>
-                  ))}
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Phone</label>
+                    <input
+                      type="text"
+                      value={formState.phone || ""}
+                      onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Specialization</label>
+                    <input
+                      type="text"
+                      value={formState.specialization || ""}
+                      onChange={(e) => setFormState({ ...formState, specialization: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Experience</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., 5 years"
+                      value={formState.experience || ""}
+                      onChange={(e) => setFormState({ ...formState, experience: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Rating</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      max="5"
+                      value={formState.rating || 0}
+                      onChange={(e) => setFormState({ ...formState, rating: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Students</label>
+                    <input
+                      type="number"
+                      value={formState.students || 0}
+                      onChange={(e) => setFormState({ ...formState, students: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Courses</label>
+                    <input
+                      type="number"
+                      value={formState.courses || 0}
+                      onChange={(e) => setFormState({ ...formState, courses: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </AdminLayout>
   );

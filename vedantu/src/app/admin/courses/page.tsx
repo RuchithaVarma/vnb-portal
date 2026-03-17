@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
   Search,
@@ -25,98 +25,106 @@ import {
 import AdminLayout from "@/components/AdminLayout";
 import {
   handleExport,
-  handleDelete,
-  handleEdit,
-  handleView,
-  handleAddNew,
 } from "@/utils/adminHandlers";
+import { getItems, addItem, updateItem, deleteItem } from "@/lib/firestoreService";
+import { Course } from "@/types";
 
 export default function CoursesManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [formState, setFormState] = useState<Partial<Course>>({
+    title: "",
+    color: "from-blue-500 to-purple-600",
+    grades: "",
+    features: [],
+    duration: "",
+    price: 0,
+    enrolled: 0,
+    rating: 0,
+    image: "",
+  });
+  const [featuresInput, setFeaturesInput] = useState("");
 
-  const courses = [
-    {
-      id: 1,
-      title: "Mathematics Advanced",
-      category: "Mathematics",
-      instructor: "Dr. Rajesh Kumar",
-      students: 1234,
-      rating: 4.8,
-      price: 9999,
-      duration: "3 months",
-      status: "active",
-      enrolledDate: "2024-01-15",
-      revenue: 123456,
-      lessons: 45,
-      completedLessons: 38,
-      thumbnail: "/math-course.jpg",
-    },
-    {
-      id: 2,
-      title: "Physics Fundamentals",
-      category: "Science",
-      instructor: "Prof. Sarah Williams",
-      students: 987,
-      rating: 4.6,
-      price: 8999,
-      duration: "2 months",
-      status: "active",
-      enrolledDate: "2024-02-01",
-      revenue: 98765,
-      lessons: 36,
-      completedLessons: 30,
-      thumbnail: "/physics-course.jpg",
-    },
-    {
-      id: 3,
-      title: "Chemistry Basics",
-      category: "Science",
-      instructor: "Dr. Michael Chen",
-      students: 756,
-      rating: 4.5,
-      price: 7999,
-      duration: "2 months",
-      status: "draft",
-      enrolledDate: "2024-02-15",
-      revenue: 0,
-      lessons: 30,
-      completedLessons: 25,
-      thumbnail: "/chemistry-course.jpg",
-    },
-    {
-      id: 4,
-      title: "Biology Masterclass",
-      category: "Science",
-      instructor: "Prof. Emily Johnson",
-      students: 543,
-      rating: 4.9,
-      price: 10999,
-      duration: "3 months",
-      status: "active",
-      enrolledDate: "2024-01-10",
-      revenue: 87654,
-      lessons: 48,
-      completedLessons: 42,
-      thumbnail: "/biology-course.jpg",
-    },
-    {
-      id: 5,
-      title: "English Literature",
-      category: "Languages",
-      instructor: "Dr. James Wilson",
-      students: 432,
-      rating: 4.4,
-      price: 6999,
-      duration: "2 months",
-      status: "archived",
-      enrolledDate: "2023-12-01",
-      revenue: 43210,
-      lessons: 24,
-      completedLessons: 24,
-      thumbnail: "/english-course.jpg",
-    },
-  ];
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      setFormState(selectedCourse);
+      setFeaturesInput(selectedCourse.features.join("\n"));
+    } else {
+      setFormState({
+        title: "",
+        color: "from-blue-500 to-purple-600",
+        grades: "",
+        features: [],
+        duration: "",
+        price: 0,
+        enrolled: 0,
+        rating: 0,
+        image: "",
+      });
+      setFeaturesInput("");
+    }
+  }, [selectedCourse]);
+
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const data = await getItems<Course>("courses");
+      setCourses(data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteItem = async (id?: string) => {
+    if (!id) return;
+    if (confirm("Are you sure you want to delete this course?")) {
+      try {
+        await deleteItem("courses", id);
+        alert("Course deleted successfully!");
+        fetchCourses();
+      } catch (error) {
+        alert("Failed to delete course.");
+      }
+    }
+  };
+
+  const handleSaveItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedFeatures = featuresInput.split("\n").filter((f) => f.trim() !== "");
+    const payload = {
+      ...formState,
+      features: updatedFeatures,
+      price: Number(formState.price),
+      enrolled: Number(formState.enrolled),
+      rating: Number(formState.rating),
+    };
+
+    try {
+      if (selectedCourse?.id) {
+        await updateItem("courses", selectedCourse.id, payload);
+        alert("Course updated successfully!");
+      } else {
+        await addItem("courses", payload);
+        alert("Course added successfully!");
+      }
+      setIsModalOpen(false);
+      fetchCourses();
+    } catch (error) {
+      alert("Failed to save course.");
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -152,7 +160,7 @@ export default function CoursesManagement() {
           <div>
             <h1 className="text-2xl font-bold">Courses Management</h1>
             <p className="text-gray-500 mt-1">
-              Manage course content and track performance
+              Manage course content and track performance {loading && "(Loading...)"}
             </p>
           </div>
           <div className="flex space-x-2">
@@ -164,7 +172,7 @@ export default function CoursesManagement() {
               Export
             </button>
             <button
-              onClick={() => handleAddNew("course")}
+              onClick={() => { setSelectedCourse(null); setIsModalOpen(true); }}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -179,7 +187,7 @@ export default function CoursesManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Total Courses</p>
-                <p className="text-2xl font-bold mt-1">156</p>
+                <p className="text-2xl font-bold mt-1">{courses.length}</p>
                 <p className="text-green-600 text-sm mt-2 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-1" />
                   +12 this month
@@ -193,8 +201,10 @@ export default function CoursesManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Courses</p>
-                <p className="text-2xl font-bold mt-1">134</p>
-                <p className="text-gray-500 text-sm mt-2">86% of total</p>
+                <p className="text-2xl font-bold mt-1">
+                  {courses.filter(c => (c.status || "active") === "active").length}
+                </p>
+                <p className="text-gray-500 text-sm mt-2">Active</p>
               </div>
               <PlayCircle className="w-10 h-10 text-green-500" />
             </div>
@@ -204,7 +214,9 @@ export default function CoursesManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Total Students</p>
-                <p className="text-2xl font-bold mt-1">12.4K</p>
+                <p className="text-2xl font-bold mt-1">
+                  {courses.reduce((acc, c) => acc + (c.students || 0), 0).toLocaleString()}
+                </p>
                 <p className="text-green-600 text-sm mt-2 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-1" />
                   +18.5%
@@ -257,10 +269,6 @@ export default function CoursesManagement() {
               <option value="languages">Languages</option>
               <option value="programming">Programming</option>
             </select>
-            <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </button>
           </div>
         </div>
 
@@ -272,31 +280,30 @@ export default function CoursesManagement() {
               className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="flex">
-                <div className="w-48 h-32 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className={`w-48 h-32 bg-gradient-to-r ${course.color || "from-blue-500 to-purple-600"} flex items-center justify-center`}>
                   <BookOpen className="w-16 h-16 text-white" />
                 </div>
                 <div className="flex-1 p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="font-semibold text-lg">{course.title}</h3>
-                      <p className="text-sm text-gray-500">{course.category}</p>
+                      <p className="text-sm text-gray-500">{course.grades}</p>
                     </div>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium flex items-center ${getStatusColor(course.status)}`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium flex items-center ${getStatusColor(course.status || "active")}`}
                     >
-                      {getStatusIcon(course.status)}
-                      <span className="ml-1">{course.status}</span>
+                      <span className="ml-1">{course.status || "active"}</span>
                     </span>
                   </div>
 
                   <p className="text-sm text-gray-600 mb-3">
-                    by {course.instructor}
+                    by {course.instructor || "Unassigned"}
                   </p>
 
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center">
                       <Users className="w-4 h-4 text-gray-400 mr-2" />
-                      <span>{course.students} students</span>
+                      <span>{course.students || 0} students</span>
                     </div>
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
@@ -319,31 +326,25 @@ export default function CoursesManagement() {
                   <div className="flex items-center text-sm text-gray-600">
                     <Video className="w-4 h-4 mr-2" />
                     <span>
-                      {course.completedLessons}/{course.lessons} lessons
+                      {course.completedLessons || 0}/{course.lessons || 0} lessons
                     </span>
                   </div>
                   <div className="text-sm font-medium">
-                    Revenue: ₹{course.revenue.toLocaleString()}
+                    Revenue: ₹{(course.revenue || 0).toLocaleString()}
                   </div>
                 </div>
 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleView(course.id.toString(), "course")}
+                    onClick={() => { setSelectedCourse(course); setIsModalOpen(true); }}
                     className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center justify-center"
                   >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Details
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Details
                   </button>
                   <button
-                    onClick={() => handleEdit(course.id.toString(), "course")}
-                    className="px-3 py-2 border rounded-lg hover:bg-gray-50"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(course.id.toString(), "course")}
-                    className="px-3 py-2 border rounded-lg hover:bg-gray-50"
+                    onClick={() => handleDeleteItem(course.id)}
+                    className="px-3 py-2 border rounded-lg hover:bg-red-50 text-red-600"
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>
@@ -353,69 +354,121 @@ export default function CoursesManagement() {
           ))}
         </div>
 
-        {/* Performance Overview */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">
-              Top Performing Courses
-            </h3>
-            <div className="space-y-3">
-              {courses
-                .sort((a, b) => b.students - a.students)
-                .slice(0, 3)
-                .map((course, index) => (
-                  <div
-                    key={course.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center">
-                      <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                        {index + 1}
-                      </span>
-                      <div>
-                        <p className="font-medium">{course.title}</p>
-                        <p className="text-sm text-gray-500">
-                          {course.instructor}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">{course.students} students</p>
-                      <p className="text-sm text-gray-500">
-                        ₹{(course.revenue / 1000).toFixed(0)}K revenue
-                      </p>
-                    </div>
+        {/* Modal Form */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg overflow-y-auto max-h-[90vh]">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">{selectedCourse ? "Edit Course" : "Add Course"}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="text-gray-500">&times;</button>
+              </div>
+              <form onSubmit={handleSaveItem} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Course Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.title || ""}
+                    onChange={(e) => setFormState({ ...formState, title: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Grades</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Class 11-12"
+                      value={formState.grades || ""}
+                      onChange={(e) => setFormState({ ...formState, grades: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
                   </div>
-                ))}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Duration</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., 12 months"
+                      value={formState.duration || ""}
+                      onChange={(e) => setFormState({ ...formState, duration: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Price (₹)</label>
+                    <input
+                      type="number"
+                      required
+                      value={formState.price || 0}
+                      onChange={(e) => setFormState({ ...formState, price: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Enrolled</label>
+                    <input
+                      type="number"
+                      value={formState.enrolled || 0}
+                      onChange={(e) => setFormState({ ...formState, enrolled: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Rating</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      max="5"
+                      value={formState.rating || 0}
+                      onChange={(e) => setFormState({ ...formState, rating: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Color Variant</label>
+                  <select
+                    value={formState.color || "from-blue-500 to-purple-600"}
+                    onChange={(e) => setFormState({ ...formState, color: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  >
+                    <option value="from-blue-500 to-purple-600">Blue-Purple</option>
+                    <option value="from-red-400 to-pink-500">Red-Pink</option>
+                    <option value="from-yellow-400 to-orange-500">Yellow-Orange</option>
+                    <option value="from-green-400 to-teal-500">Green-Teal</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Features (One per line)</label>
+                  <textarea
+                    rows={3}
+                    value={featuresInput}
+                    onChange={(e) => setFeaturesInput(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    placeholder="Live Classes&#10;Doubt Solving"
+                  />
+                </div>
+                <div className="flex justify-end space-x-2 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Course Categories</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Mathematics</span>
-                <span className="text-sm font-medium">45 courses</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Science</span>
-                <span className="text-sm font-medium">38 courses</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Languages</span>
-                <span className="text-sm font-medium">27 courses</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Programming</span>
-                <span className="text-sm font-medium">32 courses</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Arts & Music</span>
-                <span className="text-sm font-medium">14 courses</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </AdminLayout>
   );

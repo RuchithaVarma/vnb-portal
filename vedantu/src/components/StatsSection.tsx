@@ -1,12 +1,22 @@
-import { TrendingUp, Users, Award, Globe } from 'lucide-react';
+import { TrendingUp, Users, Award, Globe, HelpCircle, type LucideIcon } from 'lucide-react';
+import { getItems } from '@/lib/firestoreService';
+import { Stat } from '@/types';
 
-const StatsSection = () => {
-  const stats = [
-    { value: "2.1Cr+", label: "Hours of Learning", icon: TrendingUp, color: "from-orange-400 to-red-400" },
-    { value: "10K+", label: "Students Scored 90%+", icon: Award, color: "from-yellow-400 to-orange-400" },
-    { value: "500+", label: "Expert Teachers", icon: Users, color: "from-blue-400 to-purple-400" },
-    { value: "100+", label: "Cities Covered", icon: Globe, color: "from-green-400 to-teal-400" }
-  ];
+const iconMap: Record<string, LucideIcon> = {
+  "⏱️": TrendingUp,
+  "🏆": Award,
+  "👨‍🏫": Users,
+  "🌍": Globe,
+};
+
+const StatsSection = async () => {
+  let stats: Stat[] = [];
+  try {
+    stats = await getItems<Stat>("stats");
+  } catch (error) {
+    console.error("Failed to fetch stats for homepage:", error);
+    // Fallback or empty list
+  }
 
   return (
     <section className="py-16 bg-white relative overflow-hidden">
@@ -21,10 +31,10 @@ const StatsSection = () => {
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {stats.map((stat, idx) => {
-            const Icon = stat.icon;
+            const Icon = iconMap[stat.icon] || HelpCircle;
             return (
               <div 
-                key={idx} 
+                key={stat.id || idx} 
                 className="text-center group animate-fadeInUp card-hover bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl border border-gray-100"
                 style={{animationDelay: `${idx * 0.1}s`}}
               >

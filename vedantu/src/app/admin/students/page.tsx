@@ -25,82 +25,103 @@ import {
   handleAddNew,
 } from "@/utils/adminHandlers";
 
+import { getItems, addItem, updateItem, deleteItem } from "@/lib/firestoreService";
+import { Student } from "@/types";
+import { useEffect } from "react";
+
 export default function StudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const students = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@email.com",
-      phone: "+91 98765 43210",
-      grade: "10th",
-      courses: 5,
-      enrolledDate: "2024-01-15",
-      lastActive: "2024-03-15",
-      status: "active",
-      progress: 75,
-      fees: "Paid",
-      avatar: "JD",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@email.com",
-      phone: "+91 98765 43211",
-      grade: "12th",
-      courses: 3,
-      enrolledDate: "2024-02-20",
-      lastActive: "2024-03-14",
-      status: "active",
-      progress: 82,
-      fees: "Paid",
-      avatar: "JS",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.j@email.com",
-      phone: "+91 98765 43212",
-      grade: "11th",
-      courses: 4,
-      enrolledDate: "2024-01-10",
-      lastActive: "2024-03-10",
-      status: "inactive",
-      progress: 45,
-      fees: "Pending",
-      avatar: "MJ",
-    },
-    {
-      id: 4,
-      name: "Sarah Williams",
-      email: "sarah.w@email.com",
-      phone: "+91 98765 43213",
-      grade: "9th",
-      courses: 6,
-      enrolledDate: "2024-01-05",
-      lastActive: "2024-03-15",
-      status: "active",
-      progress: 91,
-      fees: "Paid",
-      avatar: "SW",
-    },
-    {
-      id: 5,
-      name: "Tom Brown",
-      email: "tom.brown@email.com",
-      phone: "+91 98765 43214",
-      grade: "10th",
-      courses: 2,
-      enrolledDate: "2024-03-01",
-      lastActive: "2024-03-12",
-      status: "new",
-      progress: 15,
-      fees: "Pending",
-      avatar: "TB",
-    },
-  ];
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [formState, setFormState] = useState<Partial<Student>>({
+    name: "",
+    email: "",
+    phone: "",
+    grade: "",
+    courses: 0,
+    status: "new",
+    progress: 0,
+    fees: "Pending",
+    avatar: "",
+  });
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  useEffect(() => {
+    if (selectedStudent) {
+      setFormState(selectedStudent);
+    } else {
+      setFormState({
+        name: "",
+        email: "",
+        phone: "",
+        grade: "",
+        courses: 0,
+        status: "new",
+        progress: 0,
+        fees: "Pending",
+        avatar: "",
+      });
+    }
+  }, [selectedStudent]);
+
+  const fetchStudents = async () => {
+    setLoading(true);
+    try {
+      const data = await getItems<Student>("students");
+      setStudents(data);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteItem = async (id?: string) => {
+    if (!id) return;
+    if (confirm("Are you sure you want to delete this student?")) {
+      try {
+        await deleteItem("students", id);
+        alert("Student deleted successfully!");
+        fetchStudents();
+      } catch (error) {
+        alert("Failed to delete student.");
+      }
+    }
+  };
+
+  const handleSaveItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      ...formState,
+      courses: Number(formState.courses),
+      progress: Number(formState.progress),
+      avatar: formState.name ? formState.name.split(" ").map(n => n[0]).join("") : "S",
+      enrolledDate: formState.enrolledDate || new Date().toISOString().split('T')[0],
+      lastActive: new Date().toISOString().split('T')[0],
+    };
+
+    try {
+      if (selectedStudent?.id) {
+        await updateItem("students", selectedStudent.id, payload);
+        alert("Student updated successfully!");
+      } else {
+        await addItem("students", payload);
+        alert("Student added successfully!");
+      }
+      setIsModalOpen(false);
+      fetchStudents();
+    } catch (error) {
+      alert("Failed to save student.");
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -127,7 +148,7 @@ export default function StudentsManagement() {
           <div>
             <h1 className="text-2xl font-bold">Students Management</h1>
             <p className="text-gray-500 mt-1">
-              Manage student enrollment and track progress
+              Manage student enrollment and track progress {loading && "(Loading...)"}
             </p>
           </div>
           <div className="flex space-x-2">
@@ -139,7 +160,7 @@ export default function StudentsManagement() {
               Export
             </button>
             <button
-              onClick={() => handleAddNew("student")}
+              onClick={() => { setSelectedStudent(null); setIsModalOpen(true); }}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -154,7 +175,7 @@ export default function StudentsManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Total Students</p>
-                <p className="text-2xl font-bold mt-1">1,234</p>
+                <p className="text-2xl font-bold mt-1">{students.length}</p>
                 <p className="text-green-600 text-sm mt-2 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-1" />
                   +12% this month
@@ -168,8 +189,10 @@ export default function StudentsManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Now</p>
-                <p className="text-2xl font-bold mt-1">892</p>
-                <p className="text-gray-500 text-sm mt-2">72.3% of total</p>
+                <p className="text-2xl font-bold mt-1">
+                  {students.filter(s => (s.status || "active") === "active").length}
+                </p>
+                <p className="text-gray-500 text-sm mt-2">Active</p>
               </div>
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
@@ -179,7 +202,9 @@ export default function StudentsManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">New This Month</p>
-                <p className="text-2xl font-bold mt-1">156</p>
+                <p className="text-2xl font-bold mt-1">
+                  {students.filter(s => s.status === "new").length}
+                </p>
                 <p className="text-green-600 text-sm mt-2 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-1" />
                   +8.5%
@@ -193,7 +218,11 @@ export default function StudentsManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Avg Progress</p>
-                <p className="text-2xl font-bold mt-1">68%</p>
+                <p className="text-2xl font-bold mt-1">
+                  {students.length > 0
+                    ? Math.round(students.reduce((acc, s) => acc + (s.progress || 0), 0) / students.length)
+                    : 0}%
+                </p>
                 <p className="text-green-600 text-sm mt-2 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-1" />
                   +5.2%
@@ -227,10 +256,6 @@ export default function StudentsManagement() {
               <option value="inactive">Inactive</option>
               <option value="new">New</option>
             </select>
-            <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </button>
           </div>
         </div>
 
@@ -240,42 +265,26 @@ export default function StudentsManagement() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Student
-                  </th>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Grade
-                  </th>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Courses
-                  </th>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Progress
-                  </th>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Fees
-                  </th>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Status
-                  </th>
-                  <th className="text-left py-3 px-6 font-medium text-gray-700">
-                    Actions
-                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Student</th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Grade</th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Courses</th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Progress</th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Fees</th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Status</th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {students.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
+                {students.map((student, idx) => (
+                  <tr key={student.id || idx} className="hover:bg-gray-50">
                     <td className="py-4 px-6">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                          {student.avatar}
+                          {student.avatar || "S"}
                         </div>
                         <div>
                           <p className="font-medium">{student.name}</p>
-                          <p className="text-sm text-gray-500">
-                            {student.email}
-                          </p>
+                          <p className="text-sm text-gray-500">{student.email}</p>
                         </div>
                       </div>
                     </td>
@@ -297,44 +306,28 @@ export default function StudentsManagement() {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span
-                        className={`text-sm font-medium ${getFeesColor(student.fees)}`}
-                      >
+                      <span className={`text-sm font-medium ${getFeesColor(student.fees)}`}>
                         {student.fees}
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(student.status)}`}
-                      >
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(student.status)}`}>
                         {student.status}
                       </span>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() =>
-                            handleView(student.id.toString(), "student")
-                          }
-                          className="p-1 hover:bg-gray-100 rounded"
-                        >
-                          <Eye className="w-4 h-4 text-gray-600" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleEdit(student.id.toString(), "student")
-                          }
+                          onClick={() => { setSelectedStudent(student); setIsModalOpen(true); }}
                           className="p-1 hover:bg-gray-100 rounded"
                         >
                           <Edit className="w-4 h-4 text-gray-600" />
                         </button>
                         <button
-                          onClick={() =>
-                            handleDelete(student.id.toString(), "student")
-                          }
-                          className="p-1 hover:bg-gray-100 rounded"
+                          onClick={() => student.id && handleDeleteItem(student.id)}
+                          className="p-1 hover:bg-red-50 text-red-600 rounded"
                         >
-                          <MoreVertical className="w-4 h-4 text-gray-600" />
+                          <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -345,76 +338,111 @@ export default function StudentsManagement() {
           </div>
         </div>
 
-        {/* Performance Overview */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Top Performers</h3>
-            <div className="space-y-3">
-              {students
-                .filter((s) => s.progress >= 80)
-                .slice(0, 3)
-                .map((student, index) => (
-                  <div
-                    key={student.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center">
-                      <span className="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                        {index + 1}
-                      </span>
-                      <div>
-                        <p className="font-medium">{student.name}</p>
-                        <p className="text-sm text-gray-500">{student.grade}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">{student.progress}%</p>
-                      <p className="text-sm text-gray-500">progress</p>
-                    </div>
+        {/* Modal Form */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg overflow-y-auto max-h-[90vh]">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">{selectedStudent ? "Edit Student" : "Add Student"}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="text-gray-500">&times;</button>
+              </div>
+              <form onSubmit={handleSaveItem} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.name || ""}
+                    onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={formState.email || ""}
+                      onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
                   </div>
-                ))}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Phone</label>
+                    <input
+                      type="text"
+                      value={formState.phone || ""}
+                      onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Grade</label>
+                    <input
+                      type="text"
+                      value={formState.grade || ""}
+                      onChange={(e) => setFormState({ ...formState, grade: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <select
+                      value={formState.status || "new"}
+                      onChange={(e) => setFormState({ ...formState, status: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="new">New</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Fees</label>
+                    <select
+                      value={formState.fees || "Pending"}
+                      onChange={(e) => setFormState({ ...formState, fees: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Paid">Paid</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Progress (%)</label>
+                    <input
+                      type="number"
+                      max="100"
+                      value={formState.progress || 0}
+                      onChange={(e) => setFormState({ ...formState, progress: Number(e.target.value) })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-            <div className="space-y-3">
-              <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                  <Calendar className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    John Doe enrolled in Math Course
-                  </p>
-                  <p className="text-xs text-gray-500">2 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                  <Award className="w-4 h-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Sarah Smith completed Physics module
-                  </p>
-                  <p className="text-xs text-gray-500">5 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                  <BookOpen className="w-4 h-4 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Mike Johnson started Chemistry course
-                  </p>
-                  <p className="text-xs text-gray-500">1 day ago</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </AdminLayout>
   );

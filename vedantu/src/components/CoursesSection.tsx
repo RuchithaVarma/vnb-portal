@@ -1,51 +1,25 @@
-import { Calculator, Globe, BookOpen, Zap, Award, GraduationCap } from 'lucide-react';
+import { BookOpen, GraduationCap, Code, Languages, Calculator, Palette, HelpCircle, type LucideIcon, Zap } from 'lucide-react';
+import { getItems } from '@/lib/firestoreService';
+import { Course } from '@/types';
 
-const courses = [
-  { 
-    title: "Olympiad Exams", 
-    icon: Award, 
-    color: "from-red-400 to-pink-500",
-    grades: "Class 3-10",
-    features: ["Competitive Prep", "Live Classes", "Doubt Solving"]
-  },
-  { 
-    title: "Vedic Maths", 
-    icon: Zap, 
-    color: "from-yellow-400 to-orange-500",
-    grades: "All Ages",
-    features: ["1-Year & Crash Courses", "Live Sessions", "Certification"]
-  },
-  { 
-    title: "Telugu (Basic & Advanced)", 
-    icon: BookOpen, 
-    color: "from-blue-400 to-cyan-500",
-    grades: "All Ages",
-    features: ["75 Live Sessions", "Daily/Weekly", "Certification"]
-  },
-  { 
-    title: "Phonics", 
-    icon: Globe, 
-    color: "from-green-400 to-teal-500",
-    grades: "Level 1-4",
-    features: ["4-6 Months Course", "Live Sessions", "Worksheets"]
-  },
-  { 
-    title: "Abacus Crash Course", 
-    icon: Calculator, 
-    color: "from-purple-400 to-indigo-500",
-    grades: "All Ages",
-    features: ["45 Live Sessions", "Worksheets", "Certification"]
-  },
-  { 
-    title: "CBSE School Tuition", 
-    icon: GraduationCap, 
-    color: "from-pink-400 to-rose-500",
-    grades: "Class 1-12",
-    features: ["All Subjects", "NCERT Based", "Board Prep"]
+const iconMap: Record<string, LucideIcon> = {
+  "JEE/NEET Preparation": GraduationCap,
+  "CBSE School Tuition": BookOpen,
+  "Coding for Kids": Code,
+  "Spoken English": Languages,
+  "Mathematics": Calculator,
+  "Creative Arts": Palette,
+};
+
+const CoursesSection = async () => {
+  let courses: Course[] = [];
+  try {
+    courses = await getItems<Course>("courses");
+  } catch (error) {
+    console.error("Failed to fetch courses for homepage:", error);
+    // Fallback or empty list
   }
-];
 
-const CoursesSection = () => {
   return (
     <section className="py-16 bg-white relative overflow-hidden">
       {/* Animated background */}
@@ -67,10 +41,10 @@ const CoursesSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course, idx) => {
-            const Icon = course.icon;
+            const Icon = iconMap[course.title] || HelpCircle;
             return (
               <div
-                key={idx}
+                key={course.id || idx}
                 className="group bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl card-hover animate-fadeInUp border-2 border-gray-100 relative overflow-hidden"
                 style={{animationDelay: `${idx * 0.1}s`}}
               >
@@ -96,6 +70,12 @@ const CoursesSection = () => {
                       </li>
                     ))}
                   </ul>
+                  
+                  {/* Price/CTA */}
+                  <div className="mb-6">
+                    <span className="text-xl font-bold text-gray-800">₹{course.price.toLocaleString()}</span>
+                    <span className="text-sm text-gray-500"> / {course.duration}</span>
+                  </div>
                   
                   {/* CTA */}
                   <button className={`w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r ${course.color} hover:shadow-2xl hover:scale-105 transition-all duration-300`}>
