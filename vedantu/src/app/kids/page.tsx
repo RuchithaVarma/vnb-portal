@@ -197,76 +197,80 @@ export default function KidsCoursesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredCourses.map((course) => (
-            <div key={course.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+            <div key={course.id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 flex flex-col h-full relative group">
               {/* Course Header */}
-              <div className={`h-32 bg-gradient-to-br ${course.color} relative`}>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    {course.icon}
-                  </div>
+              <div className={`h-40 bg-gradient-to-br ${course.color} relative overflow-hidden flex items-center justify-center`}>
+                <div className="absolute inset-0 bg-black/5"></div>
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg relative z-10 border border-white/30">
+                  {course.icon}
                 </div>
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-700 rounded-full">
+                <div className="absolute top-4 left-4 z-20">
+                  <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-xs font-black text-gray-800 rounded-full shadow-sm border border-gray-100">
                     {course.ageGroup} years
                   </span>
                 </div>
-                <div className="absolute top-4 right-4">
-                  <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-700 rounded-full">
+                <div className="absolute top-4 right-4 z-20">
+                  <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-xs font-black text-gray-800 rounded-full shadow-sm border border-gray-100">
                     {course.category}
                   </span>
                 </div>
               </div>
 
               {/* Course Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <div className="p-6 flex flex-col flex-1">
+                <h3 className="text-xl font-black text-gray-900 mb-2 group-hover:text-[var(--primary)] transition-colors tracking-tight">
                   {course.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-500 text-sm mb-4 font-medium line-clamp-2">
                   {course.description}
                 </p>
                 
                 {/* Features */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 mb-6">
                   {course.features.map((feature, index) => (
-                    <span key={index} className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+                    <span key={index} className="text-[10px] px-2.5 py-1 bg-gray-50 text-gray-500 font-bold rounded-lg border border-gray-100">
                       {feature}
                     </span>
                   ))}
                 </div>
                 
-                <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Star className="text-yellow-500 fill-current" size={16} />
-                    <span className="font-medium">{course.rating}</span>
+                {/* Micro Details */}
+                <div className="flex items-center gap-3 mb-6 text-xs font-bold text-gray-500">
+                  <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-xl text-amber-600 border border-amber-100">
+                    <Star className="fill-current" size={14} />
+                    <span>{course.rating}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Users size={16} />
+                  <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-xl text-blue-600 border border-blue-100">
+                    <Users size={14} />
                     <span>{course.students.toLocaleString()}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock size={16} />
+                  <div className="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-xl text-purple-600 border border-purple-100">
+                    <Clock size={14} />
                     <span>{course.duration}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mb-4">
+                {/* Divider node */}
+                <div className="flex items-center justify-between mb-6 pt-5 border-t border-gray-100 mt-auto">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">₹{course.price.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500 line-through">₹{course.originalPrice.toLocaleString()}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Fee</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-gray-900 tracking-tighter">₹{course.price.toLocaleString()}</span>
+                      <span className="text-xs text-gray-400 line-through font-bold">₹{course.originalPrice.toLocaleString()}</span>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">{course.lessons} lessons</p>
-                    <p className="text-xs text-gray-400">{course.instructor}</p>
+                    <p className="text-sm text-gray-800 font-black">{course.lessons} lessons</p>
+                    <p className="text-[11px] text-gray-400 font-bold">by {course.instructor}</p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <Link href={`/kids/courses/${course.id}`} className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center py-2 rounded-lg font-semibold hover:shadow-lg transition-all">
+                  <Link href={`/kids/courses/${course.id}`} className="flex-1 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 text-white text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-400/20 transition-all">
                     Enroll Now
                   </Link>
-                  <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Play size={20} />
+                  <button className="px-4 py-2 border-2 border-gray-100 hover:border-purple-300 text-gray-700 hover:text-purple-600 rounded-xl transition-all">
+                    <Play size={18} />
                   </button>
                 </div>
               </div>
@@ -315,7 +319,7 @@ export default function KidsCoursesPage() {
               Book FREE Trial
             </Link>
             <Link href="/counseling" className="px-8 py-4 border-2 border-white text-white rounded-lg font-bold hover:bg-white/10 transition-colors">
-              Talk to Counselor
+            Talk to Counselor
             </Link>
           </div>
         </div>

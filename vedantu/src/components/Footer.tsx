@@ -29,14 +29,13 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Exams */}
+          {/* Skills & Logic */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-[var(--primary)]">Competitive Exams</h3>
+            <h3 className="text-lg font-bold mb-4 text-[var(--primary)]">Skills & Logic</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link href="/jee" className="hover:text-white">JEE Main & Advanced</Link></li>
-              <li><Link href="/neet" className="hover:text-white">NEET</Link></li>
-              <li><Link href="/olympiad" className="hover:text-white">Olympiad</Link></li>
-              <li><Link href="/boards" className="hover:text-white">Board Exams</Link></li>
+              <li><Link href="/courses/vedic-maths" className="hover:text-white">Vedic Maths</Link></li>
+              <li><Link href="/courses/phonics" className="hover:text-white">Phonics</Link></li>
+              <li><Link href="/courses/abacus-long-term" className="hover:text-white">Abacus</Link></li>
             </ul>
           </div>
 
@@ -53,12 +52,12 @@ const Footer = () => {
 
           {/* Popular Courses */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-[var(--primary)]">Popular Courses</h3>
+            <h3 className="text-lg font-bold mb-4 text-[var(--primary)]">Academic Courses</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link href="/class-12" className="hover:text-white">Class 12</Link></li>
-              <li><Link href="/class-11" className="hover:text-white">Class 11</Link></li>
-              <li><Link href="/class-10" className="hover:text-white">Class 10</Link></li>
-              <li><Link href="/class-9" className="hover:text-white">Class 9</Link></li>
+              <li><Link href="/courses/class-7-8" className="hover:text-white">Class 7 & 8</Link></li>
+              <li><Link href="/courses/class-5-6" className="hover:text-white">Class 5 & 6</Link></li>
+              <li><Link href="/courses/class-3-4" className="hover:text-white">Class 3 & 4</Link></li>
+              <li><Link href="/courses/telugu-basics" className="hover:text-white">Telugu Basics</Link></li>
             </ul>
           </div>
         </div>

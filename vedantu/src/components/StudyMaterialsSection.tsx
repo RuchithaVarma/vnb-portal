@@ -1,4 +1,5 @@
 import { BookOpen, FileText, Award, Download, CheckCircle, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 const studyMaterials = [
   { title: "NCERT Solutions", icon: BookOpen, color: "from-blue-400 to-cyan-500", count: "All Classes" },
@@ -50,10 +51,10 @@ const StudyMaterialsSection = () => {
                   <h3 className="text-xl font-bold mb-2 text-gray-800">{material.title}</h3>
                   <p className="text-sm text-gray-600 mb-4">{material.count}</p>
                   
-                  <button className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:gap-3 transition-all">
+                  <Link href="/coming-soon" className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:gap-3 transition-all cursor-pointer">
                     Access Now
                     <Download size={16} className="group-hover:translate-y-0.5 transition-transform" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             );
@@ -61,9 +62,9 @@ const StudyMaterialsSection = () => {
         </div>
 
         <div className="text-center mt-12 animate-fadeInUp" style={{animationDelay: '0.7s'}}>
-          <button className="btn-primary shadow-2xl">
-            Explore All Resources →
-          </button>
+          <Link href="/materials" className="btn-primary shadow-2xl inline-block">
+            Explore All Resources &rarr;
+          </Link>
         </div>
       </div>
     </section>

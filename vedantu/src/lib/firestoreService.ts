@@ -11,6 +11,7 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
+import seedData from "@/data/seed-data.json";
 
 // Generic function to get items
 export const getItems = async <T>(collectionName: string): Promise<T[]> => {
@@ -22,6 +23,11 @@ export const getItems = async <T>(collectionName: string): Promise<T[]> => {
     })) as T[];
   } catch (error) {
     console.error(`Error getting items from ${collectionName}:`, error);
+    // Global Fallback to seedData to prevent blank screens
+    if (seedData && (seedData as any)[collectionName]) {
+      console.warn(`[Firestore] Falling back to local seed-data for: ${collectionName}`);
+      return (seedData as any)[collectionName] as T[];
+    }
     throw error;
   }
 };

@@ -1,10 +1,9 @@
 "use client";
-import { useState } from 'react';
 import { Star, ArrowRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Hero = () => {
-  const [activeTab, setActiveTab] = useState('school');
 
   return (
     <section className="relative bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 py-16 md:py-24 overflow-hidden">
@@ -31,36 +30,22 @@ const Hero = () => {
 
             {/* Tabs with enhanced styling */}
             <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => setActiveTab('school')}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  activeTab === 'school'
-                    ? 'bg-[var(--primary)] text-white shadow-xl scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
-                }`}
-              >
+              <Link href="/courses?category=academic" className="px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
                 📚 School Tuition
-              </button>
-              <button
-                onClick={() => setActiveTab('kids')}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  activeTab === 'kids'
-                    ? 'bg-[var(--primary)] text-white shadow-xl scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
-                }`}
-              >
+              </Link>
+              <Link href="/kids" className="px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
                 🧒 Courses for Kids
-              </button>
+              </Link>
             </div>
 
             {/* CTAs with enhanced animations */}
             <div className="flex flex-wrap gap-4 pt-4">
-              <button className="btn-primary flex items-center gap-2 shadow-xl">
+              <Link href="/trial" className="btn-primary flex items-center gap-2 shadow-xl cursor-pointer">
                 Book FREE Trial <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button className="px-6 py-3 bg-white text-[var(--primary)] border-2 border-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105">
+              </Link>
+              <Link href="/courses" className="px-6 py-3 bg-white text-[var(--primary)] border-2 border-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 cursor-pointer">
                 Explore Courses
-              </button>
+              </Link>
             </div>
 
             {/* Trust Indicators with animations */}

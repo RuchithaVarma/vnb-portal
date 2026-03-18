@@ -53,28 +53,60 @@ const Header = () => {
 
   const courses = [
     {
-      category: "Academic Courses",
+      category: "Academic",
       icon: <GraduationCap size={20} />,
       items: [
         {
-          name: "Class 1-5",
-          href: "/courses/primary",
-          description: "Foundation building for young learners",
-        },
-        {
-          name: "Class 6-8",
-          href: "/courses/middle",
+          name: "Class 7 & 8",
+          href: "/courses?category=academic",
           description: "Concept clarity and skill development",
         },
         {
-          name: "Class 9-10",
-          href: "/courses/secondary",
-          description: "Board exam preparation",
+          name: "Class 5 & 6",
+          href: "/courses?category=academic",
+          description: "Foundation building for young learners",
         },
         {
-          name: "Class 11-12",
-          href: "/courses/senior",
-          description: "Advanced concepts and competitive exams",
+          name: "Class 3 & 4",
+          href: "/courses?category=academic",
+          description: "Basic arithmetic and interactive reading",
+        },
+      ],
+    },
+    {
+      category: "Skills & Logic",
+      icon: <Sparkles size={20} />,
+      items: [
+        {
+          name: "Vedic Maths",
+          href: "/courses?category=skill",
+          description: "Master speed calculation tricks",
+        },
+        {
+          name: "Phonics",
+          href: "/courses?category=skill",
+          description: "Reading fluency and pronunciation",
+        },
+        {
+          name: "Abacus",
+          href: "/courses?category=skill",
+          description: "Mental arithmetic and concentration",
+        },
+      ],
+    },
+    {
+      category: "Languages",
+      icon: <Award size={20} />,
+      items: [
+        {
+          name: "Telugu Basics",
+          href: "/courses?category=languages",
+          description: "Learn Telugu from scratch",
+        },
+        {
+          name: "Telugu Advanced",
+          href: "/courses?category=languages",
+          description: "Advanced grammar and essay writing",
         },
       ],
     },
@@ -83,50 +115,9 @@ const Header = () => {
       icon: <Award size={20} />,
       items: [
         {
-          name: "Olympiad Exams",
-          href: "/courses/olympiad",
-          description: "Competitive exam preparation for young achievers",
-        },
-        {
-          name: "NEET Preparation",
-          href: "/courses/neet",
-          description: "Medical entrance exam coaching",
-        },
-        {
-          name: "CBSE Board Exams",
-          href: "/courses/cbse",
-          description: "Comprehensive board exam preparation",
-        },
-        {
-          name: "State Board Exams",
-          href: "/courses/state",
-          description: "State-specific exam preparation",
-        },
-      ],
-    },
-    {
-      category: "Special Programs",
-      icon: <Sparkles size={20} />,
-      items: [
-        {
-          name: "Super Teachers",
-          href: "/courses/super-teachers",
-          description: "Learn from India's best teachers",
-        },
-        {
-          name: "1-on-1 Sessions",
-          href: "/courses/one-on-one",
-          description: "Personalized learning experience",
-        },
-        {
-          name: "Crash Courses",
-          href: "/courses/crash",
-          description: "Intensive exam preparation",
-        },
-        {
-          name: "Summer Programs",
-          href: "/courses/summer",
-          description: "Engaging summer learning programs",
+          name: "Olympiad Exams Preparation",
+          href: "/courses?category=competitive",
+          description: "Competitive preparation for young achievers",
         },
       ],
     },
@@ -170,11 +161,11 @@ const Header = () => {
               {/* Courses Dropdown Menu */}
               {isCoursesOpen && (
                 <div
-                  className="absolute top-full left-0 mt-2 w-[600px] bg-white rounded-lg shadow-xl border border-gray-200 p-6 animate-fadeIn"
+                  className="absolute top-full left-0 mt-2 w-[800px] bg-white rounded-lg shadow-xl border border-gray-200 p-6 animate-fadeIn"
                   onMouseEnter={() => setIsCoursesOpen(true)}
                   onMouseLeave={() => setIsCoursesOpen(false)}
                 >
-                  <div className="grid grid-cols-3 gap-6">
+                  <div className="grid grid-cols-4 gap-6">
                     {courses.map((category, index) => (
                       <div key={index}>
                         <div className="flex items-center gap-2 mb-4">
@@ -221,7 +212,7 @@ const Header = () => {
                       </div>
                       <Link
                         href="/counseling"
-                        className="btn-primary text-sm cursor-pointer"
+                       className="btn-primary text-sm cursor-pointer"
                       >
                         Talk to Expert
                       </Link>
@@ -246,22 +237,22 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
-              href="/centres"
+              href="/contact"
               className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors relative group cursor-pointer"
             >
-              Offline Centres
+              Contact Us
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
           </nav>
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            <div className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer">
-              <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center animate-pulse">
+            <Link href="/counseling" className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer">
+             <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center animate-pulse">
                 <Phone size={16} className="text-white" />
               </div>
               <span className="text-sm">Talk to Experts</span>
-            </div>
+            </Link>
 
             {isAuthenticated ? (
               /* User Profile Dropdown */
@@ -388,10 +379,10 @@ const Header = () => {
                 Free Study Material
               </Link>
               <Link
-                href="/centres"
+                href="/contact"
                 className="text-gray-700 font-medium hover:text-[var(--primary)] transition-colors cursor-pointer"
               >
-                Offline Centres
+                Contact Us
               </Link>
 
               {/* Mobile Auth Section */}

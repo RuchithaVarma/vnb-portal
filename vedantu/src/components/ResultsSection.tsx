@@ -1,10 +1,9 @@
 import { Trophy, Award, Medal, Star } from 'lucide-react';
 
 const toppers = [
-  { name: "Arjun Sharma", rank: "AIR 1", exam: "JEE Advanced 2025", score: "100%", icon: Trophy },
-  { name: "Priya Patel", rank: "AIR 3", exam: "NEET 2025", score: "720/720", icon: Award },
-  { name: "Rahul Kumar", rank: "99.8%ile", exam: "Class 12 Boards", score: "98.6%", icon: Medal },
-  { name: "Sneha Reddy", rank: "State Topper", exam: "Class 10 Boards", score: "100%", icon: Star }
+  { name: "Sneha Reddy", rank: "State Topper", exam: "Class 10 Boards", score: "100%", icon: Trophy },
+  { name: "Rahul Kumar", rank: "99.8%ile", exam: "Class 12 Boards", score: "98.6%", icon: Award },
+  { name: "Ananya Verma", rank: "School Topper", exam: "Class 8", score: "98%", icon: Medal }
 ];
 
 const ResultsSection = () => {

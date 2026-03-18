@@ -2,20 +2,6 @@ import { Quote, Star } from 'lucide-react';
 
 const testimonials = [
   {
-    name: "Priya Sharma",
-    achievement: "JEE Advanced AIR 45",
-    score: "99.8%ile",
-    quote: "Brilliant Roots's live classes and personalized doubt solving helped me crack JEE. The teachers are amazing and always available to help!",
-    color: "from-blue-400 to-cyan-500"
-  },
-  {
-    name: "Arjun Patel",
-    achievement: "NEET AIR 120",
-    score: "720/720",
-    quote: "The structured curriculum and regular tests kept me on track. I'm grateful to my Brilliant Roots teachers for their constant support.",
-    color: "from-purple-400 to-pink-500"
-  },
-  {
     name: "Sneha Reddy",
     achievement: "Class 12 CBSE",
     score: "98.4%",
@@ -28,6 +14,13 @@ const testimonials = [
     score: "96.8%",
     quote: "Brilliant Roots helped me build strong fundamentals. The teachers explain concepts so clearly that even difficult topics become easy!",
     color: "from-orange-400 to-red-500"
+  },
+  {
+    name: "Aanya Singh",
+    achievement: "Coding Competition",
+    score: "1st Place",
+    quote: "The coding course at Brilliant Roots sparked my interest in programming. Now I'm building my own apps!",
+    color: "from-pink-400 to-purple-500"
   }
 ];
 

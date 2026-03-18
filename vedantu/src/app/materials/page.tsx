@@ -7,6 +7,7 @@ export default function StudyMaterialsPage() {
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedClass, setSelectedClass] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [visibleMaterials, setVisibleMaterials] = useState(6);
 
   const subjects = [
     { id: 'all', name: 'All Subjects', icon: <BookOpen size={20} /> },
@@ -259,87 +260,90 @@ export default function StudyMaterialsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMaterials.map((material) => (
-            <div key={material.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+          {filteredMaterials.slice(0, visibleMaterials).map((material) => (
+            <div key={material.id} className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 flex flex-col h-full relative group">
+              {/* Top Accent Strip */}
+              <div className="h-1.5 bg-gradient-to-r from-blue-500 to-teal-500"></div>
+
               {/* Material Header */}
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-6 flex flex-col flex-1">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center border border-blue-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
                       {getTypeIcon(material.type)}
                     </div>
                     <div>
-                      <span className="text-xs font-semibold text-gray-500 uppercase">{material.type}</span>
-                      <h3 className="text-lg font-bold text-gray-900 line-clamp-2">{material.title}</h3>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{material.type}</span>
+                      <h3 className="text-lg font-black text-gray-900 line-clamp-2 tracking-tight group-hover:text-blue-600 transition-colors">{material.title}</h3>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star className="text-yellow-500 fill-current" size={16} />
-                    <span className="font-medium">{material.rating}</span>
+                  <div className="flex items-center gap-1 text-sm bg-amber-50 px-2.5 py-1 rounded-xl text-amber-600 border border-amber-100 font-bold">
+                    <Star className="fill-current" size={14} />
+                    <span>{material.rating}</span>
                   </div>
                 </div>
                 
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                <p className="text-gray-500 text-sm mb-4 line-clamp-2 font-medium">
                   {material.description}
                 </p>
 
                 {/* Chapters */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 mb-5">
                   {material.chapters.slice(0, 3).map((chapter, index) => (
-                    <span key={index} className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                    <span key={index} className="text-[10px] px-2.5 py-1 bg-gray-50 text-gray-500 font-bold rounded-lg border border-gray-100">
                       {chapter}
                     </span>
                   ))}
                   {material.chapters.length > 3 && (
-                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+                    <span className="text-[10px] px-2.5 py-1 bg-gray-50 text-gray-400 font-bold rounded-lg border border-gray-100">
                       +{material.chapters.length - 3} more
                     </span>
                   )}
                 </div>
 
-                {/* Material Info */}
-                <div className="flex items-center gap-4 text-sm text-gray-500">
+                {/* Material Info Stats */}
+                <div className="flex items-center gap-4 text-xs font-bold text-gray-400 mt-auto pt-4 border-t border-gray-50">
                   <div className="flex items-center gap-1">
-                    <FileText size={14} />
+                    <FileText size={14} className="text-blue-500" />
                     <span>{material.format}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Download size={14} />
+                    <Download size={14} className="text-green-500" />
                     <span>{material.downloads.toLocaleString()}</span>
                   </div>
                   {material.pages && (
                     <div className="flex items-center gap-1">
-                      <FileText size={14} />
+                      <BookOpen size={14} className="text-purple-500" />
                       <span>{material.pages} pages</span>
                     </div>
                   )}
                   {material.duration && (
                     <div className="flex items-center gap-1">
-                      <Clock size={14} />
+                      <Clock size={14} className="text-red-500" />
                       <span>{material.duration}</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="p-6 bg-gray-50">
+              {/* Actions Footer */}
+              <div className="p-6 bg-gray-50 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-gray-500">File size: {material.size}</span>
+                  <span className="text-xs text-gray-400 font-bold">File size: {material.size}</span>
                   {material.preview && (
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1">
-                      <Eye size={16} />
+                    <button className="text-blue-600 hover:text-blue-700 text-xs font-black uppercase tracking-widest flex items-center gap-1 group/btn">
+                      <Eye size={16} className="group-hover/btn:scale-110 transition-transform" />
                       Preview
                     </button>
                   )}
                 </div>
                 <div className="flex gap-3">
-                  <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                  <Link href="/coming-soon" className="flex-1 bg-gradient-to-r from-blue-600 to-teal-500 hover:opacity-90 text-white py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-blue-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer">
                     <Download size={16} />
-                    Download Free
-                  </button>
-                  <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Award size={16} />
+                    Download
+                  </Link>
+                  <button className="px-4 py-3 border-2 border-gray-200 hover:border-blue-500 text-gray-600 hover:text-blue-600 rounded-xl transition-all">
+                    <Award size={18} />
                   </button>
                 </div>
               </div>
@@ -348,11 +352,16 @@ export default function StudyMaterialsPage() {
         </div>
 
         {/* Load More */}
-        <div className="text-center mt-12">
-          <button className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-            Load More Materials
-          </button>
-        </div>
+        {visibleMaterials < filteredMaterials.length && (
+          <div className="text-center mt-12">
+            <button 
+              onClick={() => setVisibleMaterials(prev => prev + 3)}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:opacity-90 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-blue-500/20 transition-all duration-300"
+            >
+              Load More Materials
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Features Section */}

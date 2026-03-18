@@ -1,6 +1,7 @@
-import { TrendingUp, Users, Award, Globe, HelpCircle, type LucideIcon } from 'lucide-react';
+import { TrendingUp, Users, Award, Globe, HelpCircle, type LucideIcon, Sparkles } from 'lucide-react';
 import { getItems } from '@/lib/firestoreService';
 import { Stat } from '@/types';
+import StatCard from './StatCard';
 
 const iconMap: Record<string, LucideIcon> = {
   "⏱️": TrendingUp,
@@ -15,46 +16,67 @@ const StatsSection = async () => {
     stats = await getItems<Stat>("stats");
   } catch (error) {
     console.error("Failed to fetch stats for homepage:", error);
-    // Fallback or empty list
+    // Fallback data
+    stats = [
+      { id: '1', icon: '⏱️', value: '2.1Cr+', label: 'Learning Hours', color: 'from-orange-400 to-pink-500' },
+      { id: '2', icon: '🏆', value: '98%', label: 'Student Satisfaction', color: 'from-blue-400 to-indigo-500' },
+      { id: '3', icon: '👨‍🏫', value: '500+', label: 'Expert Teachers', color: 'from-green-400 to-teal-500' },
+      { id: '4', icon: '🌍', value: '50+', label: 'Cities Reached', color: 'from-purple-400 to-fuchsia-500' },
+    ];
   }
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden">
+    <section className="py-24 bg-white relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-400"></div>
-      
-      <div className="container mx-auto px-4">
-        <h2 className="section-title text-center mb-4 animate-fadeInUp">
-          Trusted by <span className="gradient-text">Millions</span>
-        </h2>
-        <p className="text-center text-gray-600 mb-12 animate-fadeIn">Making education accessible and effective for every student</p>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-400"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-orange-50/50 rounded-full blur-[120px] -z-10"></div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-yellow-50 px-6 py-2.5 rounded-full shadow-sm mb-6 border border-orange-100">
+            <Sparkles className="text-[var(--primary)]" size={16} />
+            <span className="font-bold text-gray-700 uppercase tracking-widest text-[10px]">Trusted Globally</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
+            Education That <span className="gradient-text">Delivers Results</span>
+          </h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Empowering students across the nation with high-quality education and a personalized learning experience.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {stats.map((stat, idx) => {
             const Icon = iconMap[stat.icon] || HelpCircle;
             return (
-              <div 
-                key={stat.id || idx} 
-                className="text-center group animate-fadeInUp card-hover bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl border border-gray-100"
-                style={{animationDelay: `${idx * 0.1}s`}}
-              >
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br ${stat.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="text-white" size={28} />
-                </div>
-                <p className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-[var(--primary)] to-orange-600 bg-clip-text text-transparent mb-2">
-                  {stat.value}
-                </p>
-                <p className="text-gray-600 font-medium">{stat.label}</p>
-              </div>
+              <StatCard
+                key={stat.id || idx}
+                stat={stat}
+                Icon={Icon}
+                index={idx}
+              />
             );
           })}
         </div>
 
         {/* Additional trust badge */}
-        <div className="mt-12 text-center animate-fadeInUp" style={{animationDelay: '0.5s'}}>
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-50 to-yellow-50 px-8 py-4 rounded-full border-2 border-orange-200">
-            <span className="text-3xl">🏆</span>
-            <span className="font-bold text-gray-800">India's Most Loved Learning Platform</span>
+        <div className="text-center">
+          <div className="inline-flex flex-col md:flex-row items-center gap-4 bg-white px-10 py-6 rounded-[2.5rem] shadow-2xl border border-gray-100 hover:scale-[1.02] transition-transform duration-500">
+            <div className="flex -space-x-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-12 h-12 rounded-full border-2 border-white bg-gray-200 overflow-hidden shadow-md">
+                  <div className={`w-full h-full bg-gradient-to-br from-orange-${i}00 to-pink-${i}00`}></div>
+                </div>
+              ))}
+              <div className="w-12 h-12 rounded-full border-2 border-white bg-[var(--primary)] flex items-center justify-center text-white text-xs font-bold shadow-md">
+                +1M
+              </div>
+            </div>
+            <div className="h-8 w-px bg-gray-200 hidden md:block mx-4"></div>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🏆</span>
+              <span className="font-bold text-gray-800 text-lg">India's Most Loved Learning Platform</span>
+            </div>
           </div>
         </div>
       </div>

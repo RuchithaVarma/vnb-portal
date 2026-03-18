@@ -1,70 +1,130 @@
 {
   "courses": [
     {
-      "title": "JEE/NEET Preparation",
+      "title": "Class 7 & 8",
       "color": "from-red-400 to-pink-500",
-      "grades": "Class 11-12",
-      "features": ["Live Classes", "Doubt Solving", "Test Series"],
-      "duration": "12 months",
-      "price": 49999,
-      "enrolled": 2500,
-      "rating": 4.8,
-      "image": "/images/courses/jeeneet.jpg"
-    },
-    {
-      "title": "CBSE School Tuition",
-      "color": "from-blue-400 to-cyan-500",
-      "grades": "Class 1-12",
-      "features": ["All Subjects", "NCERT Based", "Board Prep"],
-      "duration": "10 months",
-      "price": 29999,
-      "enrolled": 3200,
-      "rating": 4.7,
-      "image": "/images/courses/cbse.jpg"
-    },
-    {
-      "title": "Coding for Kids",
-      "color": "from-purple-400 to-indigo-500",
-      "grades": "Class 1-8",
-      "features": ["Scratch", "Python", "Web Dev"],
-      "duration": "6 months",
-      "price": 19999,
-      "enrolled": 1800,
+      "grades": "Class 7-8",
+      "features": ["Mathematics", "Science", "Eng Grammar", "Soc Studies"],
+      "duration": "Academic Year",
+      "price": 15000,
+      "originalPrice": 20000,
+      "enrolled": 12450,
       "rating": 4.9,
-      "image": "/images/courses/coding.jpg"
+      "image": "/images/courses/class78.jpg",
+      "category": "academic",
+      "icon": "GraduationCap"
     },
     {
-      "title": "Spoken English",
+      "title": "Class 5 & 6",
+      "color": "from-blue-400 to-cyan-500",
+      "grades": "Class 5-6",
+      "features": ["Mathematics", "EVS/Science", "English", "Creative Thinking"],
+      "duration": "Academic Year",
+      "price": 10000,
+      "originalPrice": 14000,
+      "enrolled": 9840,
+      "rating": 4.8,
+      "image": "/images/courses/class56.jpg",
+      "category": "academic",
+      "icon": "GraduationCap"
+    },
+    {
+      "title": "Class 3 & 4",
+      "color": "from-purple-400 to-indigo-500",
+      "grades": "Class 3-4",
+      "features": ["Arithmetic", "Reading", "Science Basics", "Mental Math"],
+      "duration": "Academic Year",
+      "price": 8000,
+      "originalPrice": 12000,
+      "enrolled": 7520,
+      "rating": 4.7,
+      "image": "/images/courses/class34.jpg",
+      "category": "academic",
+      "icon": "GraduationCap"
+    },
+    {
+      "title": "Vedic Maths",
       "color": "from-green-400 to-teal-500",
       "grades": "All Ages",
-      "features": ["Fluency", "Grammar", "Confidence"],
-      "duration": "3 months",
-      "price": 14999,
-      "enrolled": 2100,
-      "rating": 4.6,
-      "image": "/images/courses/english.jpg"
+      "features": ["Addition Shortcuts", "Multiplication", "Square Roots", "Advanced Sutras"],
+      "duration": "12 months",
+      "price": 1500,
+      "originalPrice": 2000,
+      "enrolled": 8934,
+      "rating": 4.9,
+      "image": "/images/courses/vedicmaths.jpg",
+      "category": "skill",
+      "icon": "Calculator"
     },
     {
-      "title": "Mathematics",
+      "title": "Phonics",
       "color": "from-yellow-400 to-orange-500",
-      "grades": "Class 1-12",
-      "features": ["Vedic Math", "Olympiad", "Advanced"],
-      "duration": "8 months",
-      "price": 24999,
-      "enrolled": 1900,
-      "rating": 4.8,
-      "image": "/images/courses/mathematics.jpg"
+      "grades": "Class 1-4",
+      "features": ["Letter Sounds", "Blending", "Sight Words", "Reading Fluency"],
+      "duration": "6 months",
+      "price": 10000,
+      "originalPrice": 12000,
+      "enrolled": 9876,
+      "rating": 4.6,
+      "image": "/images/courses/phonics.jpg",
+      "category": "skill",
+      "icon": "Volume2"
     },
     {
-      "title": "Creative Arts",
+      "title": "Abacus Long Term",
       "color": "from-pink-400 to-rose-500",
-      "grades": "Class 1-8",
-      "features": ["Drawing", "Music", "Dance"],
-      "duration": "6 months",
-      "price": 17999,
-      "enrolled": 1500,
+      "grades": "Class 1-6",
+      "features": ["Abacus Basics", "Addition/Subtraction", "Mental Arithmetic"],
+      "duration": "12 months",
+      "price": 6000,
+      "originalPrice": 8000,
+      "enrolled": 4532,
+      "rating": 4.8,
+      "image": "/images/courses/abacus.jpg",
+      "category": "skill",
+      "icon": "Brain"
+    },
+    {
+      "title": "Telugu Basics",
+      "color": "from-indigo-400 to-purple-500",
+      "grades": "All Ages",
+      "features": ["Varnamala", "Vocabulary", "Simple Sentences", "Speaking"],
+      "duration": "3 months",
+      "price": 4000,
+      "originalPrice": 6000,
+      "enrolled": 6782,
       "rating": 4.7,
-      "image": "/images/courses/arts.jpg"
+      "image": "/images/courses/telugu.jpg",
+      "category": "languages",
+      "icon": "Languages"
+    },
+    {
+      "title": "Telugu Advanced",
+      "color": "from-indigo-400 to-purple-500",
+      "grades": "All Ages",
+      "features": ["Grammar", "Literature", "Essay Writing", "Conversation"],
+      "duration": "6 months",
+      "price": 6000,
+      "originalPrice": 8000,
+      "enrolled": 4210,
+      "rating": 4.8,
+      "image": "/images/courses/telugu_adv.jpg",
+      "category": "languages",
+      "icon": "Languages"
+    },
+    {
+      "title": "Olympiad Exams Preparation",
+      "color": "from-orange-400 to-pink-500",
+      "grades": "Competitions",
+      "features": ["Doubt Clearing", "Mock Tests", "Structured Curriculum"],
+      "duration": "6 months",
+      "price": 12000,
+      "originalPrice": 15000,
+      "enrolled": 15420,
+      "rating": 4.8,
+      "image": "/images/courses/olympiad.jpg",
+      "category": "competitive",
+      "icon": "Trophy"
     }
   ],
   "stats": [
@@ -133,20 +193,12 @@
   ],
   "results": [
     {
-      "name": "Arjun Sharma",
-      "rank": "AIR 1",
-      "exam": "JEE Advanced 2025",
+      "name": "Sneha Reddy",
+      "rank": "State Topper",
+      "exam": "Class 10 Boards",
       "score": "100%",
-      "image": "/images/students/arjun.jpg",
-      "story": "Brilliant Roots helped me achieve my dream with their excellent faculty and structured approach."
-    },
-    {
-      "name": "Priya Patel",
-      "rank": "AIR 3",
-      "exam": "NEET 2025",
-      "score": "720/720",
-      "image": "/images/students/priya.jpg",
-      "story": "The regular tests and doubt clearing sessions were game-changers for my NEET preparation."
+      "image": "/images/students/sneha.jpg",
+      "story": "The teachers made complex topics easy to understand and always motivated me."
     },
     {
       "name": "Rahul Kumar",
@@ -157,12 +209,12 @@
       "story": "I improved my scores significantly with Brilliant Roots' personalized attention."
     },
     {
-      "name": "Sneha Reddy",
-      "rank": "State Topper",
-      "exam": "Class 10 Boards",
-      "score": "100%",
-      "image": "/images/students/sneha.jpg",
-      "story": "The teachers made complex topics easy to understand and always motivated me."
+      "name": "Ananya Verma",
+      "rank": "School Topper",
+      "exam": "Class 8",
+      "score": "98%",
+      "image": "/images/students/ananya.jpg",
+      "story": "The interactive live sessions helped me grasp concepts much faster and excel in my exams."
     }
   ],
   "teachers": [
@@ -219,31 +271,13 @@
   ],
   "testimonials": [
     {
-      "name": "Priya Sharma",
-      "achievement": "JEE Advanced AIR 45",
-      "score": "99.8%ile",
-      "quote": "Brilliant Roots's live classes and personalized doubt solving helped me crack JEE. The teachers are amazing and always available to help!",
-      "color": "from-blue-400 to-cyan-500",
-      "image": "/images/students/priya-testimonial.jpg",
-      "course": "JEE/NEET Preparation"
-    },
-    {
-      "name": "Arjun Patel",
-      "achievement": "NEET AIR 120",
-      "score": "720/720",
-      "quote": "The structured curriculum and regular tests kept me on track. I'm grateful to my Brilliant Roots teachers for their constant support.",
-      "color": "from-purple-400 to-pink-500",
-      "image": "/images/students/arjun-testimonial.jpg",
-      "course": "JEE/NEET Preparation"
-    },
-    {
       "name": "Sneha Reddy",
       "achievement": "Class 12 CBSE",
       "score": "98.4%",
       "quote": "I improved from 75% to 98% with Brilliant Roots! The interactive classes made learning fun and the study materials were excellent.",
       "color": "from-green-400 to-teal-500",
       "image": "/images/students/sneha-testimonial.jpg",
-      "course": "CBSE School Tuition"
+      "course": "Class 7 & 8"
     },
     {
       "name": "Rahul Kumar",
@@ -252,7 +286,7 @@
       "quote": "Brilliant Roots helped me build strong fundamentals. The teachers explain concepts so clearly that even difficult topics become easy!",
       "color": "from-orange-400 to-red-500",
       "image": "/images/students/rahul-testimonial.jpg",
-      "course": "CBSE School Tuition"
+      "course": "Class 5 & 6"
     },
     {
       "name": "Aanya Singh",
@@ -261,7 +295,7 @@
       "quote": "The coding course at Brilliant Roots sparked my interest in programming. Now I'm building my own apps!",
       "color": "from-pink-400 to-purple-500",
       "image": "/images/students/aanya-testimonial.jpg",
-      "course": "Coding for Kids"
+      "course": "Phonics"
     }
   ],
   "studyMaterials": [
