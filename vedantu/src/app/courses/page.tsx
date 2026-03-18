@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -51,27 +51,35 @@ export default function CoursesPage() {
   // Check if user has access to a course
   const hasCourseAccess = (courseTitle: string) => {
     if (!isAuthenticated || !user) return false;
-    
+
     // Check if payment is confirmed
-    if (user.paymentStatus !== 'paid') return false;
-    
+    if (user.paymentStatus !== "paid") return false;
+
     // Check if this is the user's enrolled course
     const enrolledCourse = user.course;
     if (!enrolledCourse) return false;
-    
+
     // Match course titles (handle variations)
     const normalizedEnrolled = enrolledCourse.toLowerCase().trim();
     const normalizedCourse = courseTitle.toLowerCase().trim();
-    
+
     // Check for exact match or partial match
-    return normalizedCourse.includes(normalizedEnrolled) || 
-           normalizedEnrolled.includes(normalizedCourse) ||
-           (normalizedEnrolled.includes('class') && normalizedCourse.includes('class')) ||
-           (normalizedEnrolled.includes('vedic') && normalizedCourse.includes('vedic')) ||
-           (normalizedEnrolled.includes('telugu') && normalizedCourse.includes('telugu')) ||
-           (normalizedEnrolled.includes('abacus') && normalizedCourse.includes('abacus')) ||
-           (normalizedEnrolled.includes('phonics') && normalizedCourse.includes('phonics')) ||
-           (normalizedEnrolled.includes('olympiad') && normalizedCourse.includes('olympiad'));
+    return (
+      normalizedCourse.includes(normalizedEnrolled) ||
+      normalizedEnrolled.includes(normalizedCourse) ||
+      (normalizedEnrolled.includes("class") &&
+        normalizedCourse.includes("class")) ||
+      (normalizedEnrolled.includes("vedic") &&
+        normalizedCourse.includes("vedic")) ||
+      (normalizedEnrolled.includes("telugu") &&
+        normalizedCourse.includes("telugu")) ||
+      (normalizedEnrolled.includes("abacus") &&
+        normalizedCourse.includes("abacus")) ||
+      (normalizedEnrolled.includes("phonics") &&
+        normalizedCourse.includes("phonics")) ||
+      (normalizedEnrolled.includes("olympiad") &&
+        normalizedCourse.includes("olympiad"))
+    );
   };
 
   const categories = [
@@ -368,26 +376,27 @@ export default function CoursesPage() {
       {/* Course Grid */}
       <section className="container mx-auto px-4 py-12">
         {/* Student Access Message */}
-        {isAuthenticated && user?.role === 'student' && (
-          <div className={`mb-8 p-4 rounded-lg ${
-            user.paymentStatus === 'paid' 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
-              : 'bg-yellow-50 border border-yellow-200 text-yellow-800'
-          }`}>
+        {isAuthenticated && user?.role === "student" && (
+          <div
+            className={`mb-8 p-4 rounded-lg ${
+              user.paymentStatus === "paid"
+                ? "bg-green-50 border border-green-200 text-green-800"
+                : "bg-yellow-50 border border-yellow-200 text-yellow-800"
+            }`}
+          >
             <div className="flex items-center gap-3">
-              {user.paymentStatus === 'paid' ? (
+              {user.paymentStatus === "paid" ? (
                 <CheckCircle className="w-5 h-5" />
               ) : (
                 <Lock className="w-5 h-5" />
               )}
               <div>
                 <p className="font-semibold">
-                  {user.paymentStatus === 'paid' 
+                  {user.paymentStatus === "paid"
                     ? `You have access to your enrolled course: ${user.course}`
-                    : `Complete your payment for "${user.course}" to access course materials`
-                  }
+                    : `Complete your payment for "${user.course}" to access course materials`}
                 </p>
-                {user.paymentStatus !== 'paid' && (
+                {user.paymentStatus !== "paid" && (
                   <p className="text-sm mt-1">
                     Contact support or check your email for payment instructions
                   </p>
@@ -412,7 +421,7 @@ export default function CoursesPage() {
           {filteredCourses.slice(0, visibleCourses).map((course) => {
             const hasAccess = hasCourseAccess(course.title);
             const isEnrolled = user?.course === course.title;
-            
+
             return (
               <motion.div
                 key={course.id}
@@ -422,7 +431,9 @@ export default function CoursesPage() {
                 whileHover={{ y: -10 }}
                 transition={{ duration: 0.4 }}
                 className={`bg-white rounded-3xl shadow-sm border overflow-hidden hover:shadow-2xl transition-all duration-500 group flex flex-col h-full relative ${
-                  !hasAccess && isAuthenticated ? 'opacity-75 border-gray-200' : 'border-gray-100'
+                  !hasAccess && isAuthenticated
+                    ? "opacity-75 border-gray-200"
+                    : "border-gray-100"
                 }`}
               >
                 {/* Access Badge */}
@@ -445,162 +456,136 @@ export default function CoursesPage() {
                     )}
                   </div>
                 )}
-              {/* Course Image/Graphics */}
-              <div className="relative h-48 bg-gradient-to-br from-[var(--primary)]/5 to-orange-100/10 overflow-hidden">
-                <motion.div
-                  className="absolute -top-12 -left-12 w-40 h-40 bg-gradient-to-br from-[var(--primary)]/30 to-pink-300/20 rounded-full blur-2xl"
-                  animate={{ scale: [1, 1.15, 1], rotate: [0, 45, 0] }}
-                  transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-                <motion.div
-                  className="absolute -bottom-12 -right-12 w-40 h-40 bg-gradient-to-br from-yellow-300/10 to-orange-400/20 rounded-full blur-2xl"
-                  animate={{ scale: [1, 1.25, 1], rotate: [0, -45, 0] }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1,
-                  }}
-                />
-
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {(() => {
-                    const Icon =
-                      (course.icon && (iconMap as any)[course.icon]) ||
-                      BookOpen;
-                    return (
-                      <Icon className="text-[var(--primary)]/40" size={64} />
-                    );
-                  })()}
-                </div>
-                {/* Status Badges */}
-                <div className="absolute top-4 left-4 flex gap-2">
-                  <span className="px-3 py-1 bg-gradient-to-r from-orange-400 to-pink-500 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg">
-                    {course.level}
-                  </span>
-                  <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-[#0f172a] text-[10px] font-black uppercase tracking-wider rounded-full shadow-sm border border-white/20">
-                    {course.category}
-                  </span>
-                </div>
-
-                <div className="absolute bottom-4 right-4">
-                  <motion.button
-                    whileHover={{ scale: 1.15, rotate: 15 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl hover:shadow-orange-200 transition-all duration-300 group"
-                  >
-                    <Play
-                      className="text-[var(--primary)] fill-current"
-                      size={18}
-                    />
-                  </motion.button>
-                </div>
-              </div>
-
-              {/* Course Content */}
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-black text-gray-900 mb-2 group-hover:text-[var(--primary)] transition-colors tracking-tight">
-                  {course.title}
-                </h3>
-                <p className="text-gray-500 text-sm mb-6 line-clamp-2 font-medium">
-                  {course.description || ""}
-                </p>
-
-                {/* Micro Details Row */}
-                <div className="flex items-center gap-3 mb-6 text-xs font-bold text-gray-500">
-                  <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1.5 rounded-xl text-amber-600 border border-amber-100">
-                    <Star className="fill-current" size={14} />
-                    <span>{course.rating}</span>
-                  </div>
-                  <div className="flex items-center gap-1 bg-blue-50 px-2.5 py-1.5 rounded-xl text-blue-600 border border-blue-100">
-                    <Users size={14} />
-                    <span>{course.students?.toLocaleString() || "0"}</span>
-                  </div>
-                  <div className="flex items-center gap-1 bg-purple-50 px-2.5 py-1.5 rounded-xl text-purple-600 border border-purple-100">
-                    <Clock size={14} />
-                    <span>{course.duration}</span>
+                {/* Course Image/Graphics */}
+                <div className="relative h-48 bg-gradient-to-br from-[var(--primary)]/5 to-orange-100/10 overflow-hidden">
+                  <motion.div
+                    className="absolute -top-12 -left-12 w-40 h-40 bg-gradient-to-br from-[var(--primary)]/30 to-pink-300/20 rounded-full blur-2xl"
+                    animate={{ scale: [1, 1.15, 1], rotate: [0, 45, 0] }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  ></motion.div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {iconMap[course.icon as keyof typeof iconMap] ? (
+                      React.createElement(
+                        iconMap[course.icon as keyof typeof iconMap],
+                        {
+                          size: 48,
+                          className: "text-[var(--primary)] opacity-20",
+                        },
+                      )
+                    ) : (
+                      <BookOpen
+                        size={48}
+                        className="text-[var(--primary)] opacity-20"
+                      />
+                    )}
                   </div>
                 </div>
 
-                {/* Divider node */}
-                <div className="flex items-center justify-between mb-6 pt-5 border-t border-gray-100 mt-auto">
-                  <div>
-                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">
-                      Fee
-                    </p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-gray-900 tracking-tighter">
-                        ₹{course.price.toLocaleString()}
-                      </span>
-                      {course.originalPrice && (
-                        <span className="text-sm text-gray-400 line-through font-bold">
-                          ₹{course.originalPrice.toLocaleString()}
-                        </span>
-                      )}
+                {/* Course Content */}
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-xl font-black text-gray-900 mb-2 group-hover:text-[var(--primary)] transition-colors tracking-tight">
+                    {course.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-6 line-clamp-2 font-medium">
+                    {course.description || ""}
+                  </p>
+
+                  {/* Micro Details Row */}
+                  <div className="flex items-center gap-3 mb-6 text-xs font-bold text-gray-500">
+                    <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1.5 rounded-xl text-amber-600 border border-amber-100">
+                      <Star className="fill-current" size={14} />
+                      <span>{course.rating}</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-blue-50 px-2.5 py-1.5 rounded-xl text-blue-600 border border-blue-100">
+                      <Users size={14} />
+                      <span>{course.students?.toLocaleString() || "0"}</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-purple-50 px-2.5 py-1.5 rounded-xl text-purple-600 border border-purple-100">
+                      <Clock size={14} />
+                      <span>{course.duration}</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    {course.originalPrice && (
-                      <div className="inline-block bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-md border border-green-100 mb-1">
-                        Save{" "}
-                        {Math.round(
-                          (1 - course.price / course.originalPrice) * 100,
+
+                  {/* Divider node */}
+                  <div className="flex items-center justify-between mb-6 pt-5 border-t border-gray-100 mt-auto">
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">
+                        Fee
+                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-gray-900 tracking-tighter">
+                          ₹{course.price.toLocaleString()}
+                        </span>
+                        {course.originalPrice && (
+                          <span className="text-sm text-gray-400 line-through font-bold">
+                            ₹{course.originalPrice.toLocaleString()}
+                          </span>
                         )}
-                        %
                       </div>
+                    </div>
+                    <div className="text-right">
+                      {course.originalPrice && (
+                        <div className="inline-block bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-md border border-green-100 mb-1">
+                          Save{" "}
+                          {Math.round(
+                            (1 - course.price / course.originalPrice) * 100,
+                          )}
+                          %
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 font-black uppercase tracking-widest">
+                        {course.lessons} Live Sessions
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    {hasAccess ? (
+                      <>
+                        <Link
+                          href={`/courses/${course.id}/learn`}
+                          className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-green-600 to-green-700 hover:to-green-800 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-green-600/30 transition-all duration-300"
+                        >
+                          Continue Learning
+                        </Link>
+                        <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                          <BookOpen size={20} />
+                        </button>
+                      </>
+                    ) : isEnrolled ? (
+                      <>
+                        <button
+                          disabled
+                          className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl opacity-75 cursor-not-allowed"
+                        >
+                          Payment Pending
+                        </button>
+                        <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                          <BookOpen size={20} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          href="/register"
+                          className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-[var(--primary)] to-orange-500 hover:to-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-500/30 transition-all duration-300"
+                        >
+                          Enroll Now
+                        </Link>
+                        <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                          <BookOpen size={20} />
+                        </button>
+                      </>
                     )}
-                    <p className="text-xs text-gray-500 font-black uppercase tracking-widest">
-                      {course.lessons} Live Sessions
-                    </p>
                   </div>
                 </div>
-
-                <div className="flex gap-3">
-                  {hasAccess ? (
-                    <>
-                      <Link
-                        href={`/courses/${course.id}/learn`}
-                        className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-green-600 to-green-700 hover:to-green-800 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-green-600/30 transition-all duration-300"
-                      >
-                        Continue Learning
-                      </Link>
-                      <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        <BookOpen size={20} />
-                      </button>
-                    </>
-                  ) : isEnrolled ? (
-                    <>
-                      <button
-                        disabled
-                        className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl opacity-75 cursor-not-allowed"
-                      >
-                        Payment Pending
-                      </button>
-                      <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        <BookOpen size={20} />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        href="/register"
-                        className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-[var(--primary)] to-orange-500 hover:to-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-500/30 transition-all duration-300"
-                      >
-                        Enroll Now
-                      </Link>
-                      <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        <BookOpen size={20} />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Load More */}
