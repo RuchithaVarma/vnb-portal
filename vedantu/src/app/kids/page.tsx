@@ -266,7 +266,7 @@ export default function KidsCoursesPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Link href={`/kids/courses/${course.id}`} className="flex-1 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 text-white text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-400/20 transition-all">
+                  <Link href="/register" className="flex-1 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 text-white text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-400/20 transition-all">
                     Enroll Now
                   </Link>
                   <button className="px-4 py-2 border-2 border-gray-100 hover:border-purple-300 text-gray-700 hover:text-purple-600 rounded-xl transition-all">

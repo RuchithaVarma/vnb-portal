@@ -396,13 +396,11 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Link href={`/courses?category=${course.category}`} className="flex-1">
-                    <motion.button 
-                      whileTap={{ scale: 0.94 }}
-                      className="w-full py-4 bg-gradient-to-r from-[var(--primary)] to-orange-500 hover:to-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-500/30 transition-all duration-300"
-                    >
-                      Enroll Now
-                    </motion.button>
+                  <Link 
+                    href="/register" 
+                    className="flex-1 w-full py-4 text-center block bg-gradient-to-r from-[var(--primary)] to-orange-500 hover:to-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:shadow-orange-500/30 transition-all duration-300"
+                  >
+                    Enroll Now
                   </Link>
                   <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                     <BookOpen size={20} />

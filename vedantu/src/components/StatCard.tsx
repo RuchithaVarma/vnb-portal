@@ -1,7 +1,14 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { motion, useInView, useSpring, useTransform } from 'framer-motion';
-import { HelpCircle, type LucideIcon } from 'lucide-react';
+import { TrendingUp, Users, Award, Globe, HelpCircle, type LucideIcon } from 'lucide-react';
+
+const iconMap: Record<string, LucideIcon> = {
+  "⏱️": TrendingUp,
+  "🏆": Award,
+  "👨‍🏫": Users,
+  "🌍": Globe,
+};
 
 interface StatCardProps {
   stat: {
@@ -10,11 +17,11 @@ interface StatCardProps {
     label: string;
     color: string;
   };
-  Icon: LucideIcon;
   index: number;
 }
 
-const StatCard = ({ stat, Icon, index }: StatCardProps) => {
+const StatCard = ({ stat, index }: StatCardProps) => {
+  const Icon = (stat.icon && iconMap[stat.icon]) || HelpCircle;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 

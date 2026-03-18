@@ -329,9 +329,9 @@ export default function NEETCoursePage() {
                       </div>
                     </div>
 
-                    <button className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    <Link href="/register" className="block text-center w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">
                       Enroll Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}

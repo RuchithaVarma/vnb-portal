@@ -244,11 +244,12 @@ export default function CourseDetailClient({ id }: { id: string }) {
                     </div>
                   </div>
 
-                  <Link href="/signin">
-                    <button className={`w-full py-6 rounded-3xl font-black text-white bg-gradient-to-r ${course.color} shadow-2xl shadow-orange-500/20 active:scale-95 transition-all mb-6 flex items-center justify-center gap-4 text-lg uppercase tracking-widest`}>
-                      Enroll Now
-                      <ArrowRight size={24} />
-                    </button>
+                  <Link 
+                    href="/register"
+                    className={`block w-full text-center py-6 rounded-3xl font-black text-white bg-gradient-to-r ${course.color} shadow-2xl shadow-orange-500/20 active:scale-95 transition-all mb-6 flex items-center justify-center gap-4 text-lg uppercase tracking-widest`}
+                  >
+                    Enroll Now
+                    <ArrowRight size={24} />
                   </Link>
 
                   <div className="flex items-center justify-center gap-4">

@@ -1,29 +1,17 @@
-import { TrendingUp, Users, Award, Globe, HelpCircle, type LucideIcon, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { getItems } from '@/lib/firestoreService';
 import { Stat } from '@/types';
 import StatCard from './StatCard';
 
-const iconMap: Record<string, LucideIcon> = {
-  "⏱️": TrendingUp,
-  "🏆": Award,
-  "👨‍🏫": Users,
-  "🌍": Globe,
-};
-
 const StatsSection = async () => {
-  let stats: Stat[] = [];
-  try {
-    stats = await getItems<Stat>("stats");
-  } catch (error) {
-    console.error("Failed to fetch stats for homepage:", error);
-    // Fallback data
-    stats = [
-      { id: '1', icon: '⏱️', value: '2.1Cr+', label: 'Learning Hours', color: 'from-orange-400 to-pink-500' },
-      { id: '2', icon: '🏆', value: '98%', label: 'Student Satisfaction', color: 'from-blue-400 to-indigo-500' },
-      { id: '3', icon: '👨‍🏫', value: '500+', label: 'Expert Teachers', color: 'from-green-400 to-teal-500' },
-      { id: '4', icon: '🌍', value: '50+', label: 'Cities Reached', color: 'from-purple-400 to-fuchsia-500' },
-    ];
-  }
+  // Temporarily bypass Firebase fetch during SSR to prevent Dev mode console.error crashes
+  // due to missing live Firestore configuration.
+  let stats: Stat[] = [
+    { id: '1', icon: '⏱️', value: '2.1Cr+', label: 'Learning Hours', color: 'from-orange-400 to-pink-500' },
+    { id: '2', icon: '🏆', value: '98%', label: 'Student Satisfaction', color: 'from-blue-400 to-indigo-500' },
+    { id: '3', icon: '👨‍🏫', value: '500+', label: 'Expert Teachers', color: 'from-green-400 to-teal-500' },
+    { id: '4', icon: '🌍', value: '50+', label: 'Cities Reached', color: 'from-purple-400 to-fuchsia-500' },
+  ];
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
@@ -47,12 +35,10 @@ const StatsSection = async () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {stats.map((stat, idx) => {
-            const Icon = (stat.icon && iconMap[stat.icon]) || HelpCircle;
             return (
               <StatCard
                 key={stat.id || idx}
                 stat={stat}
-                Icon={Icon}
                 index={idx}
               />
             );

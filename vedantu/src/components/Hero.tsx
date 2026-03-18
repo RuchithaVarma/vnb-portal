@@ -40,8 +40,11 @@ const Hero = () => {
 
             {/* CTAs with enhanced animations */}
             <div className="flex flex-wrap gap-4 pt-4">
+              <Link href="/register" className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 cursor-pointer flex items-center gap-2">
+                Register Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
               <Link href="/trial" className="btn-primary flex items-center gap-2 shadow-xl cursor-pointer">
-                Book FREE Trial <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                Book FREE Trial
               </Link>
               <Link href="/courses" className="px-6 py-3 bg-white text-[var(--primary)] border-2 border-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 cursor-pointer">
                 Explore Courses

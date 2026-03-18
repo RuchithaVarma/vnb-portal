@@ -18,15 +18,15 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Connect to Firestore emulator in development
-if (process.env.NODE_ENV === 'development') {
-  try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    console.log('Connected to Firestore emulator');
-  } catch (e) {
-    console.log('Firestore emulator already connected');
-  }
-}
+// Connect to Firestore emulator in development (Uncomment if needed)
+// if (process.env.NODE_ENV === 'development') {
+//   try {
+//     connectFirestoreEmulator(db, 'localhost', 8080);
+//     console.log('Connected to Firestore emulator');
+//   } catch (e) {
+//     console.log('Firestore emulator already connected');
+//   }
+// }
 
 // Initialize Analytics safely
 const analytics = typeof window !== "undefined" ? isSupported().then(yes => yes ? getAnalytics(app) : null) : null;
