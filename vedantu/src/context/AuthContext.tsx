@@ -15,7 +15,11 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (credentials: { username: string; password: string } | { email: string; password: string }) => Promise<boolean>;
+  login: (
+    credentials:
+      | { username: string; password: string }
+      | { email: string; password: string },
+  ) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -49,22 +53,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(getStoredUser());
   const [loading, setLoading] = useState(false);
 
-  const login = async (credentials: { username: string; password: string } | { email: string; password: string }): Promise<boolean> => {
+  const login = async (
+    credentials:
+      | { username: string; password: string }
+      | { email: string; password: string },
+  ): Promise<boolean> => {
     setLoading(true);
-    
+
     try {
       // Check if it's a student login with username/password
-      if ('username' in credentials) {
-        const studentCredentials = JSON.parse(localStorage.getItem("studentCredentials") || "{}");
-        const foundCredential = Object.values(studentCredentials).find((cred: any) => 
-          cred.username === credentials.username && cred.password === credentials.password
+      if ("username" in credentials) {
+        const studentCredentials = JSON.parse(
+          localStorage.getItem("studentCredentials") || "{}",
         );
-        
-        if (foundCredential) {
+        const foundCredential = Object.values(studentCredentials).find(
+          (cred: any) =>
+            cred.username === credentials.username &&
+            cred.password === credentials.password,
+        );
+
+        if (
+          foundCredential &&
+          typeof foundCredential === "object" &&
+          "email" in foundCredential
+        ) {
           // Find the application details
-          const applications = JSON.parse(localStorage.getItem("studentApplications") || "[]");
-          const application = applications.find((app: any) => app.personalInfo.email === foundCredential.email);
-          
+          const applications = JSON.parse(
+            localStorage.getItem("studentApplications") || "[]",
+          );
+          const application = applications.find(
+            (app: any) =>
+              app.personalInfo.email === (foundCredential as any).email,
+          );
+
           if (application) {
             const userData: User = {
               id: application.id,
@@ -74,9 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               grade: application.academicInfo.currentGrade,
               role: "student",
               applicationId: application.id,
-              username: foundCredential.username,
+              username: (foundCredential as any).username,
             };
-            
+
             setUser(userData);
             if (typeof window !== "undefined") {
               localStorage.setItem("user", JSON.stringify(userData));
@@ -85,17 +106,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return true;
           }
         }
-      } 
+      }
       // Check if it's an admin login with email/password
-      else if ('email' in credentials) {
+      else if ("email" in credentials) {
         // For demo: admin@brilliantroots.com / admin123
-        if (credentials.email === "admin@brilliantroots.com" && credentials.password === "admin123") {
+        if (
+          credentials.email === "admin@brilliantroots.com" &&
+          credentials.password === "admin123"
+        ) {
           const adminData: User = {
             name: "Administrator",
             email: credentials.email,
             role: "admin",
           };
-          
+
           setUser(adminData);
           if (typeof window !== "undefined") {
             localStorage.setItem("user", JSON.stringify(adminData));
@@ -103,15 +127,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
           return true;
         }
-        
+
         // For demo: teacher@brilliantroots.com / teacher123
-        if (credentials.email === "teacher@brilliantroots.com" && credentials.password === "teacher123") {
+        if (
+          credentials.email === "teacher@brilliantroots.com" &&
+          credentials.password === "teacher123"
+        ) {
           const teacherData: User = {
             name: "Teacher",
             email: credentials.email,
             role: "teacher",
           };
-          
+
           setUser(teacherData);
           if (typeof window !== "undefined") {
             localStorage.setItem("user", JSON.stringify(teacherData));
@@ -120,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return true;
         }
       }
-      
+
       setLoading(false);
       return false;
     } catch (error) {
