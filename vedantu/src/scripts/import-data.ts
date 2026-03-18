@@ -1,5 +1,5 @@
 // Set NODE_ENV to development to connect to emulator
-process.env.NODE_ENV = "development";
+(process.env as any).NODE_ENV = "development";
 
 import { db } from "../lib/firebase";
 import {
