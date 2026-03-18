@@ -12,6 +12,7 @@ const testUserData = {
   grade: "10",
   role: "student",
   username: "teststudent",
+  password: "Brilliant@123",
   course: "Mathematics",
   preferredTiming: "Evening",
   parentName: "Test Parent",
@@ -58,6 +59,7 @@ async function testUserStorage() {
       console.log(`  Phone: ${data.phone || "N/A"}`);
       console.log(`  Grade: ${data.grade || "N/A"}`);
       console.log(`  Role: ${data.role || "N/A"}`);
+      console.log(`  Password: ${data.password ? "✓ Stored" : "✗ Not stored"}`);
       console.log(`  Application ID: ${data.applicationId || "N/A"}`);
       console.log(`  Created: ${data.createdAt || "N/A"}`);
     });

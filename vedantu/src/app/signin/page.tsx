@@ -9,17 +9,14 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle,
-  User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loginType, setLoginType] = useState<"email" | "username">("email");
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
     password: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -31,16 +28,10 @@ export default function SignIn() {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (loginType === "email") {
-      if (!formData.email) {
-        newErrors.email = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = "Email is invalid";
-      }
-    } else {
-      if (!formData.username) {
-        newErrors.username = "Username is required";
-      }
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
     }
 
     if (!formData.password) {
@@ -62,28 +53,40 @@ export default function SignIn() {
     setLoginError("");
 
     try {
-      let success = false;
-      
-      if (loginType === "email") {
-        success = await login({ email: formData.email, password: formData.password });
-      } else {
-        success = await login({ username: formData.username, password: formData.password });
-      }
+      // Always use email login
+      const success = await login({
+        email: formData.email,
+        password: formData.password,
+      });
 
       if (success) {
-        // Redirect based on user role
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        if (user.role === "admin") {
-          router.push("/admin");
-        } else if (user.role === "student") {
-          router.push("/dashboard");
-        } else if (user.role === "teacher") {
-          router.push("/teacher");
+        // Get user data from localStorage or context for role-based routing
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+
+          // Perfect role-based routing
+          switch (user.role) {
+            case "admin":
+              router.push("/admin");
+              break;
+            case "teacher":
+              router.push("/teacher");
+              break;
+            case "student":
+              router.push("/dashboard");
+              break;
+            default:
+              router.push("/"); // Fallback to home
+          }
         } else {
+          // Fallback if no user data found
           router.push("/");
         }
       } else {
-        setLoginError("Invalid credentials. Please try again.");
+        setLoginError(
+          "Invalid credentials. Please check your email and password.",
+        );
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -135,83 +138,31 @@ export default function SignIn() {
 
         {/* Sign In Form */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-8">
-          {/* Login Type Selector */}
-          <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setLoginType("email")}
-              className={`flex-1 py-2 px-4 rounded-md transition-all duration-200 ${
-                loginType === "email"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Email Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginType("username")}
-              className={`flex-1 py-2 px-4 rounded-md transition-all duration-200 ${
-                loginType === "username"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Student Login
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email or Username Field */}
-            {loginType === "email" ? (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all ${
-                      errors.email ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="admin@brilliantroots.com"
-                  />
+            {/* Email Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
                 </div>
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="student@brilliantroots.com"
+                />
               </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all ${
-                      errors.username ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="Enter your username"
-                  />
-                </div>
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-                )}
-              </div>
-            )}
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
 
             {/* Password Field */}
             <div>
@@ -335,7 +286,7 @@ export default function SignIn() {
 
           {/* Sign Up Link */}
           <p className="text-center text-gray-600 mt-6">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/signup"
               className="text-[var(--primary)] hover:underline font-semibold"

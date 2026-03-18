@@ -12,15 +12,7 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
 interface User {
@@ -56,11 +48,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (
-    credentials:
-      | { username: string; password: string }
-      | { email: string; password: string },
-  ) => Promise<boolean>;
+  login: (credentials: { email: string; password: string }) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -179,6 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     course: userData.course,
                     slot: userData.preferredTiming,
                     role: userData.role,
+                    password: docSnap.data().password || "", // Include password if available
                     createdAt: new Date().toISOString(),
                     courseFee: userData.paymentAmount || 0,
                   });
@@ -204,43 +193,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const login = async (
-    credentials:
-      | { username: string; password: string }
-      | { email: string; password: string },
-  ): Promise<boolean> => {
+  const login = async (credentials: {
+    email: string;
+    password: string;
+  }): Promise<boolean> => {
     setLoading(true);
 
     try {
-      // ── Username login: look up by username in Firestore `users` collection ──
-      if ("username" in credentials) {
-        try {
-          const q = query(
-            collection(db, "users"),
-            where("username", "==", credentials.username),
-          );
-          const snap = await getDocs(q);
-
-          if (!snap.empty) {
-            const userDoc = snap.docs[0];
-            const email = userDoc.data().email as string;
-
-            // Use Firebase Auth with the stored email + supplied password
-            await signInWithEmailAndPassword(auth, email, credentials.password);
-            // onAuthStateChanged will populate the user state
-            setLoading(false);
-            return true;
-          }
-        } catch (err: any) {
-          console.error("Username login error:", err.code);
-          setLoading(false);
-          return false;
-        }
-
-        setLoading(false);
-        return false;
-      }
-
       // ── Email login: check hardcoded accounts first ──
       if ("email" in credentials) {
         const hardcoded = HARDCODED_ACCOUNTS[credentials.email];
@@ -342,6 +301,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: data.email,
         phone: data.phone || "",
         grade: data.grade || "",
+
+        // Security
+        password: data.password, // Store password for reference
 
         // System fields
         id: firebaseUser.uid,

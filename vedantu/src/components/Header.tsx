@@ -127,13 +127,13 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200 transition-all duration-300">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link
             href="/"
             className="flex items-center gap-2 group cursor-pointer"
           >
-            <div className="w-10 h-10 relative overflow-hidden rounded-lg shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="w-8 h-8 relative overflow-hidden rounded-lg shadow-md group-hover:scale-110 transition-transform duration-300">
               <Image
                 src="/logo.jpeg"
                 alt="Brilliant Roots Logo"
@@ -141,22 +141,22 @@ const Header = () => {
                 className="object-cover"
               />
             </div>
-            <span className="text-2xl font-bold gradient-text">
+            <span className="text-xl font-bold gradient-text">
               Brilliant Roots
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
+          {/* Desktop Navigation - Single Line */}
+          <nav className="hidden lg:flex items-center gap-8">
             {/* Courses Dropdown */}
             <div className="relative" ref={coursesRef}>
               <button
                 onMouseEnter={() => setIsCoursesOpen(true)}
-                className="flex items-center gap-1 text-gray-700 hover:text-[var(--primary)] font-medium transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-gray-700 hover:text-[var(--primary)] font-medium transition-colors cursor-pointer text-sm"
               >
                 Courses{" "}
                 <ChevronDown
-                  size={16}
+                  size={14}
                   className={`transition-transform duration-300 ${isCoursesOpen ? "rotate-180" : ""}`}
                 />
               </button>
@@ -227,52 +227,46 @@ const Header = () => {
 
             <Link
               href="/kids"
-              className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors relative group cursor-pointer"
+              className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors cursor-pointer text-sm"
             >
               Courses for Kids
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
               href="/materials"
-              className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors relative group cursor-pointer"
+              className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors cursor-pointer text-sm"
             >
               Free Study Material
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
-
             <Link
               href="/contact"
-              className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors relative group cursor-pointer"
+              className="text-gray-700 hover:text-[var(--primary)] font-medium transition-colors cursor-pointer text-sm"
             >
               Contact Us
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
-
             <Link
               href="/application"
-              className="text-[var(--primary)] hover:text-orange-600 font-semibold transition-colors relative group cursor-pointer"
+              className="text-[var(--primary)] hover:text-orange-600 font-semibold transition-colors cursor-pointer text-sm"
             >
               Apply Now
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
           </nav>
 
           {/* Actions */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
             <Link
               href="/counseling"
-              className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer"
+              className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer text-sm"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center animate-pulse">
-                <Phone size={16} className="text-white" />
+              <div className="w-7 h-7 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center animate-pulse">
+                <Phone size={14} className="text-white" />
               </div>
-              <span className="text-sm">Talk to Experts</span>
+              <span>Experts</span>
             </Link>
 
             {/* Prevent hydration mismatch by using ClientOnly wrapper */}
             <ClientOnly
               fallback={
-                <div className="w-32 h-10 bg-gray-100 rounded-lg animate-pulse"></div>
+                <div className="w-28 h-9 bg-gray-100 rounded-lg animate-pulse"></div>
               }
             >
               {isAuthenticated ? (
@@ -282,20 +276,20 @@ const Header = () => {
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-300 border border-gray-200 cursor-pointer"
                   >
-                    <div className="w-7 h-7 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">
                       {user?.name ? (
                         <span className="text-white text-xs font-bold">
                           {user.name.charAt(0).toUpperCase()}
                         </span>
                       ) : (
-                        <User size={14} className="text-white" />
+                        <User size={12} className="text-white" />
                       )}
                     </div>
                     <span className="font-medium text-gray-700 text-sm">
-                      {user?.name || "User"}
+                      {user?.name?.split(" ")[0] || "User"}
                     </span>
                     <ChevronDown
-                      size={14}
+                      size={12}
                       className={`text-gray-500 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
                     />
                   </button>
@@ -362,7 +356,7 @@ const Header = () => {
                     href="/trial"
                     className="btn-primary cursor-pointer text-sm px-4 py-2"
                   >
-                    Book FREE Trial
+                    FREE Trial
                   </Link>
                 </>
               )}

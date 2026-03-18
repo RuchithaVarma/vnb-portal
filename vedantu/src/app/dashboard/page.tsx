@@ -1,7 +1,15 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import { BookOpen, Award, Calendar, TrendingUp, CheckCircle, LogOut, CreditCard } from "lucide-react";
+import {
+  BookOpen,
+  Award,
+  Calendar,
+  TrendingUp,
+  CheckCircle,
+  LogOut,
+  CreditCard,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
@@ -17,8 +25,8 @@ export default function Dashboard() {
   const studentId = user?.applicationId
     ? user.applicationId
     : user
-    ? `BR${user.email.slice(0, 3).toUpperCase()}${Math.abs(user.email.charCodeAt(0) * 997) % 10000}`
-    : "";
+      ? `BR${user.email.slice(0, 3).toUpperCase()}${Math.abs(user.email.charCodeAt(0) * 997) % 10000}`
+      : "";
 
   if (!user) {
     return (
@@ -48,7 +56,9 @@ export default function Dashboard() {
               <h1 className="text-3xl font-bold text-gray-900">
                 Welcome back, {user.name}!
               </h1>
-              <p className="text-gray-600 mt-1">Continue your learning journey</p>
+              <p className="text-gray-600 mt-1">
+                Continue your learning journey
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
@@ -77,7 +87,9 @@ export default function Dashboard() {
         <div className="bg-gradient-to-r from-[var(--primary)] to-orange-500 rounded-2xl p-6 mb-8 text-white shadow-lg">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <p className="text-white/80 text-sm font-medium mb-1">Your Enrolled Course</p>
+              <p className="text-white/80 text-sm font-medium mb-1">
+                Your Enrolled Course
+              </p>
               <h2 className="text-2xl font-bold">{enrolledCourse}</h2>
               {user.preferredTiming && (
                 <p className="text-white/80 text-sm mt-1 flex items-center gap-1">
@@ -98,8 +110,8 @@ export default function Dashboard() {
               )}
               {user.paymentAmount && (
                 <span className="text-white/80 text-sm flex items-center gap-1">
-                  <CreditCard className="w-4 h-4" />
-                  ₹{user.paymentAmount.toLocaleString("en-IN")} paid
+                  <CreditCard className="w-4 h-4" />₹
+                  {user.paymentAmount.toLocaleString("en-IN")} paid
                 </span>
               )}
             </div>
@@ -135,7 +147,9 @@ export default function Dashboard() {
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                 <Calendar className="text-purple-600" size={24} />
               </div>
-              <span className="text-sm text-gray-600 font-semibold">This week</span>
+              <span className="text-sm text-gray-600 font-semibold">
+                This week
+              </span>
             </div>
             <h3 className="text-2xl font-bold text-gray-900">—</h3>
             <p className="text-gray-600 text-sm">Upcoming Classes</p>
@@ -158,14 +172,25 @@ export default function Dashboard() {
           {/* Enrolled Course Detail */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Your Course</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                Your Course
+              </h2>
               <div className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold text-gray-900 text-lg">{enrolledCourse}</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">Brilliant Roots Learning Program</p>
+                    <h3 className="font-semibold text-gray-900 text-lg">
+                      {enrolledCourse}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      Brilliant Roots Learning Program
+                    </p>
                     {user.username && (
-                      <p className="text-xs text-gray-400 mt-1">Login: <code className="bg-gray-100 px-1.5 py-0.5 rounded">{user.username}</code></p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Login:{" "}
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded">
+                          {user.username}
+                        </code>
+                      </p>
                     )}
                   </div>
                   {hasPayment && (
@@ -192,23 +217,39 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mt-4">
                   {user.preferredTiming && (
                     <p className="text-sm text-gray-600">
-                      🕐 Classes: <span className="font-medium">{user.preferredTiming}</span>
+                      🕐 Classes:{" "}
+                      <span className="font-medium">
+                        {user.preferredTiming}
+                      </span>
                     </p>
                   )}
-                  <button className="text-sm text-[var(--primary)] hover:underline font-medium">
-                    View Schedule →
-                  </button>
+                  {hasPayment ? (
+                    <Link
+                      href="/courses"
+                      className="text-sm text-[var(--primary)] hover:underline font-medium"
+                    >
+                      Access Course Materials →
+                    </Link>
+                  ) : (
+                    <button className="text-sm text-[var(--primary)] hover:underline font-medium">
+                      View Schedule →
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Profile summary */}
               <div className="mt-6 pt-6 border-t border-gray-100">
-                <h3 className="font-semibold text-gray-700 mb-3 text-sm">Your Profile</h3>
+                <h3 className="font-semibold text-gray-700 mb-3 text-sm">
+                  Your Profile
+                </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {user.email && (
                     <div>
                       <p className="text-gray-400 text-xs">Email</p>
-                      <p className="text-gray-700 font-medium truncate">{user.email}</p>
+                      <p className="text-gray-700 font-medium truncate">
+                        {user.email}
+                      </p>
                     </div>
                   )}
                   {user.phone && (
@@ -220,13 +261,17 @@ export default function Dashboard() {
                   {user.grade && (
                     <div>
                       <p className="text-gray-400 text-xs">Grade</p>
-                      <p className="text-gray-700 font-medium">Grade {user.grade}</p>
+                      <p className="text-gray-700 font-medium">
+                        Grade {user.grade}
+                      </p>
                     </div>
                   )}
                   {user.parentName && (
                     <div>
                       <p className="text-gray-400 text-xs">Parent/Guardian</p>
-                      <p className="text-gray-700 font-medium">{user.parentName}</p>
+                      <p className="text-gray-700 font-medium">
+                        {user.parentName}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -240,10 +285,23 @@ export default function Dashboard() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center gap-3 px-4 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
-                  <BookOpen size={20} />
-                  <span>Book New Class</span>
-                </button>
+                {hasPayment ? (
+                  <Link
+                    href="/courses"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors"
+                  >
+                    <BookOpen size={20} />
+                    <span>Access My Course</span>
+                  </Link>
+                ) : (
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed"
+                    disabled
+                  >
+                    <BookOpen size={20} />
+                    <span>Complete Payment First</span>
+                  </button>
+                )}
                 <button className="w-full flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   <Award size={20} />
                   <span>View Certificates</span>
@@ -275,13 +333,17 @@ export default function Dashboard() {
                   <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-gray-400 text-xs font-bold">3</span>
                   </div>
-                  <p className="text-sm text-gray-400">Attend your first class</p>
+                  <p className="text-sm text-gray-400">
+                    Attend your first class
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-gray-400 text-xs font-bold">4</span>
                   </div>
-                  <p className="text-sm text-gray-400">Complete your first assignment</p>
+                  <p className="text-sm text-gray-400">
+                    Complete your first assignment
+                  </p>
                 </div>
               </div>
             </div>

@@ -168,6 +168,9 @@ export default function RegisterPage() {
           formData.email.split("@")[0].toLowerCase() +
           Math.floor(Math.random() * 1000),
 
+        // Security
+        password: DEFAULT_PASSWORD, // Store password for reference
+
         // Academic Info
         grade: formData.studentClass,
         course: formData.course,
@@ -201,6 +204,7 @@ export default function RegisterPage() {
         course: formData.course,
         slot: formData.slot,
         role: "student",
+        password: DEFAULT_PASSWORD, // Store password for reference
         createdAt: serverTimestamp(),
         courseFee: selectedCourse?.price || 0,
       });

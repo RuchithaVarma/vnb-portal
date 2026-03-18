@@ -236,7 +236,7 @@ export default function ApplicationForm() {
         paymentMethod: formData.paymentMethod,
         paymentStatus: "pending",
         paymentAmount: getCourseFee(formData.course),
-        paymentDate: null,
+        paymentDate: undefined,
 
         // Application status
         applicationStatus: "submitted",
