@@ -16,6 +16,7 @@ import {
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import ClientOnly from "@/components/ClientOnly";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -140,7 +141,9 @@ const Header = () => {
                 className="object-cover"
               />
             </div>
-            <span className="text-2xl font-bold gradient-text">Brilliant Roots</span>
+            <span className="text-2xl font-bold gradient-text">
+              Brilliant Roots
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -212,7 +215,7 @@ const Header = () => {
                       </div>
                       <Link
                         href="/counseling"
-                       className="btn-primary text-sm cursor-pointer"
+                        className="btn-primary text-sm cursor-pointer"
                       >
                         Talk to Expert
                       </Link>
@@ -244,108 +247,126 @@ const Header = () => {
               Contact Us
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
             </Link>
+
+            <Link
+              href="/application"
+              className="text-[var(--primary)] hover:text-orange-600 font-semibold transition-colors relative group cursor-pointer"
+            >
+              Apply Now
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
+            </Link>
           </nav>
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link href="/counseling" className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer">
-             <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center animate-pulse">
+            <Link
+              href="/counseling"
+              className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer"
+            >
+              <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center animate-pulse">
                 <Phone size={16} className="text-white" />
               </div>
               <span className="text-sm">Talk to Experts</span>
             </Link>
 
-            {isAuthenticated ? (
-              /* User Profile Dropdown */
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-300 border border-gray-200 cursor-pointer"
-                >
-                  <div className="w-7 h-7 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">
-                    {user?.name ? (
-                      <span className="text-white text-xs font-bold">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    ) : (
-                      <User size={14} className="text-white" />
-                    )}
-                  </div>
-                  <span className="font-medium text-gray-700 text-sm">
-                    {user?.name || "User"}
-                  </span>
-                  <ChevronDown
-                    size={14}
-                    className={`text-gray-500 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {/* Dropdown Menu */}
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeIn">
-                    <div className="px-3 py-2 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900">
-                        {user?.name}
-                      </p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+            {/* Prevent hydration mismatch by using ClientOnly wrapper */}
+            <ClientOnly
+              fallback={
+                <div className="w-32 h-10 bg-gray-100 rounded-lg animate-pulse"></div>
+              }
+            >
+              {isAuthenticated ? (
+                /* User Profile Dropdown */
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-300 border border-gray-200 cursor-pointer"
+                  >
+                    <div className="w-7 h-7 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">
+                      {user?.name ? (
+                        <span className="text-white text-xs font-bold">
+                          {user.name.charAt(0).toUpperCase()}
+                        </span>
+                      ) : (
+                        <User size={14} className="text-white" />
+                      )}
                     </div>
+                    <span className="font-medium text-gray-700 text-sm">
+                      {user?.name || "User"}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className={`text-gray-500 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
 
-                    <div className="py-1">
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <BookOpen size={14} />
-                        <span>Dashboard</span>
-                      </Link>
-                      <Link
-                        href="/courses"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <Award size={14} />
-                        <span>My Courses</span>
-                      </Link>
-                      <Link
-                        href="/settings"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <Settings size={14} />
-                        <span>Settings</span>
-                      </Link>
-                    </div>
+                  {/* Dropdown Menu */}
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-fadeIn">
+                      <div className="px-3 py-2 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900">
+                          {user?.name}
+                        </p>
+                        <p className="text-xs text-gray-500">{user?.email}</p>
+                      </div>
 
-                    <div className="border-t border-gray-100 pt-1">
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full cursor-pointer"
-                      >
-                        <LogOut size={14} />
-                        <span>Sign Out</span>
-                      </button>
+                      <div className="py-1">
+                        <Link
+                          href="/dashboard"
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <BookOpen size={14} />
+                          <span>Dashboard</span>
+                        </Link>
+                        <Link
+                          href="/courses"
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <Award size={14} />
+                          <span>My Courses</span>
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <Settings size={14} />
+                          <span>Settings</span>
+                        </Link>
+                      </div>
+
+                      <div className="border-t border-gray-100 pt-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full cursor-pointer"
+                        >
+                          <LogOut size={14} />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* Auth Buttons */
-              <>
-                <Link
-                  href="/signin"
-                  className="px-4 py-2 border-2 border-[var(--primary)] text-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 hover:scale-105 cursor-pointer text-sm"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/trial"
-                  className="btn-primary cursor-pointer text-sm px-4 py-2"
-                >
-                  Book FREE Trial
-                </Link>
-              </>
-            )}
+                  )}
+                </div>
+              ) : (
+                /* Auth Buttons */
+                <>
+                  <Link
+                    href="/signin"
+                    className="px-4 py-2 border-2 border-[var(--primary)] text-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 hover:scale-105 cursor-pointer text-sm"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/trial"
+                    className="btn-primary cursor-pointer text-sm px-4 py-2"
+                  >
+                    Book FREE Trial
+                  </Link>
+                </>
+              )}
+            </ClientOnly>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -389,50 +410,56 @@ const Header = () => {
 
               {/* Mobile Auth Section */}
               <div className="flex flex-col gap-3 mt-4 pt-4 border-t">
-                {isAuthenticated ? (
-                  <>
-                    <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
-                      <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </span>
+                <ClientOnly
+                  fallback={
+                    <div className="w-full h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                  }
+                >
+                  {isAuthenticated ? (
+                    <>
+                      <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {user?.name?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {user?.name}
+                          </p>
+                          <p className="text-xs text-gray-500">{user?.email}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {user?.name}
-                        </p>
-                        <p className="text-xs text-gray-500">{user?.email}</p>
-                      </div>
-                    </div>
-                    <Link
-                      href="/dashboard"
-                      className="text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer"
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="text-center px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors cursor-pointer"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/signin"
-                      className="text-center px-4 py-2 border-2 border-[var(--primary)] text-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-colors cursor-pointer"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/trial"
-                      className="text-center btn-primary cursor-pointer"
-                    >
-                      Book FREE Trial
-                    </Link>
-                  </>
-                )}
+                      <Link
+                        href="/dashboard"
+                        className="text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer"
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="text-center px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors cursor-pointer"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/signin"
+                        className="text-center px-4 py-2 border-2 border-[var(--primary)] text-[var(--primary)] rounded-lg font-semibold hover:bg-orange-50 transition-colors cursor-pointer"
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/trial"
+                        className="text-center btn-primary cursor-pointer"
+                      >
+                        Book FREE Trial
+                      </Link>
+                    </>
+                  )}
+                </ClientOnly>
               </div>
             </nav>
           </div>

@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/Layout";
 import { AuthProvider } from "@/context/AuthContext";
+import FirebaseErrorBoundary from "@/components/FirebaseErrorBoundary";
+import "@/lib/firebase-error-handler";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -24,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} font-poppins antialiased`}>
-        <AuthProvider>
-          <Layout>{children}</Layout>
-        </AuthProvider>
+        <FirebaseErrorBoundary>
+          <AuthProvider>
+            <Layout>{children}</Layout>
+          </AuthProvider>
+        </FirebaseErrorBoundary>
       </body>
     </html>
   );

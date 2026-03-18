@@ -1,16 +1,16 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAcCgHfU9nXzz0GxSGbcvMrQwQ5FFAq1aQ",
-  authDomain: "brilliantroots-27ce3.firebaseapp.com",
-  projectId: "brilliantroots-27ce3",
-  storageBucket: "brilliantroots-27ce3.firebasestorage.app",
-  messagingSenderId: "429371611993",
-  appId: "1:429371611993:web:df4f67b279c69683db8a48",
-  measurementId: "G-37477X5F69"
+  apiKey: "AIzaSyDtM1PN2kZX8mghjUIq8yQ5A5trHxlRCGw",
+  authDomain: "brilliantroots-541a2.firebaseapp.com",
+  projectId: "brilliantroots-541a2",
+  storageBucket: "brilliantroots-541a2.firebasestorage.app",
+  messagingSenderId: "446712229144",
+  appId: "1:446712229144:web:ce7c30c8ce5c4ea085426d",
+  measurementId: "G-YKGPNY7KWD",
 };
 
 // Initialize Firebase
@@ -28,7 +28,25 @@ const db = getFirestore(app);
 //   }
 // }
 
-// Initialize Analytics safely
-const analytics = typeof window !== "undefined" ? isSupported().then(yes => yes ? getAnalytics(app) : null) : null;
+// Initialize Analytics safely with error handling
+const analytics =
+  typeof window !== "undefined"
+    ? isSupported()
+        .then((supported) => {
+          if (supported) {
+            try {
+              return getAnalytics(app);
+            } catch (error) {
+              console.warn("Analytics initialization failed:", error);
+              return null;
+            }
+          }
+          return null;
+        })
+        .catch((error) => {
+          console.warn("Analytics support check failed:", error);
+          return null;
+        })
+    : Promise.resolve(null);
 
 export { app, auth, db, analytics };

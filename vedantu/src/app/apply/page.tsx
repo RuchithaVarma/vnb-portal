@@ -13,9 +13,17 @@ import {
   CheckCircle,
   ArrowRight,
   Sparkles,
+  CreditCard,
+  Lock,
+  Copy,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { emailService } from "@/utils/emailService";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
 interface ApplicationData {
   personalInfo: {
@@ -50,11 +58,52 @@ interface ApplicationData {
   };
 }
 
+interface PaymentData {
+  cardName: string;
+  cardNumber: string;
+  expiry: string;
+  cvv: string;
+}
+
+// Course fee map
+const COURSE_FEES: Record<string, number> = {
+  "Mathematics": 4999,
+  "Science": 4999,
+  "English": 3999,
+  "JEE Preparation": 9999,
+  "NEET Preparation": 9999,
+  "Foundation Course": 7999,
+  "Coding & Programming": 5999,
+  "Comprehensive Package": 14999,
+};
+
+// Generate a username like BRRuch4821
+const generateUsername = (firstName: string): string => {
+  const prefix = "BR" + firstName.slice(0, 4).toUpperCase();
+  const suffix = Math.floor(1000 + Math.random() * 9000).toString();
+  return prefix + suffix;
+};
+
+// Generate a random 8-char password
+const generatePassword = (): string => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let password = "";
+  for (let i = 0; i < 8; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
+
 export default function StudentApplication() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [applicationId, setApplicationId] = useState("");
+  const [generatedUsername, setGeneratedUsername] = useState("");
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [showGeneratedPassword, setShowGeneratedPassword] = useState(false);
+  const [passwordCopied, setPasswordCopied] = useState(false);
+  const [usernameCopied, setUsernameCopied] = useState(false);
   const router = useRouter();
 
   const [formData, setFormData] = useState<ApplicationData>({
@@ -90,13 +139,19 @@ export default function StudentApplication() {
     },
   });
 
+  const [paymentData, setPaymentData] = useState<PaymentData>({
+    cardName: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+  });
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validateStep = (step: number) => {
     const newErrors: { [key: string]: string } = {};
 
     if (step === 1) {
-      // Personal Info Validation
       if (!formData.personalInfo.firstName) newErrors.firstName = "First name is required";
       if (!formData.personalInfo.lastName) newErrors.lastName = "Last name is required";
       if (!formData.personalInfo.email) {
@@ -115,13 +170,11 @@ export default function StudentApplication() {
       if (!formData.personalInfo.state) newErrors.state = "State is required";
       if (!formData.personalInfo.pincode) newErrors.pincode = "Pincode is required";
     } else if (step === 2) {
-      // Academic Info Validation
       if (!formData.academicInfo.currentGrade) newErrors.currentGrade = "Grade is required";
       if (!formData.academicInfo.school) newErrors.school = "School name is required";
       if (!formData.academicInfo.board) newErrors.board = "Board is required";
       if (formData.academicInfo.subjects.length === 0) newErrors.subjects = "Select at least one subject";
     } else if (step === 3) {
-      // Parent Info Validation
       if (!formData.parentInfo.parentName) newErrors.parentName = "Parent name is required";
       if (!formData.parentInfo.parentPhone) {
         newErrors.parentPhone = "Parent phone is required";
@@ -134,10 +187,20 @@ export default function StudentApplication() {
         newErrors.parentEmail = "Parent email is invalid";
       }
     } else if (step === 4) {
-      // Course Info Validation
       if (!formData.courseInfo.interestedCourse) newErrors.interestedCourse = "Select a course";
       if (!formData.courseInfo.preferredTiming) newErrors.preferredTiming = "Select preferred timing";
       if (!formData.courseInfo.learningGoals) newErrors.learningGoals = "Learning goals are required";
+    } else if (step === 5) {
+      if (!paymentData.cardName) newErrors.cardName = "Cardholder name is required";
+      if (!paymentData.cardNumber || paymentData.cardNumber.replace(/\s/g, "").length < 16) {
+        newErrors.cardNumber = "Enter a valid 16-digit card number";
+      }
+      if (!paymentData.expiry || !/^\d{2}\/\d{2}$/.test(paymentData.expiry)) {
+        newErrors.expiry = "Enter expiry as MM/YY";
+      }
+      if (!paymentData.cvv || paymentData.cvv.length < 3) {
+        newErrors.cvv = "Enter a valid CVV";
+      }
     }
 
     setErrors(newErrors);
@@ -152,16 +215,33 @@ export default function StudentApplication() {
         [field]: value,
       },
     }));
-    // Clear error when user starts typing
     const errorKey = field;
     if (errors[errorKey]) {
       setErrors(prev => ({ ...prev, [errorKey]: "" }));
     }
   };
 
+  const handlePaymentChange = (field: keyof PaymentData, value: string) => {
+    let formatted = value;
+    if (field === "cardNumber") {
+      formatted = value.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})/g, "$1 ").trim();
+    }
+    if (field === "expiry") {
+      formatted = value.replace(/\D/g, "").slice(0, 4);
+      if (formatted.length >= 3) {
+        formatted = formatted.slice(0, 2) + "/" + formatted.slice(2);
+      }
+    }
+    if (field === "cvv") {
+      formatted = value.replace(/\D/g, "").slice(0, 4);
+    }
+    setPaymentData(prev => ({ ...prev, [field]: formatted }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
+  };
+
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 4));
+      setCurrentStep(prev => Math.min(prev + 1, 5));
     }
   };
 
@@ -173,55 +253,134 @@ export default function StudentApplication() {
     return "APP" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 5).toUpperCase();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateStep(currentStep)) return;
+    if (!validateStep(5)) return;
 
     setIsSubmitting(true);
 
     try {
-      // Generate application ID
       const appId = generateApplicationId();
       setApplicationId(appId);
 
-      // Store application data (in real app, this would be sent to backend/Firebase)
-      const application = {
-        id: appId,
-        ...formData,
-        status: "pending",
-        submittedAt: new Date().toISOString(),
+      const username = generateUsername(formData.personalInfo.firstName);
+      const password = generatePassword();
+      setGeneratedUsername(username);
+      setGeneratedPassword(password);
+
+      const courseFee = COURSE_FEES[formData.courseInfo.interestedCourse] || 4999;
+
+      let uid = "";
+      try {
+        // Create Firebase Auth account
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.personalInfo.email,
+          password
+        );
+        uid = userCredential.user.uid;
+      } catch (authError: any) {
+        if (authError.code === "auth/email-already-in-use") {
+          setIsSubmitting(false);
+          setErrors({ cardNumber: "This email is already registered. Please sign in instead." });
+          return;
+        }
+        console.warn("Firebase Auth failed, falling back to local prototype mode:", authError);
+        uid = "local_" + Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
+      }
+
+      const userDataForDb = {
+        uid,
+        username,
+        email: formData.personalInfo.email,
+        role: "student",
+        // Personal info
+        firstName: formData.personalInfo.firstName,
+        lastName: formData.personalInfo.lastName,
+        name: `${formData.personalInfo.firstName} ${formData.personalInfo.lastName}`,
+        phone: formData.personalInfo.phone,
+        dateOfBirth: formData.personalInfo.dateOfBirth,
+        address: formData.personalInfo.address,
+        city: formData.personalInfo.city,
+        state: formData.personalInfo.state,
+        pincode: formData.personalInfo.pincode,
+        // Academic info
+        grade: formData.academicInfo.currentGrade,
+        school: formData.academicInfo.school,
+        board: formData.academicInfo.board,
+        subjects: formData.academicInfo.subjects,
+        previousScore: formData.academicInfo.previousScore,
+        // Parent info
+        parentName: formData.parentInfo.parentName,
+        parentPhone: formData.parentInfo.parentPhone,
+        parentEmail: formData.parentInfo.parentEmail,
+        parentOccupation: formData.parentInfo.parentOccupation,
+        // Course info
+        interestedCourse: formData.courseInfo.interestedCourse,
+        preferredTiming: formData.courseInfo.preferredTiming,
+        learningGoals: formData.courseInfo.learningGoals,
+        experience: formData.courseInfo.experience,
+        // Payment info
+        paymentStatus: "paid",
+        paymentAmount: courseFee,
+        paymentDate: new Date().toISOString(),
+        // Meta
+        applicationId: appId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
-      // Store in localStorage for demo (replace with Firebase in production)
-      const existingApplications = JSON.parse(localStorage.getItem("studentApplications") || "[]");
-      existingApplications.push(application);
-      localStorage.setItem("studentApplications", JSON.stringify(existingApplications));
+      try {
+        // Save full user document to Firestore `users` collection
+        await setDoc(doc(db, "users", uid), userDataForDb);
+      } catch (dbError) {
+        console.warn("Firestore save failed, proceeding with local only:", dbError);
+      }
 
-      // Send confirmation email
+      // Save to local fallback to ensure login works even without Firebase
+      const localStudents = JSON.parse(localStorage.getItem('localStudents') || '[]');
+      localStudents.push({
+        ...userDataForDb,
+        id: uid,
+        password: password,
+        isLocal: true
+      });
+      localStorage.setItem('localStudents', JSON.stringify(localStudents));
+
+      // Send confirmation email (best effort)
       try {
         await emailService.sendApplicationConfirmation({
           studentName: `${formData.personalInfo.firstName} ${formData.personalInfo.lastName}`,
           studentEmail: formData.personalInfo.email,
           parentEmail: formData.parentInfo.parentEmail,
           applicationId: appId,
-          course: formData.courseInfo.interestedCourse
+          course: formData.courseInfo.interestedCourse,
         });
-      } catch (error) {
-        console.error("Failed to send confirmation email:", error);
+      } catch (err) {
+        console.warn("Email notification failed (non-critical):", err);
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
       setApplicationSubmitted(true);
-    } catch (error) {
-      console.error("Error submitting application:", error);
+    } catch (error: any) {
+      console.error("Error during payment/registration:", error);
+      setErrors({ cardNumber: "Registration failed due to an unexpected block. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const copyToClipboard = async (text: string, type: "username" | "password") => {
+    await navigator.clipboard.writeText(text);
+    if (type === "username") {
+      setUsernameCopied(true);
+      setTimeout(() => setUsernameCopied(false), 2000);
+    } else {
+      setPasswordCopied(true);
+      setTimeout(() => setPasswordCopied(false), 2000);
+    }
+  };
+
+  // ─── SUCCESS SCREEN ───────────────────────────────────────────────
   if (applicationSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center p-4">
@@ -230,25 +389,73 @@ export default function StudentApplication() {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h1>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800 mb-2">Your Application ID:</p>
-              <p className="text-2xl font-bold text-blue-900">{applicationId}</p>
-            </div>
-            <p className="text-gray-600 mb-8">
-              Thank you for your interest! We've received your application and will review it shortly. 
-              You can check your application status using the ID above.
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">You're enrolled! 🎉</h1>
+            <p className="text-gray-600 mb-6">
+              Payment successful for <span className="font-semibold text-[var(--primary)]">{formData.courseInfo.interestedCourse}</span>.
+              Use the credentials below to log in.
             </p>
-            <div className="space-y-4">
+
+            {/* Credentials Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6 text-left">
+              <h2 className="text-sm font-semibold text-blue-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <Lock className="w-4 h-4" /> Your Login Credentials (save these!)
+              </h2>
+
+              {/* Username */}
+              <div className="mb-4">
+                <label className="block text-xs text-gray-500 mb-1">Username</label>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-gray-900 font-mono text-lg font-bold tracking-wider">
+                    {generatedUsername}
+                  </code>
+                  <button
+                    onClick={() => copyToClipboard(generatedUsername, "username")}
+                    className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                  >
+                    <Copy className="w-3 h-3" />
+                    {usernameCopied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Password</label>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-gray-900 font-mono text-lg font-bold tracking-wider">
+                    {showGeneratedPassword ? generatedPassword : "••••••••"}
+                  </code>
+                  <button
+                    onClick={() => setShowGeneratedPassword(!showGeneratedPassword)}
+                    className="p-2 text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg bg-white"
+                  >
+                    {showGeneratedPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(generatedPassword, "password")}
+                    className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                  >
+                    <Copy className="w-3 h-3" />
+                    {passwordCopied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                ⚠️ Save your password now — it won't be shown again. You can also log in using your email address.
+              </p>
+            </div>
+
+            <div className="space-y-3">
               <Link
-                href={`/application-status?id=${applicationId}`}
-                className="inline-flex items-center gap-2 bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--primary-hover)] transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                href="/signin"
+                className="inline-flex items-center justify-center gap-2 w-full bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--primary-hover)] transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]"
               >
-                Check Application Status
+                Go to Login
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <div>
-                <Link href="/" className="text-[var(--primary)] hover:underline">
+                <Link href="/" className="text-[var(--primary)] hover:underline text-sm">
                   Return to Home
                 </Link>
               </div>
@@ -259,13 +466,14 @@ export default function StudentApplication() {
     );
   }
 
+  // ─── STEP CONTENT ─────────────────────────────────────────────────
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Personal Information</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
@@ -418,7 +626,7 @@ export default function StudentApplication() {
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Academic Information</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Current Grade *</label>
@@ -432,18 +640,9 @@ export default function StudentApplication() {
                     }`}
                   >
                     <option value="">Select Grade</option>
-                    <option value="1">Grade 1</option>
-                    <option value="2">Grade 2</option>
-                    <option value="3">Grade 3</option>
-                    <option value="4">Grade 4</option>
-                    <option value="5">Grade 5</option>
-                    <option value="6">Grade 6</option>
-                    <option value="7">Grade 7</option>
-                    <option value="8">Grade 8</option>
-                    <option value="9">Grade 9</option>
-                    <option value="10">Grade 10</option>
-                    <option value="11">Grade 11</option>
-                    <option value="12">Grade 12</option>
+                    {[1,2,3,4,5,6,7,8,9,10,11,12].map(g => (
+                      <option key={g} value={String(g)}>Grade {g}</option>
+                    ))}
                   </select>
                 </div>
                 {errors.currentGrade && <p className="mt-1 text-sm text-red-600">{errors.currentGrade}</p>}
@@ -529,7 +728,7 @@ export default function StudentApplication() {
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Parent/Guardian Information</h3>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Parent/Guardian Name *</label>
               <div className="relative">
@@ -600,7 +799,7 @@ export default function StudentApplication() {
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Course Preferences</h3>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Interested Course *</label>
               <select
@@ -611,16 +810,16 @@ export default function StudentApplication() {
                 }`}
               >
                 <option value="">Select a course</option>
-                <option value="Mathematics">Mathematics</option>
-                <option value="Science">Science</option>
-                <option value="English">English</option>
-                <option value="JEE Preparation">JEE Preparation</option>
-                <option value="NEET Preparation">NEET Preparation</option>
-                <option value="Foundation Course">Foundation Course</option>
-                <option value="Coding & Programming">Coding & Programming</option>
-                <option value="Comprehensive Package">Comprehensive Package</option>
+                {Object.keys(COURSE_FEES).map(course => (
+                  <option key={course} value={course}>{course}</option>
+                ))}
               </select>
               {errors.interestedCourse && <p className="mt-1 text-sm text-red-600">{errors.interestedCourse}</p>}
+              {formData.courseInfo.interestedCourse && (
+                <p className="mt-2 text-sm font-semibold text-[var(--primary)]">
+                  Course Fee: ₹{(COURSE_FEES[formData.courseInfo.interestedCourse] ?? 4999).toLocaleString("en-IN")}
+                </p>
+              )}
             </div>
 
             <div>
@@ -651,7 +850,7 @@ export default function StudentApplication() {
                   errors.learningGoals ? "border-red-500" : "border-gray-300"
                 }`}
                 rows={4}
-                placeholder="Tell us about your learning goals and what you hope to achieve..."
+                placeholder="Tell us about your learning goals..."
               />
               {errors.learningGoals && <p className="mt-1 text-sm text-red-600">{errors.learningGoals}</p>}
             </div>
@@ -669,10 +868,119 @@ export default function StudentApplication() {
           </div>
         );
 
+      case 5: {
+        const courseFee = COURSE_FEES[formData.courseInfo.interestedCourse] ?? 4999;
+        return (
+          <div className="space-y-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-1">Payment</h3>
+            <p className="text-gray-500 text-sm mb-4">Complete your enrollment by making the course payment.</p>
+
+            {/* Order Summary */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Order Summary</h4>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-600">{formData.courseInfo.interestedCourse}</span>
+                <span className="font-semibold text-gray-900">₹{courseFee.toLocaleString("en-IN")}</span>
+              </div>
+              <div className="flex justify-between items-center mb-2 text-sm text-gray-500">
+                <span>Preferred Timing</span>
+                <span>{formData.courseInfo.preferredTiming}</span>
+              </div>
+              <hr className="border-blue-200 my-3" />
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-gray-900">Total</span>
+                <span className="text-xl font-bold text-[var(--primary)]">₹{courseFee.toLocaleString("en-IN")}</span>
+              </div>
+            </div>
+
+            {/* Payment Form */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CreditCard className="w-5 h-5 text-gray-500" />
+                <span className="font-medium text-gray-700">Card Details</span>
+                <span className="ml-auto text-xs text-green-600 bg-green-50 border border-green-200 rounded px-2 py-0.5 flex items-center gap-1">
+                  <Lock className="w-3 h-3" /> Secure Demo Payment
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cardholder Name *</label>
+                <input
+                  type="text"
+                  value={paymentData.cardName}
+                  onChange={(e) => handlePaymentChange("cardName", e.target.value)}
+                  className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent ${
+                    errors.cardName ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Name on card"
+                />
+                {errors.cardName && <p className="mt-1 text-sm text-red-600">{errors.cardName}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Card Number *</label>
+                <div className="relative">
+                  <CreditCard className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={paymentData.cardNumber}
+                    onChange={(e) => handlePaymentChange("cardNumber", e.target.value)}
+                    className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent font-mono tracking-wider ${
+                      errors.cardNumber ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="1234 5678 9012 3456"
+                  />
+                </div>
+                {errors.cardNumber && <p className="mt-1 text-sm text-red-600">{errors.cardNumber}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date *</label>
+                  <input
+                    type="text"
+                    value={paymentData.expiry}
+                    onChange={(e) => handlePaymentChange("expiry", e.target.value)}
+                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent ${
+                      errors.expiry ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="MM/YY"
+                  />
+                  {errors.expiry && <p className="mt-1 text-sm text-red-600">{errors.expiry}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">CVV *</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <input
+                      type="password"
+                      value={paymentData.cvv}
+                      onChange={(e) => handlePaymentChange("cvv", e.target.value)}
+                      className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent ${
+                        errors.cvv ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="•••"
+                    />
+                  </div>
+                  {errors.cvv && <p className="mt-1 text-sm text-red-600">{errors.cvv}</p>}
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-400 text-center">
+              🔒 This is a demo payment — no real charge will be made. Enter any dummy card details.
+            </p>
+          </div>
+        );
+      }
+
       default:
         return null;
     }
   };
+
+  const STEP_LABELS = ["Personal Info", "Academic Info", "Parent Info", "Course Info", "Payment"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center p-4">
@@ -689,36 +997,32 @@ export default function StudentApplication() {
             <div className="w-12 h-12 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
               <Sparkles className="text-white" size={28} />
             </div>
-            <span className="text-3xl font-bold gradient-text">
-              Brilliant Roots
-            </span>
+            <span className="text-3xl font-bold gradient-text">Brilliant Roots</span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Student Application Form
-          </h1>
-          <p className="text-gray-600">
-            Join our learning community - Apply in just 4 simple steps
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Student Application Form</h1>
+          <p className="text-gray-600">Join our learning community — Apply in 5 simple steps</p>
         </div>
 
         {/* Progress indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            {[1, 2, 3, 4].map((step) => (
-              <div key={step} className="flex items-center">
+            {[1, 2, 3, 4, 5].map((step) => (
+              <div key={step} className="flex items-center flex-1">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
-                    step <= currentStep
-                      ? "bg-[var(--primary)] text-white"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 shrink-0 ${
+                    step < currentStep
+                      ? "bg-green-500 text-white"
+                      : step === currentStep
+                      ? "bg-[var(--primary)] text-white ring-4 ring-[var(--primary)]/20"
                       : "bg-gray-200 text-gray-500"
                   }`}
                 >
-                  {step}
+                  {step < currentStep ? <CheckCircle className="w-5 h-5" /> : step}
                 </div>
-                {step < 4 && (
+                {step < 5 && (
                   <div
-                    className={`w-full h-1 mx-2 transition-all duration-300 ${
-                      step < currentStep ? "bg-[var(--primary)]" : "bg-gray-200"
+                    className={`flex-1 h-1 mx-2 transition-all duration-300 ${
+                      step < currentStep ? "bg-green-500" : "bg-gray-200"
                     }`}
                   />
                 )}
@@ -726,16 +1030,15 @@ export default function StudentApplication() {
             ))}
           </div>
           <div className="flex justify-between mt-2">
-            <span className="text-xs text-gray-600">Personal Info</span>
-            <span className="text-xs text-gray-600">Academic Info</span>
-            <span className="text-xs text-gray-600">Parent Info</span>
-            <span className="text-xs text-gray-600">Course Info</span>
+            {STEP_LABELS.map(label => (
+              <span key={label} className="text-xs text-gray-600 text-center" style={{ width: "20%" }}>{label}</span>
+            ))}
           </div>
         </div>
 
         {/* Form */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-8">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={currentStep === 5 ? handlePaymentSubmit : (e) => { e.preventDefault(); nextStep(); }}>
             {renderStepContent()}
 
             {/* Navigation buttons */}
@@ -749,7 +1052,7 @@ export default function StudentApplication() {
                 Previous
               </button>
 
-              {currentStep < 4 ? (
+              {currentStep < 5 ? (
                 <button
                   type="button"
                   onClick={nextStep}
@@ -762,17 +1065,17 @@ export default function StudentApplication() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-3 bg-[var(--primary)] text-white rounded-lg font-semibold hover:bg-[var(--primary-hover)] transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Submitting...
+                      Processing...
                     </>
                   ) : (
                     <>
-                      <FileText className="w-4 h-4" />
-                      Submit Application
+                      <CreditCard className="w-4 h-4" />
+                      Pay ₹{((COURSE_FEES[formData.courseInfo.interestedCourse]) ?? 4999).toLocaleString("en-IN")} & Enroll
                     </>
                   )}
                 </button>
@@ -786,11 +1089,11 @@ export default function StudentApplication() {
           <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
             <div className="flex items-center gap-1">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span>Secure application</span>
+              <span>Secure enrollment</span>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span>Quick review</span>
+              <span>Instant credentials</span>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle className="w-4 h-4 text-green-500" />

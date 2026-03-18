@@ -31,7 +31,7 @@ export default function SignUp() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -84,14 +84,27 @@ export default function SignUp() {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setErrors({});
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await signup({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        grade: formData.grade,
+      });
+
+      if (result.success) {
+        router.push("/");
+      } else {
+        setErrors({ general: result.error || "Signup failed. Please try again." });
+      }
+    } catch (error) {
+      setErrors({ general: "An unexpected error occurred. Please try again later." });
+    } finally {
       setIsLoading(false);
-      // Use the auth context login function
-      login({ email: formData.email, password: formData.password });
-      router.push("/");
-    }, 1500);
+    }
   };
 
   const handleChange = (
