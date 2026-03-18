@@ -1,6 +1,6 @@
 [build]
   base = "vedantu/"
-  command = "chmod +x build.sh && ./build.sh"
+  command = "npm ci && npm run build && echo 'Build completed. Checking for out directory:' && ls -la && echo 'out directory contents:' && ls -la out/ || echo 'out directory does not exist'"
   publish = "out"
 
 [build.environment]
