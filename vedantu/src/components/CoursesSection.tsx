@@ -78,7 +78,7 @@ const CoursesSection = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {courses.slice(0, 6).map((course, idx) => {
-            const Icon = (iconMap as any)[course.icon] || BookOpen;
+            const Icon = (course.icon && (iconMap as any)[course.icon]) || BookOpen;
             const cardColor = course.color || 'from-orange-400 to-pink-500';
             
             return (

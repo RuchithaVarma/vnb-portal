@@ -242,7 +242,7 @@ export default function KidsCoursesPage() {
                   </div>
                   <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-xl text-blue-600 border border-blue-100">
                     <Users size={14} />
-                    <span>{course.students.toLocaleString()}</span>
+                    <span>{course.students?.toLocaleString() || "0"}</span>
                   </div>
                   <div className="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-xl text-purple-600 border border-purple-100">
                     <Clock size={14} />
@@ -256,7 +256,7 @@ export default function KidsCoursesPage() {
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Fee</p>
                     <div className="flex items-baseline gap-1">
                       <span className="text-3xl font-black text-gray-900 tracking-tighter">₹{course.price.toLocaleString()}</span>
-                      <span className="text-xs text-gray-400 line-through font-bold">₹{course.originalPrice.toLocaleString()}</span>
+                      {course.originalPrice && <span className="text-xs text-gray-400 line-through font-bold">₹{course.originalPrice.toLocaleString()}</span>}
                     </div>
                   </div>
                   <div className="text-right">

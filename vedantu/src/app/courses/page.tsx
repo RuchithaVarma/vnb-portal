@@ -326,7 +326,7 @@ export default function CoursesPage() {
                 
                 <div className="absolute inset-0 flex items-center justify-center">
                   {(() => {
-                    const Icon = (iconMap as any)[(course as any).icon] || BookOpen;
+                    const Icon = (course.icon && (iconMap as any)[course.icon]) || BookOpen;
                     return <Icon className="text-[var(--primary)]/40" size={64} />;
                   })()}
                 </div>
@@ -357,7 +357,7 @@ export default function CoursesPage() {
                   {course.title}
                 </h3>
                 <p className="text-gray-500 text-sm mb-6 line-clamp-2 font-medium">
-                  {course.description}
+                  {course.description || ""}
                 </p>
 
                 {/* Micro Details Row */}
@@ -368,7 +368,7 @@ export default function CoursesPage() {
                   </div>
                   <div className="flex items-center gap-1 bg-blue-50 px-2.5 py-1.5 rounded-xl text-blue-600 border border-blue-100">
                     <Users size={14} />
-                    <span>{course.students.toLocaleString()}</span>
+                    <span>{course.students?.toLocaleString() || "0"}</span>
                   </div>
                   <div className="flex items-center gap-1 bg-purple-50 px-2.5 py-1.5 rounded-xl text-purple-600 border border-purple-100">
                     <Clock size={14} />
@@ -382,13 +382,15 @@ export default function CoursesPage() {
                     <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Fee</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black text-gray-900 tracking-tighter">₹{course.price.toLocaleString()}</span>
-                      <span className="text-sm text-gray-400 line-through font-bold">₹{course.originalPrice.toLocaleString()}</span>
+                      {course.originalPrice && <span className="text-sm text-gray-400 line-through font-bold">₹{course.originalPrice.toLocaleString()}</span>}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="inline-block bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-md border border-green-100 mb-1">
-                      Save {Math.round((1 - course.price / course.originalPrice) * 100)}%
-                    </div>
+                    {course.originalPrice && (
+                      <div className="inline-block bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-md border border-green-100 mb-1">
+                        Save {Math.round((1 - course.price / course.originalPrice) * 100)}%
+                      </div>
+                    )}
                     <p className="text-xs text-gray-500 font-black uppercase tracking-widest">{course.lessons} Live Sessions</p>
                   </div>
                 </div>

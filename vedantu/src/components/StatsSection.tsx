@@ -47,7 +47,7 @@ const StatsSection = async () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {stats.map((stat, idx) => {
-            const Icon = iconMap[stat.icon] || HelpCircle;
+            const Icon = (stat.icon && iconMap[stat.icon]) || HelpCircle;
             return (
               <StatCard
                 key={stat.id || idx}
