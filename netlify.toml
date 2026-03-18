@@ -1,10 +1,20 @@
 [build]
   base = "vedantu/"
-  command = "npm run build"
+  command = "chmod +x build.sh && ./build.sh"
   publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--prefer-offline --no-audit"
+
+# Cache dependencies for faster builds
+[[build.cache]]
+  path = "node_modules"
+  name = "node_modules"
+
+[[build.cache]]
+  path = ".next/cache"
+  name = "next_cache"
 
 [[redirects]]
   from = "/api/*"

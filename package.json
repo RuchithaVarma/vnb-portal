@@ -10,7 +10,7 @@
     "seed": "cd vedantu && npx tsx src/scripts/seed.ts",
     "import": "cd vedantu && npx tsx src/scripts/import-data.ts",
     "emulator": "cd vedantu && firebase emulators:start",
-    "seed:emulator": "cd vedantu && firebase emulators:start --only firestore & sleep 5 && npx tsx src/scripts/seed.ts && firebase emulators:stop",
+    "seed:emulator": "cd vedantu && firebase emulators:start --only firestore & sleep 5 && npx tsx src/scripts/import-data.ts && firebase emulators:stop",
     "import:emulator": "cd vedantu && firebase emulators:start --only firestore & sleep 5 && npx tsx src/scripts/import-data.ts && firebase emulators:stop"
   },
   "dependencies": {
