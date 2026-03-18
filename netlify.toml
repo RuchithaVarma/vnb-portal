@@ -1,19 +1,19 @@
 [build]
   base = "vedantu/"
-  command = "npm ci && npm run build && echo 'Build completed. Checking for out directory:' && ls -la && echo 'out directory contents:' && ls -la out/ || echo 'out directory does not exist'"
+  command = "npm ci && npm run build"
   publish = "out"
+  NPM_FLAGS = "--prefer-offline --no-audit"
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--prefer-offline --no-audit"
 
 # Cache dependencies for faster builds
 [[build.cache]]
-  path = "node_modules"
+  path = "vedantu/node_modules"
   name = "node_modules"
 
 [[build.cache]]
-  path = ".next/cache"
+  path = "vedantu/.next/cache"
   name = "next_cache"
 
 [[redirects]]

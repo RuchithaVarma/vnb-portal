@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cd vedantu && npm run dev",
-    "build": "cd vedantu && npm install && npm run build",
+    "build": "cd vedantu && npm ci && npm run build",
     "start": "cd vedantu && npm start",
     "lint": "cd vedantu && npm run lint",
     "seed": "cd vedantu && npx tsx src/scripts/seed.ts",
