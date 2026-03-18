@@ -1,6 +1,6 @@
 "use client";
 import { GraduationCap, Users, BookOpen, Heart, Lightbulb, Target, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 const teachers = [
   { name: "Dr. Rajesh Kumar", subject: "Physics", qualification: "IIT Delhi, PhD", experience: "15+ years", color: "from-blue-500 to-cyan-400" },
@@ -8,7 +8,7 @@ const teachers = [
   { name: "Mr. Vikram Singh", subject: "Chemistry", qualification: "IIT Kanpur, B.Tech", experience: "10+ years", color: "from-green-500 to-teal-400" }
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -18,7 +18,7 @@ const containerVariants = {
   }
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
     opacity: 1, 

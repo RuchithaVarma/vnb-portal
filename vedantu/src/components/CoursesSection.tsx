@@ -3,7 +3,7 @@ import { BookOpen, GraduationCap, Code, Languages, Calculator, Palette, HelpCirc
 import { getItems } from '@/lib/firestoreService';
 import { getLocalCourses } from '@/lib/localData';
 import { Course } from '@/types';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -16,7 +16,7 @@ const iconMap: Record<string, LucideIcon> = {
   "BookOpen": BookOpen
 };
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -24,7 +24,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
     opacity: 1, 
