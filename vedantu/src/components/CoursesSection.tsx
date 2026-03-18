@@ -129,10 +129,16 @@ const CoursesSection = () => {
           })}
         </motion.div>
 
-        <div className="text-center mt-16 animate-fadeInUp">
+        <div className="text-center mt-16 animate-fadeInUp flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link href="/courses">
-            <button className="px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 mx-auto">
+            <button className="px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
               View All Courses
+              <ChevronRight size={20} />
+            </button>
+          </Link>
+          <Link href="/tests">
+            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
+              Explore Tests
               <ChevronRight size={20} />
             </button>
           </Link>
