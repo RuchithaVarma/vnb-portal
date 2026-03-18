@@ -90,7 +90,7 @@ export default function TestApplication() {
       const usersCollection = collection(db, "users");
       const snapshot = await getDocs(usersCollection);
 
-      let foundUser = null;
+      let foundUser: any = null;
       snapshot.docs.forEach((doc) => {
         if (doc.data().email === email) {
           foundUser = { id: doc.id, ...doc.data() };
