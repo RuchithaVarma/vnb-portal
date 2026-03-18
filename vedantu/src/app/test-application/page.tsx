@@ -10,14 +10,17 @@ export default function TestApplication() {
   const [isLoading, setIsLoading] = useState(false);
 
   const addResult = (message: string) => {
-    setResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    setResults((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
   };
 
   // Test application submission with all fields
   const testApplicationSubmission = async () => {
     setIsLoading(true);
     addResult("🧪 Testing full application submission...");
-    
+
     const testData = {
       // Basic authentication info
       name: "Test Application User",
@@ -25,34 +28,34 @@ export default function TestApplication() {
       phone: "9876543210",
       password: "password123",
       grade: "10",
-      
+
       // Course information
       course: "mathematics",
       preferredTiming: "evening",
-      
+
       // Parent information
       parentName: "Test Parent",
       parentPhone: "9876543211",
       parentEmail: "parent@test.com",
       parentOccupation: "Engineer",
-      
+
       // Address information
       address: "123 Test Street, Test Area",
       city: "Test City",
       state: "Test State",
       postalCode: "123456",
-      
+
       // Additional information
       previousSchool: "Test Previous School",
       reasonForJoining: "To improve my studies",
       howDidYouHear: "google",
-      
+
       // Payment information
       paymentMethod: "online",
       paymentStatus: "pending",
       paymentAmount: 5000,
-      paymentDate: null,
-      
+      paymentDate: undefined,
+
       // Application status
       applicationStatus: "submitted",
       applicationDate: new Date().toISOString(),
@@ -61,10 +64,10 @@ export default function TestApplication() {
     try {
       addResult("Submitting application data...");
       const result = await signup(testData);
-      
+
       if (result.success) {
         addResult("✅ Application submitted successfully!");
-        
+
         // Verify data was stored
         setTimeout(async () => {
           await verifyStoredData(testData.email);
@@ -75,25 +78,25 @@ export default function TestApplication() {
     } catch (error: any) {
       addResult(`❌ Error: ${error.message}`);
     }
-    
+
     setIsLoading(false);
   };
 
   // Verify data in Firestore
   const verifyStoredData = async (email: string) => {
     addResult("🔍 Verifying stored data in Firestore...");
-    
+
     try {
       const usersCollection = collection(db, "users");
       const snapshot = await getDocs(usersCollection);
-      
+
       let foundUser = null;
-      snapshot.docs.forEach(doc => {
+      snapshot.docs.forEach((doc) => {
         if (doc.data().email === email) {
           foundUser = { id: doc.id, ...doc.data() };
         }
       });
-      
+
       if (foundUser) {
         addResult("✅ User found in Firestore!");
         addResult(`   Name: ${foundUser.name}`);
@@ -116,26 +119,26 @@ export default function TestApplication() {
   const checkAllUsers = async () => {
     setIsLoading(true);
     addResult("🔍 Checking all users in Firestore...");
-    
+
     try {
       const querySnapshot = await getDocs(collection(db, "users"));
       addResult(`Found ${querySnapshot.docs.length} users in collection:`);
-      
+
       querySnapshot.docs.forEach((doc, index) => {
         const data = doc.data();
         addResult(`\nUser ${index + 1}:`);
-        addResult(`  Email: ${data.email || 'N/A'}`);
-        addResult(`  Name: ${data.name || 'N/A'}`);
-        addResult(`  Course: ${data.course || 'N/A'}`);
-        addResult(`  Parent: ${data.parentName || 'N/A'}`);
-        addResult(`  Address: ${data.address || 'N/A'}`);
-        addResult(`  Payment: ${data.paymentMethod || 'N/A'}`);
+        addResult(`  Email: ${data.email || "N/A"}`);
+        addResult(`  Name: ${data.name || "N/A"}`);
+        addResult(`  Course: ${data.course || "N/A"}`);
+        addResult(`  Parent: ${data.parentName || "N/A"}`);
+        addResult(`  Address: ${data.address || "N/A"}`);
+        addResult(`  Payment: ${data.paymentMethod || "N/A"}`);
         addResult(`  Fields: ${Object.keys(data).length}`);
       });
     } catch (error: any) {
       addResult(`❌ Error: ${error.message}`);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -148,7 +151,7 @@ export default function TestApplication() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Application Form Test</h1>
-        
+
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Test Functions</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -179,17 +182,23 @@ export default function TestApplication() {
           <h2 className="text-xl font-semibold mb-4">Test Results</h2>
           <div className="bg-gray-100 rounded p-4 h-96 overflow-y-auto">
             {results.length === 0 ? (
-              <p className="text-gray-500">No tests run yet. Click a test button above.</p>
+              <p className="text-gray-500">
+                No tests run yet. Click a test button above.
+              </p>
             ) : (
-              <pre className="text-sm whitespace-pre-wrap">{results.join('\n')}</pre>
+              <pre className="text-sm whitespace-pre-wrap">
+                {results.join("\n")}
+              </pre>
             )}
           </div>
         </div>
-        
+
         <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h3 className="font-semibold text-yellow-900 mb-2">Instructions:</h3>
           <ol className="list-decimal list-inside text-sm text-yellow-800 space-y-1">
-            <li>Click "Test Application Submission" to test with sample data</li>
+            <li>
+              Click "Test Application Submission" to test with sample data
+            </li>
             <li>Check the browser console for detailed logs</li>
             <li>Use "Check All Users" to see all stored users</li>
             <li>Verify all fields are stored correctly</li>

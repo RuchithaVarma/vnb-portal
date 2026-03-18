@@ -6,6 +6,9 @@ const nextConfig = {
     unoptimized: true,
   },
   distDir: "out",
+  turbopack: {
+    root: "./",
+  },
 };
 
 module.exports = nextConfig;
