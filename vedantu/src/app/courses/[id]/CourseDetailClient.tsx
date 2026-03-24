@@ -6,10 +6,48 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function CourseDetailClient({ id }: { id: string }) {
+  const { user, isAuthenticated, loading } = useAuth();
+  const router = useRouter();
   const course = getLocalCourses().find(c => c.id === id);
   const extra = getLocalCourseExtra(id);
   const [activeTab, setActiveTab] = useState('curriculum');
+
+  useEffect(() => {
+    if (!loading && isAuthenticated && user?.role === 'student' && user.course && course) {
+      const enrolledValue = user.course.toLowerCase();
+      const courseTitle = course.title.toLowerCase();
+      
+      let hasAccess = false;
+      
+      // Mapping logic (Sync with courses/page.tsx)
+      if (enrolledValue === "vedic-maths" && courseTitle.includes("vedic")) hasAccess = true;
+      else if (enrolledValue === "telugu" && courseTitle.includes("telugu")) hasAccess = true;
+      else if (enrolledValue === "phonics" && courseTitle.includes("phonics")) hasAccess = true;
+      else if (enrolledValue === "abacus" && courseTitle.includes("abacus")) hasAccess = true;
+      else if (enrolledValue === "olympiad" && courseTitle.includes("olympiad")) hasAccess = true;
+      else if (enrolledValue === "jee" && courseTitle.includes("jee")) hasAccess = true;
+      else if (enrolledValue === "neet" && courseTitle.includes("neet")) hasAccess = true;
+      else if (["mathematics", "science", "english", "coding"].includes(enrolledValue) && courseTitle.includes("tuition")) hasAccess = true;
+      else if (courseTitle.includes(enrolledValue)) hasAccess = true;
+      
+      if (!hasAccess) {
+        router.push('/courses');
+      }
+    }
+  }, [user, isAuthenticated, loading, course, router]);
+
+  if (loading) {
+     return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--primary)]"></div>
+      </div>
+    );
+  }
 
   if (!course) {
     return (

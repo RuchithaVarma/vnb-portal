@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import AdminGuard from "./AdminGuard";
 
 export const metadata: Metadata = {
   title: "Admin Portal - Brilliant Roots",
@@ -12,5 +13,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <AdminGuard>{children}</AdminGuard>;
 }

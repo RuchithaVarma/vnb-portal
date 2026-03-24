@@ -247,6 +247,42 @@ export default function CoursesPage() {
   ];
 
   const filteredCourses = courses.filter((course) => {
+    // If student is logged in, only show their related course
+    if (isAuthenticated && user?.role === "student" && user.course) {
+      const enrolledValue = user.course.toLowerCase();
+      const courseTitle = course.title.toLowerCase();
+
+      // Mapping logic: check if the course title relates to the enrolled course value
+      if (enrolledValue === "vedic-maths" && courseTitle.includes("vedic"))
+        return true;
+      if (enrolledValue === "telugu" && courseTitle.includes("telugu"))
+        return true;
+      if (enrolledValue === "phonics" && courseTitle.includes("phonics"))
+        return true;
+      if (enrolledValue === "abacus" && courseTitle.includes("abacus"))
+        return true;
+      if (enrolledValue === "olympiad" && courseTitle.includes("olympiad"))
+        return true;
+      if (enrolledValue === "jee" && courseTitle.includes("jee")) return true;
+      if (enrolledValue === "neet" && courseTitle.includes("neet")) return true;
+
+      // Tuition categories for general subjects
+      if (
+        ["mathematics", "science", "english", "coding"].includes(
+          enrolledValue,
+        ) &&
+        courseTitle.includes("tuition")
+      ) {
+        return true;
+      }
+
+      // If no specific mapping, check for simple inclusion
+      if (courseTitle.includes(enrolledValue)) return true;
+
+      return false; // Hide non-related courses for students
+    }
+
+    // Default category filtering for non-students or non-logged-in users
     return selectedCategory === "all" || course.category === selectedCategory;
   });
 
