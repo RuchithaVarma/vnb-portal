@@ -18,11 +18,11 @@ import {
 import { handleLogout, handleNotification } from "@/utils/adminHandlers";
 
 const menuItems = [
-  { id: "students", label: "Students", icon: Users, href: "/admin/students" },
+  // { id: "students", label: "Students", icon: Users, href: "/admin/students" },
   { id: "teachers", label: "Teachers", icon: UserCheck, href: "/admin/teachers" },
   { id: "courses", label: "Courses", icon: BookOpen, href: "/admin/courses" },
-  { id: "payments", label: "Payments", icon: CreditCard, href: "/admin/payments" },
-  { id: "settings", label: "Settings", icon: Settings, href: "/admin/settings" },
+  // { id: "payments", label: "Payments", icon: CreditCard, href: "/admin/payments" },
+  // { id: "settings", label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 function AdminLayoutContent({
