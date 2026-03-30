@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Users,
   Star,
@@ -21,6 +21,10 @@ import {
   UserCheck,
   Video,
   Edit,
+  Loader2,
+  ImagePlus,
+  X,
+  Camera,
 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import {
@@ -32,13 +36,16 @@ import {
 } from "@/utils/adminHandlers";
 import { getItems, addItem, updateItem, deleteItem } from "@/lib/firestoreService";
 import { Teacher } from "@/types";
-import { useEffect } from "react";
+
 
 export default function TeachersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const photoFileInputRef = useRef<HTMLInputElement>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,6 +55,7 @@ export default function TeachersManagement() {
     email: "",
     phone: "",
     specialization: "",
+    qualification: "",
     experience: "",
     rating: 0,
     students: 0,
@@ -56,6 +64,7 @@ export default function TeachersManagement() {
     status: "active",
     nextClass: "",
     avatar: "",
+    color: "from-blue-500 to-cyan-400",
   });
 
   useEffect(() => {
@@ -65,12 +74,14 @@ export default function TeachersManagement() {
   useEffect(() => {
     if (selectedTeacher) {
       setFormState(selectedTeacher);
+      setPhotoPreview((selectedTeacher as any).photo || "");
     } else {
       setFormState({
         name: "",
         email: "",
         phone: "",
         specialization: "",
+        qualification: "",
         experience: "",
         rating: 0,
         students: 0,
@@ -79,9 +90,46 @@ export default function TeachersManagement() {
         status: "active",
         nextClass: "",
         avatar: "",
+        color: "from-blue-500 to-cyan-400",
       });
+      setPhotoPreview("");
     }
   }, [selectedTeacher]);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        setPhotoPreview(dataUrl);
+        setFormState((prev) => ({ ...prev, photo: dataUrl } as any));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearPhoto = () => {
+    setPhotoPreview("");
+    setFormState((prev) => ({ ...prev, photo: "" } as any));
+    if (photoFileInputRef.current) photoFileInputRef.current.value = "";
+  };
 
   const fetchTeachers = async () => {
     setLoading(true);
@@ -110,16 +158,19 @@ export default function TeachersManagement() {
 
   const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
+    const initials = formState.name ? formState.name.split(" ").map(n => n[0]).join("") : "T";
     const payload = {
       ...formState,
       students: Number(formState.students),
       revenue: Number(formState.revenue),
       courses: Number(formState.courses),
       rating: Number(formState.rating),
-      avatar: formState.name ? formState.name.split(" ").map(n => n[0]).join("") : "T",
+      avatar: initials,
+      photo: photoPreview || (formState as any).photo || "",
       joinedDate: formState.joinedDate || new Date().toISOString().split('T')[0],
     };
 
+    setIsSaving(true);
     try {
       if (selectedTeacher?.id) {
         await updateItem("teachers", selectedTeacher.id, payload);
@@ -132,6 +183,8 @@ export default function TeachersManagement() {
       fetchTeachers();
     } catch (error) {
       alert("Failed to save teacher.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -276,8 +329,12 @@ export default function TeachersManagement() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
-                    {teacher.avatar || "T"}
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4 overflow-hidden">
+                    {(teacher as any).photo ? (
+                      <img src={(teacher as any).photo} alt={teacher.name} className="w-full h-full object-cover" />
+                    ) : (
+                      teacher.avatar || "T"
+                    )}
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">{teacher.name}</h3>
@@ -369,6 +426,47 @@ export default function TeachersManagement() {
                 <button onClick={() => setIsModalOpen(false)} className="text-gray-500">&times;</button>
               </div>
               <form onSubmit={handleSaveItem} className="space-y-4">
+                {/* Photo Upload */}
+                <div className="flex flex-col items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={photoFileInputRef}
+                    onChange={handlePhotoUpload}
+                  />
+                  <div className="relative">
+                    <div
+                      onClick={() => photoFileInputRef.current?.click()}
+                      className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl cursor-pointer overflow-hidden ring-4 ring-blue-100 hover:ring-blue-300 transition-all"
+                    >
+                      {photoPreview ? (
+                        <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{formState.name ? formState.name.split(" ").map(n => n[0]).join("") : "?"}</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => photoFileInputRef.current?.click()}
+                      className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-1.5 hover:bg-blue-700 shadow"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                    </button>
+                    {photoPreview && (
+                      <button
+                        type="button"
+                        onClick={clearPhoto}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2 cursor-pointer hover:text-blue-500" onClick={() => photoFileInputRef.current?.click()}>
+                    Click to upload photo
+                  </p>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Name</label>
                   <input
@@ -462,9 +560,17 @@ export default function TeachersManagement() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Save Changes
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </button>
                 </div>
               </form>

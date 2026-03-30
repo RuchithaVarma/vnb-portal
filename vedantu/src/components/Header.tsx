@@ -27,8 +27,13 @@ const Header = () => {
   const [isCoursesOpen, setIsCoursesOpen] = useState(false);
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const { user, isAuthenticated, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const coursesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -355,7 +360,7 @@ const Header = () => {
             </Link>
 
             {/* User Profile Dropdown */}
-            {isAuthenticated ? (
+            {mounted && isAuthenticated ? (
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -480,7 +485,7 @@ const Header = () => {
 
               {/* Mobile Auth Section */}
               <div className="flex flex-col gap-3 mt-4 pt-4 border-t">
-                {isAuthenticated ? (
+                {mounted && isAuthenticated ? (
                   <>
                     <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
                       <div className="w-8 h-8 bg-gradient-to-br from-[var(--primary)] to-orange-600 rounded-full flex items-center justify-center">

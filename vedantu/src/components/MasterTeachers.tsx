@@ -1,12 +1,9 @@
 "use client";
-import { GraduationCap, Users, BookOpen, Heart, Lightbulb, Target, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { GraduationCap, Users, BookOpen, Target, Lightbulb, Sparkles } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
-
-const teachers = [
-  { name: "Dr. Rajesh Kumar", subject: "Physics", qualification: "IIT Delhi, PhD", experience: "15+ years", color: "from-blue-500 to-cyan-400" },
-  { name: "Prof. Anita Sharma", subject: "Mathematics", qualification: "IIT Bombay, M.Tech", experience: "12+ years", color: "from-purple-500 to-pink-400" },
-  { name: "Mr. Vikram Singh", subject: "Chemistry", qualification: "IIT Kanpur, B.Tech", experience: "10+ years", color: "from-green-500 to-teal-400" }
-];
+import { getItems } from '@/lib/firestoreService';
+import { Teacher } from '@/types';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -28,6 +25,40 @@ const cardVariants: Variants = {
 };
 
 const MasterTeachers = () => {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const data = await getItems<Teacher>("teachers");
+        if (data.length > 0) {
+          setTeachers(data);
+        } else {
+          // Fallback to initial data if Firestore is empty
+          setTeachers([
+            { name: "Dr. Rajesh Kumar", specialization: "Physics", qualification: "IIT Delhi, PhD", experience: "15+ years", color: "from-blue-500 to-cyan-400" },
+            { name: "Prof. Anita Sharma", specialization: "Mathematics", qualification: "IIT Bombay, M.Tech", experience: "12+ years", color: "from-purple-500 to-pink-400" },
+            { name: "Mr. Vikram Singh", specialization: "Chemistry", qualification: "IIT Kanpur, B.Tech", experience: "10+ years", color: "from-green-500 to-teal-400" }
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTeachers();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="py-24 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)]"></div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-24 bg-white relative overflow-hidden">
       {/* Background decoration */}
@@ -64,20 +95,24 @@ const MasterTeachers = () => {
         >
           {teachers.map((teacher, idx) => (
             <motion.div 
-              key={idx} 
+              key={teacher.id || idx} 
               variants={cardVariants}
               whileHover={{ y: -10, scale: 1.02 }}
               className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 group relative overflow-hidden"
             >
-              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${teacher.color} opacity-[0.02] rounded-full blur-2xl group-hover:opacity-[0.05] transition-opacity`}></div>
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${teacher.color || 'from-orange-500 to-yellow-400'} opacity-[0.02] rounded-full blur-2xl group-hover:opacity-[0.05] transition-opacity`}></div>
               
               <div className="flex justify-center mb-6">
                 <div className="relative">
-                  <div className={`w-24 h-24 bg-gradient-to-br ${teacher.color} rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-orange-100 group-hover:rotate-6 transition-transform duration-500`}>
-                    {teacher.name.split(' ').map(n => n[0]).join('')}
+                  <div className={`w-24 h-24 bg-gradient-to-br ${teacher.color || 'from-orange-500 to-yellow-400'} rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-orange-100 group-hover:rotate-6 transition-transform duration-500 overflow-hidden`}>
+                    {(teacher as any).photo ? (
+                      <img src={(teacher as any).photo} alt={teacher.name} className="w-full h-full object-cover" />
+                    ) : (
+                      teacher.avatar || (teacher.name ? teacher.name.split(' ').map(n => n[0]).join('') : 'T')
+                    )}
                   </div>
                   <div className="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-xl shadow-md border border-gray-50">
-                    <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${teacher.color} flex items-center justify-center`}>
+                    <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${teacher.color || 'from-orange-500 to-yellow-400'} flex items-center justify-center`}>
                       <GraduationCap size={12} className="text-white" />
                     </div>
                   </div>
@@ -85,12 +120,12 @@ const MasterTeachers = () => {
               </div>
               
               <h3 className="text-xl font-bold text-center text-gray-900 mb-1">{teacher.name}</h3>
-              <p className="text-center text-[var(--primary)] font-bold text-sm mb-6 tracking-wide uppercase">{teacher.subject}</p>
+              <p className="text-center text-[var(--primary)] font-bold text-sm mb-6 tracking-wide uppercase">{teacher.specialization || teacher.subject}</p>
               
               <div className="space-y-3">
                 <div className="flex items-center gap-3 bg-gray-50/50 p-3.5 rounded-xl border border-gray-100/50">
                   <GraduationCap size={18} className="text-[var(--primary)] flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-700">{teacher.qualification}</span>
+                  <span className="text-sm font-medium text-gray-700">{teacher.qualification || "Expert Faculty"}</span>
                 </div>
                 <div className="flex items-center gap-3 bg-gray-50/50 p-3.5 rounded-xl border border-gray-100/50">
                   <BookOpen size={18} className="text-[var(--primary)] flex-shrink-0" />

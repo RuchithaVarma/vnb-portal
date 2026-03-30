@@ -22,6 +22,9 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Loader2,
+  ImagePlus,
+  X,
 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import {
@@ -35,7 +38,10 @@ export default function CoursesManagement() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,10 +68,46 @@ export default function CoursesManagement() {
     fetchCourses();
   }, []);
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        setImagePreview(dataUrl);
+        setFormState((prev) => ({ ...prev, image: dataUrl }));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearImage = () => {
+    setImagePreview("");
+    setFormState((prev) => ({ ...prev, image: "" }));
+    if (imageFileInputRef.current) imageFileInputRef.current.value = "";
+  };
+
   useEffect(() => {
     if (selectedCourse) {
       setFormState(selectedCourse);
       setFeaturesInput(selectedCourse.features.join("\n"));
+      setImagePreview(selectedCourse.image || "");
     } else {
       setFormState({
         title: "",
@@ -81,9 +123,10 @@ export default function CoursesManagement() {
         ageGroup: "all",
         description: "",
         icon: "BookOpen",
+        isKidsCourse: false,
       });
       setFeaturesInput("");
-      setFormState((prev) => ({ ...prev, isKidsCourse: false }));
+      setImagePreview("");
     }
   }, [selectedCourse]);
 
@@ -123,6 +166,7 @@ export default function CoursesManagement() {
       rating: Number(formState.rating),
     };
 
+    setIsSaving(true);
     try {
       if (selectedCourse?.id) {
         await updateItem("courses", selectedCourse.id, payload);
@@ -135,6 +179,8 @@ export default function CoursesManagement() {
       fetchCourses();
     } catch (error) {
       alert("Failed to save course.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -346,8 +392,12 @@ export default function CoursesManagement() {
               className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="flex">
-                <div className={`w-48 h-32 bg-gradient-to-r ${course.color || "from-blue-500 to-purple-600"} flex items-center justify-center`}>
-                  <BookOpen className="w-16 h-16 text-white" />
+                <div className={`w-48 h-32 bg-gradient-to-r ${course.color || "from-blue-500 to-purple-600"} flex items-center justify-center overflow-hidden relative`}>
+                  {course.image ? (
+                    <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <BookOpen className="w-16 h-16 text-white" />
+                  )}
                 </div>
                 <div className="flex-1 p-4">
                   <div className="flex items-start justify-between mb-2">
@@ -429,6 +479,43 @@ export default function CoursesManagement() {
                 <button onClick={() => setIsModalOpen(false)} className="text-gray-500">&times;</button>
               </div>
               <form onSubmit={handleSaveItem} className="space-y-4">
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Course Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={imageFileInputRef}
+                    onChange={handleImageUpload}
+                  />
+                  <div
+                    onClick={() => imageFileInputRef.current?.click()}
+                    className="relative w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors overflow-hidden"
+                  >
+                    {imagePreview ? (
+                      <>
+                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all flex items-center justify-center">
+                          <span className="text-white text-sm font-medium opacity-0 hover:opacity-100">Change Image</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); clearImage(); }}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center text-gray-400">
+                        <ImagePlus className="w-10 h-10 mb-2" />
+                        <span className="text-sm">Click to upload course image</span>
+                        <span className="text-xs mt-1">PNG, JPG, WEBP up to 5MB</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Course Title</label>
                   <input
@@ -586,9 +673,17 @@ export default function CoursesManagement() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Save Changes
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </button>
                 </div>
               </form>

@@ -61,7 +61,14 @@ a {
   cursor: pointer !important;
 }
 
-[onclick] {
+[onclick],
+.cursor-pointer,
+.hover\:shadow-md,
+.hover\:shadow-lg,
+.hover\:bg-gray-50,
+.hover\:bg-blue-700,
+.hover\:bg-blue-50,
+select {
   cursor: pointer !important;
 }
 

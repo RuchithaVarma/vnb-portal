@@ -112,10 +112,16 @@ const CoursesSection = () => {
                 <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${cardColor} opacity-[0.03] rounded-full blur-3xl group-hover:opacity-[0.08] transition-opacity`}></div>
                 
                 <div className="flex-1">
-                  {/* Icon */}
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${cardColor} mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-lg shadow-orange-100`}>
-                    <Icon className="text-white" size={28} />
-                  </div>
+                  {/* Icon or Image */}
+                  {course.image ? (
+                    <div className={`w-16 h-16 rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-lg shadow-orange-100 overflow-hidden`}>
+                      <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${cardColor} mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-lg shadow-orange-100`}>
+                      <Icon className="text-white" size={28} />
+                    </div>
+                  )}
                   
                   {/* Content */}
                   <h3 className="text-2xl font-bold mb-2 text-gray-900 group-hover:text-[var(--primary)] transition-colors">{course.title}</h3>
