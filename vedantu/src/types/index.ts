@@ -12,6 +12,7 @@ export interface Course {
   rating: number;
   image: string;
   category?: string;
+  ageGroup?: string;
   icon?: string;
   instructor?: string;
   students?: number;
@@ -21,6 +22,13 @@ export interface Course {
   status?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Additional fields from Firebase
+  isKidsCourse?: boolean;
+  difficulty?: string;
+  prerequisites?: string[];
+  learningOutcomes?: string[];
+  schedule?: string;
+  certificate?: boolean;
 }
 
 export interface Stat {
@@ -66,7 +74,6 @@ export interface Student {
   fees: string; // Paid, Pending
   avatar: string;
 }
-
 
 export interface Testimonial {
   id?: string;

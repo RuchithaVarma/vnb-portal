@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "Brilliant Roots | India's Leading Online Learning Platform",
   description:
     "Live online classes with India's best teachers. Personalized learning for Class 1-12, JEE, NEET & more. Book a FREE trial today!",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

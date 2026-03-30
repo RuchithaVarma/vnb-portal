@@ -29,15 +29,55 @@ body {
 
 /* Custom Utilities */
 .btn-primary {
-  @apply bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-hover)] transition-all duration-300 font-semibold hover:shadow-lg hover:scale-105;
+  @apply bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-hover)] transition-all duration-300 font-semibold hover:shadow-lg hover:scale-105 cursor-pointer;
 }
 
 .btn-accent {
-  @apply bg-[var(--accent)] text-[var(--foreground)] px-6 py-3 rounded-lg hover:bg-yellow-500 transition-all duration-300 font-semibold hover:shadow-lg hover:scale-105;
+  @apply bg-[var(--accent)] text-[var(--foreground)] px-6 py-3 rounded-lg hover:bg-yellow-500 transition-all duration-300 font-semibold hover:shadow-lg hover:scale-105 cursor-pointer;
 }
 
 .section-title {
   @apply text-3xl md:text-4xl font-bold mb-6 text-[var(--foreground)];
+}
+
+/* Global cursor styles for all interactive elements */
+button {
+  cursor: pointer !important;
+}
+
+input[type="button"] {
+  cursor: pointer !important;
+}
+
+input[type="submit"] {
+  cursor: pointer !important;
+}
+
+a {
+  cursor: pointer !important;
+}
+
+[role="button"] {
+  cursor: pointer !important;
+}
+
+[onclick] {
+  cursor: pointer !important;
+}
+
+/* Ensure all button-like elements have pointer cursor */
+.btn,
+.button,
+button:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled {
+  cursor: pointer !important;
+}
+
+button:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled {
+  cursor: not-allowed !important;
 }
 
 /* Animations */

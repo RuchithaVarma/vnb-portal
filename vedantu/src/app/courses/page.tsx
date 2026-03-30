@@ -1,16 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Star,
   Clock,
   Users,
   BookOpen,
-  Play,
   Award,
   GraduationCap,
-  ChevronRight,
   Sparkles,
   Languages,
   Calculator,
@@ -20,8 +18,21 @@ import {
   Mic,
   Lock,
   CheckCircle,
+  Palette,
+  Music,
+  Gamepad2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { getItems } from "@/lib/firestoreService";
+import { Course } from "@/types";
+import {
+  filterCoursesByCategory,
+  getEnrollmentText,
+  getCourseBadgeColor,
+  isKidsCourse,
+  filterCoursesByRole,
+  shouldShowKidsCourses,
+} from "@/utils/courseUtils";
 
 const iconMap = {
   Award,
@@ -33,20 +44,106 @@ const iconMap = {
   Mic,
   GraduationCap,
   Languages,
+  Palette,
+  Music,
+  Gamepad2,
+  Sparkles,
 };
 
 export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [visibleCourses, setVisibleCourses] = useState(6);
+  const [courses, setCourses] = useState<Course[]>([]);
   const { user, isAuthenticated } = useAuth();
+
+  // Smart course categorization function
+  const getCourseCategory = (course: Course): string => {
+    // First check if category is explicitly set
+    if (course.category) return course.category;
+
+    // Infer category from title and other fields
+    const title = course.title.toLowerCase();
+    const grades = course.grades.toLowerCase();
+
+    // Academic courses
+    if (
+      title.includes("class") ||
+      grades.includes("class") ||
+      title.includes("tuition") ||
+      title.includes("academic")
+    ) {
+      return "academic";
+    }
+
+    // Skill courses
+    if (
+      title.includes("vedic") ||
+      title.includes("abacus") ||
+      title.includes("phonics") ||
+      title.includes("skill")
+    ) {
+      return "skill";
+    }
+
+    // Language courses
+    if (
+      title.includes("telugu") ||
+      title.includes("english") ||
+      title.includes("language") ||
+      title.includes("speaking")
+    ) {
+      return "languages";
+    }
+
+    // Competitive exams
+    if (
+      title.includes("olympiad") ||
+      title.includes("jee") ||
+      title.includes("neet") ||
+      title.includes("competitive")
+    ) {
+      return "competitive";
+    }
+
+    // Default to academic for courses with class grades
+    if (grades.includes("class")) return "academic";
+
+    return "general"; // fallback category
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get("category");
-      if (cat) setSelectedCategory(cat);
+      if (cat) {
+        // Use setTimeout to avoid synchronous setState in effect
+        setTimeout(() => setSelectedCategory(cat), 0);
+      }
     }
-  }, []);
+
+    // Fetch courses from Firestore
+    const fetchCourses = async () => {
+      try {
+        const data = await getItems("courses");
+        setCourses(data as Course[]);
+
+        // Debug logging
+        console.log("🔥 Firebase Courses Data:", data);
+        console.log("📊 Selected Category:", selectedCategory);
+
+        // Log course categories
+        const courseCategories = (data as Course[]).map((course) => ({
+          title: course.title,
+          category: course.category,
+          inferredCategory: getCourseCategory(course),
+        }));
+        console.log("📚 Course Categories:", courseCategories);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+    fetchCourses();
+  }, [selectedCategory]);
 
   // Check if user has access to a course
   const hasCourseAccess = (courseTitle: string) => {
@@ -82,171 +179,39 @@ export default function CoursesPage() {
     );
   };
 
-  const categories = [
-    { id: "all", name: "All Courses", icon: <BookOpen size={20} /> },
-    { id: "academic", name: "Academic", icon: <GraduationCap size={20} /> },
-    { id: "competitive", name: "Competitive Exams", icon: <Award size={20} /> },
-    { id: "skill", name: "Skill Development", icon: <Sparkles size={20} /> },
-    { id: "languages", name: "Languages", icon: <Languages size={20} /> },
-  ];
+  // Dynamic categories based on user role
+  const getCategoriesForRole = () => {
+    const baseCategories = [
+      { id: "all", name: "All Courses", icon: <BookOpen size={20} /> },
+      { id: "academic", name: "Academic", icon: <GraduationCap size={20} /> },
+      {
+        id: "competitive",
+        name: "Competitive Exams",
+        icon: <Award size={20} />,
+      },
+      { id: "skill", name: "Skill Development", icon: <Sparkles size={20} /> },
+      { id: "languages", name: "Languages", icon: <Languages size={20} /> },
+    ];
 
-  const courses = [
-    {
-      id: 1,
-      title: "Olympiad Exams Preparation",
-      category: "competitive",
-      icon: "Trophy",
-      instructor: "Dr. Ramesh Kumar",
-      rating: 4.8,
-      students: 15420,
-      duration: "6 months",
-      price: 12000,
-      originalPrice: 15000,
-      image: "/api/placeholder/400/250",
-      level: "Advanced",
-      lessons: 120,
-      description:
-        "Competitive exam preparation for young achievers with live classes and doubt resolution",
-    },
-    {
-      id: 2,
-      title: "Vedic Maths (Basic to Advanced)",
-      category: "skill",
-      icon: "Calculator",
-      instructor: "Prof. Anjali Sharma",
-      rating: 4.9,
-      students: 8934,
-      duration: "12 months",
-      price: 1500,
-      originalPrice: 2000,
-      image: "/api/placeholder/400/250",
-      level: "All Levels",
-      lessons: 45,
-      description:
-        "Master speed calculation and mathematical tricks with Vedic techniques",
-    },
-    {
-      id: 3,
-      title: "Telugu Language Basics",
-      category: "languages",
-      icon: "Languages",
-      instructor: "Dr. Priya Nair",
-      rating: 4.7,
-      students: 6782,
-      duration: "3 months",
-      price: 4000,
-      originalPrice: 6000,
-      image: "/api/placeholder/400/250",
-      level: "Beginner",
-      lessons: 45,
-      description:
-        "Learn Telugu from scratch covering alphabet, vocabulary, and simple sentences with live sessions.",
-    },
-    {
-      id: 9, // Using a unique ID
-      title: "Telugu Language Advanced",
-      category: "languages",
-      icon: "Languages",
-      instructor: "Dr. Priya Nair",
-      rating: 4.8,
-      students: 4210,
-      duration: "6 months",
-      price: 6000,
-      originalPrice: 8000,
-      image: "/api/placeholder/400/250",
-      level: "Advanced",
-      lessons: 75,
-      description:
-        "Master advanced Telugu grammar, literature, and fluent conversation.",
-    },
-    {
-      id: 4,
-      title: "Phonics for Kids",
-      category: "skill",
-      icon: "Volume2",
-      instructor: "Ms. Sneha Patel",
-      rating: 4.6,
-      students: 9876,
-      duration: "6 months",
-      price: 10000,
-      originalPrice: 12000,
-      image: "/api/placeholder/400/250",
-      level: "Beginner",
-      lessons: 80,
-      description:
-        "Comprehensive phonics course with live sessions and worksheets",
-    },
-    {
-      id: 5,
-      title: "Abacus Crash Course",
-      category: "skill",
-      icon: "Brain",
-      instructor: "Tech Expert Rahul",
-      rating: 4.8,
-      students: 4532,
-      duration: "3 months",
-      price: 6000,
-      originalPrice: 8000,
-      image: "/api/placeholder/400/250",
-      level: "Beginner",
-      lessons: 45,
-      description:
-        "Intensive Abacus course for fast arithmetic and concentration improvement",
-    },
-    {
-      id: 6,
-      title: "Class 7 & 8 Tuition",
-      category: "academic",
-      icon: "GraduationCap",
-      instructor: "Elite Faculty",
-      rating: 4.9,
-      students: 12450,
-      duration: "Academic Year",
-      price: 15000,
-      originalPrice: 20000,
-      image: "/api/placeholder/400/250",
-      level: "Grades 7-8",
-      lessons: 45,
-      description:
-        "Comprehensive academic tuition covering Mathematics, Science, and English for Grades 7-8.",
-    },
-    {
-      id: 7,
-      title: "Class 5 & 6 Tuition",
-      category: "academic",
-      icon: "GraduationCap",
-      instructor: "Elite Faculty",
-      rating: 4.8,
-      students: 9840,
-      duration: "Academic Year",
-      price: 10000,
-      originalPrice: 14000,
-      image: "/api/placeholder/400/250",
-      level: "Grades 5-6",
-      lessons: 36,
-      description:
-        "Building strong foundations in Math, EVS/Science, and languages for Grades 5-6.",
-    },
-    {
-      id: 8,
-      title: "Class 3 & 4 Tuition",
-      category: "academic",
-      icon: "GraduationCap",
-      instructor: "Elite Faculty",
-      rating: 4.7,
-      students: 7520,
-      duration: "Academic Year",
-      price: 8000,
-      originalPrice: 12000,
-      image: "/api/placeholder/400/250",
-      level: "Grades 3-4",
-      lessons: 24,
-      description:
-        "Interactive and engaging classes for young learners covering basic arithmetic and reading.",
-    },
-  ];
+    // Add kids courses only if user should see them
+    if (shouldShowKidsCourses(user?.role, user?.grade)) {
+      baseCategories.push({
+        id: "kids",
+        name: "Courses for Kids",
+        icon: <Star size={20} />,
+      });
+    }
 
-  const filteredCourses = courses.filter((course) => {
+    return baseCategories;
+  };
+
+  const categories = getCategoriesForRole();
+
+  // Enhanced filtered courses with better categorization
+  const filteredCourses = filterCoursesByCategory(
+    courses,
+    selectedCategory,
+  ).filter((course) => {
     // If student is logged in, only show their related course
     if (isAuthenticated && user?.role === "student" && user.course) {
       const enrolledValue = user.course.toLowerCase();
@@ -282,8 +247,21 @@ export default function CoursesPage() {
       return false; // Hide non-related courses for students
     }
 
-    // Default category filtering for non-students or non-logged-in users
-    return selectedCategory === "all" || course.category === selectedCategory;
+    // Enhanced category filtering for non-students or non-logged-in users
+    const courseCategory = getCourseCategory(course);
+    const isKids = isKidsCourse(course);
+
+    if (selectedCategory === "all") {
+      // Hide kids courses from the main "All Courses" tab to differentiate
+      return !isKids;
+    }
+    
+    if (selectedCategory === "kids") {
+      return isKids;
+    }
+
+    // For other categories (academic, skill, etc.), only show if NOT a kids course
+    return courseCategory === selectedCategory && !isKids;
   });
 
   return (
@@ -313,8 +291,8 @@ export default function CoursesPage() {
                 </span>
               </h1>
               <p className="text-xl md:text-2xl font-medium mb-8 text-white/90 leading-relaxed">
-                Discover world-class course bundles designed by India's best
-                teachers. Learn live, interact, and excel with structure.
+                Discover world-class course bundles designed by India&apos;s
+                best teachers. Learn live, interact, and excel with structure.
               </p>
             </motion.div>
 
@@ -466,7 +444,7 @@ export default function CoursesPage() {
                 viewport={{ once: true }}
                 whileHover={{ y: -10 }}
                 transition={{ duration: 0.4 }}
-                className={`bg-white rounded-3xl shadow-sm border overflow-hidden hover:shadow-2xl transition-all duration-500 group flex flex-col h-full relative ${
+                className={`bg-white rounded-3xl shadow-sm border overflow-hidden hover:shadow-2xl transition-all duration-500 group flex flex-col h-full relative transform hover:scale-105 hover:-translate-y-2 ${
                   !hasAccess && isAuthenticated
                     ? "opacity-75 border-gray-200"
                     : "border-gray-100"
@@ -493,31 +471,152 @@ export default function CoursesPage() {
                   </div>
                 )}
                 {/* Course Image/Graphics */}
-                <div className="relative h-48 bg-gradient-to-br from-[var(--primary)]/5 to-orange-100/10 overflow-hidden">
-                  <motion.div
-                    className="absolute -top-12 -left-12 w-40 h-40 bg-gradient-to-br from-[var(--primary)]/30 to-pink-300/20 rounded-full blur-2xl"
-                    animate={{ scale: [1, 1.15, 1], rotate: [0, 45, 0] }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  ></motion.div>
+                <div className="relative h-48 overflow-hidden">
+                  {/* Dynamic Background Gradient based on course color */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${course.color || "from-blue-400 to-purple-600"} opacity-90`}
+                  >
+                    {/* Animated overlay patterns */}
+                    <motion.div
+                      className="absolute inset-0"
+                      animate={{
+                        background: [
+                          "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)",
+                          "radial-gradient(circle at 80% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)",
+                          "radial-gradient(circle at 50% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)",
+                        ],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+
+                    {/* Floating animated elements */}
+                    <motion.div
+                      className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full backdrop-blur-sm"
+                      animate={{
+                        y: [0, -10, 0],
+                        opacity: [0.3, 0.8, 0.3],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 0,
+                      }}
+                    />
+                    <motion.div
+                      className="absolute bottom-6 left-6 w-6 h-6 bg-white/15 rounded-full backdrop-blur-sm"
+                      animate={{
+                        y: [0, -8, 0],
+                        opacity: [0.2, 0.6, 0.2],
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 0.5,
+                      }}
+                    />
+                    <motion.div
+                      className="absolute top-12 left-8 w-4 h-4 bg-white/25 rounded-full backdrop-blur-sm"
+                      animate={{
+                        y: [0, -6, 0],
+                        opacity: [0.4, 0.7, 0.4],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 1,
+                      }}
+                    />
+                  </div>
+
+                  {/* Course Image or Icon */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    {iconMap[course.icon as keyof typeof iconMap] ? (
-                      React.createElement(
-                        iconMap[course.icon as keyof typeof iconMap],
-                        {
-                          size: 48,
-                          className: "text-[var(--primary)] opacity-20",
-                        },
-                      )
+                    {course.image &&
+                    course.image !== "/images/courses/default.jpg" ? (
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.6 }}
+                        className="relative w-full h-full"
+                      >
+                        <img
+                          src={course.image}
+                          alt={course.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to gradient if image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = "none";
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `
+                                <div class="w-full h-full flex items-center justify-center">
+                                  <svg class="w-16 h-16 text-white/50" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                                  </svg>
+                                </div>
+                              `;
+                            }
+                          }}
+                        />
+                        {/* Overlay gradient for better text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                      </motion.div>
                     ) : (
-                      <BookOpen
-                        size={48}
-                        className="text-[var(--primary)] opacity-20"
-                      />
+                      /* Animated Icon Fallback */
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.6 }}
+                        className="relative"
+                      >
+                        {iconMap[course.icon as keyof typeof iconMap] ? (
+                          React.createElement(
+                            iconMap[course.icon as keyof typeof iconMap],
+                            {
+                              size: 64,
+                              className: "text-white/80 drop-shadow-lg",
+                            },
+                          )
+                        ) : (
+                          <BookOpen
+                            size={64}
+                            className="text-white/80 drop-shadow-lg"
+                          />
+                        )}
+                        {/* Pulsing ring effect */}
+                        <motion.div
+                          className="absolute inset-0 border-2 border-white/30 rounded-full scale-150"
+                          animate={{
+                            scale: [1.5, 2, 1.5],
+                            opacity: [0.5, 0, 0.5],
+                          }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        />
+                      </motion.div>
                     )}
+                  </div>
+
+                  {/* Course category badge */}
+                  <div className="absolute top-3 left-3">
+                    <motion.div
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                      className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-700 shadow-lg"
+                    >
+                      {course.category || "General"}
+                    </motion.div>
                   </div>
                 </div>
 
@@ -526,9 +625,41 @@ export default function CoursesPage() {
                   <h3 className="text-xl font-black text-gray-900 mb-2 group-hover:text-[var(--primary)] transition-colors tracking-tight">
                     {course.title}
                   </h3>
-                  <p className="text-gray-500 text-sm mb-6 line-clamp-2 font-medium">
+                  <p className="text-gray-500 text-sm mb-4 line-clamp-2 font-medium">
                     {course.description || ""}
                   </p>
+
+                  {/* Course Features */}
+                  {course.features && course.features.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2">
+                        {course.features.slice(0, 3).map((feature, index) => (
+                          <span
+                            key={index}
+                            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                        {course.features.length > 3 && (
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+                            +{course.features.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Grades Badge */}
+                  {course.grades && (
+                    <div className="mb-4">
+                      <span
+                        className={`inline-block text-xs px-3 py-1 rounded-full font-medium border ${getCourseBadgeColor(course)}`}
+                      >
+                        {course.grades}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Micro Details Row */}
                   <div className="flex items-center gap-3 mb-6 text-xs font-bold text-gray-500">
@@ -538,7 +669,7 @@ export default function CoursesPage() {
                     </div>
                     <div className="flex items-center gap-1 bg-blue-50 px-2.5 py-1.5 rounded-xl text-blue-600 border border-blue-100">
                       <Users size={14} />
-                      <span>{course.students?.toLocaleString() || "0"}</span>
+                      <span>{getEnrollmentText(course)}</span>
                     </div>
                     <div className="flex items-center gap-1 bg-purple-50 px-2.5 py-1.5 rounded-xl text-purple-600 border border-purple-100">
                       <Clock size={14} />
@@ -574,7 +705,7 @@ export default function CoursesPage() {
                         </div>
                       )}
                       <p className="text-xs text-gray-500 font-black uppercase tracking-widest">
-                        {course.lessons} Live Sessions
+                        {course.lessons || "12"} Live Sessions
                       </p>
                     </div>
                   </div>
@@ -633,6 +764,44 @@ export default function CoursesPage() {
             >
               Load More Courses
             </button>
+          </div>
+        )}
+
+        {/* No Courses Found State */}
+        {filteredCourses.length === 0 && (
+          <div className="text-center py-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-md mx-auto"
+            >
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <BookOpen size={40} className="text-gray-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                No Courses Found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {selectedCategory === "all"
+                  ? "No courses are available at the moment. Please check back later!"
+                  : `No courses found in "${categories.find((c) => c.id === selectedCategory)?.name || selectedCategory}". Try browsing other categories or check back soon.`}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={() => setSelectedCategory("all")}
+                  className="px-6 py-3 bg-[var(--primary)] text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors"
+                >
+                  View All Courses
+                </button>
+                <Link
+                  href="/contact"
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  Contact Support
+                </Link>
+              </div>
+            </motion.div>
           </div>
         )}
       </section>

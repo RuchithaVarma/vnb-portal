@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import * as XLSX from "xlsx";
 import {
   BookOpen,
   Search,
@@ -12,7 +13,7 @@ import {
   Users,
   Star,
   TrendingUp,
-  Download,
+  Upload,
   Clock,
   DollarSign,
   Award,
@@ -34,6 +35,7 @@ export default function CoursesManagement() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,6 +50,11 @@ export default function CoursesManagement() {
     enrolled: 0,
     rating: 0,
     image: "",
+    category: "academic",
+    ageGroup: "all",
+    description: "",
+    icon: "BookOpen",
+    isKidsCourse: false,
   });
   const [featuresInput, setFeaturesInput] = useState("");
 
@@ -70,8 +77,13 @@ export default function CoursesManagement() {
         enrolled: 0,
         rating: 0,
         image: "",
+        category: "academic",
+        ageGroup: "all",
+        description: "",
+        icon: "BookOpen",
       });
       setFeaturesInput("");
+      setFormState((prev) => ({ ...prev, isKidsCourse: false }));
     }
   }, [selectedCourse]);
 
@@ -126,6 +138,53 @@ export default function CoursesManagement() {
     }
   };
 
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
+
+      let importedCount = 0;
+      for (const row of jsonData) {
+        if (!row.title) continue;
+        
+        const payload = {
+          title: row.title || "",
+          grades: row.grades || "",
+          duration: row.duration || "",
+          price: Number(row.price) || 0,
+          enrolled: Number(row.enrolled) || 0,
+          rating: Number(row.rating) || 0,
+          color: row.color || "from-blue-500 to-purple-600",
+          features: row.features ? String(row.features).split("\n").filter((f: string) => f.trim() !== "") : [],
+          status: row.status || "active",
+          category: row.category || "academic",
+          ageGroup: row.ageGroup || "all",
+          description: row.description || "",
+          icon: row.icon || "BookOpen",
+          isKidsCourse: row.isKidsCourse === "true" || row.isKidsCourse === true || false,
+        };
+
+        await addItem("courses", payload);
+        importedCount++;
+      }
+      
+      alert(`Imported ${importedCount} courses successfully!`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      fetchCourses();
+    } catch (error) {
+      console.error("Error importing courses:", error);
+      alert("Failed to import courses. Please check file format.");
+      setLoading(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -164,12 +223,19 @@ export default function CoursesManagement() {
             </p>
           </div>
           <div className="flex space-x-2">
+            <input 
+              type="file" 
+              accept=".xlsx, .xls" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleImport} 
+            />
             <button
-              onClick={() => handleExport("courses", courses)}
+              onClick={() => fileInputRef.current?.click()}
               className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Export
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </button>
             <button
               onClick={() => { setSelectedCourse(null); setIsModalOpen(true); }}
@@ -385,6 +451,20 @@ export default function CoursesManagement() {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-medium text-gray-700">Age Group (Kids Page)</label>
+                    <select
+                      value={formState.ageGroup || "all"}
+                      onChange={(e) => setFormState({ ...formState, ageGroup: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="all">All Ages</option>
+                      <option value="3-5">3-5 years</option>
+                      <option value="6-8">6-8 years</option>
+                      <option value="9-12">9-12 years</option>
+                      <option value="13-17">13-17 years</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700">Duration</label>
                     <input
                       type="text"
@@ -439,6 +519,52 @@ export default function CoursesManagement() {
                     <option value="from-yellow-400 to-orange-500">Yellow-Orange</option>
                     <option value="from-green-400 to-teal-500">Green-Teal</option>
                   </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Category</label>
+                    <select
+                      value={formState.category || "academic"}
+                      onChange={(e) => setFormState({ ...formState, category: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="academic">Academic</option>
+                      <option value="competitive">Competitive Exams</option>
+                      <option value="skill">Skill Development</option>
+                      <option value="languages">Languages</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Icon Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., GraduationCap, Trophy, Calculator"
+                      value={formState.icon || ""}
+                      onChange={(e) => setFormState({ ...formState, icon: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2 cursor-pointer mt-6">
+                      <input
+                        type="checkbox"
+                        checked={formState.isKidsCourse || false}
+                        onChange={(e) => setFormState({ ...formState, isKidsCourse: e.target.checked })}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">Is Kids Course?</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Short Description</label>
+                  <input
+                    type="text"
+                    placeholder="Short description for dropdown menus"
+                    value={formState.description || ""}
+                    onChange={(e) => setFormState({ ...formState, description: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Features (One per line)</label>

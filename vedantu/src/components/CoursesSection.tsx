@@ -1,10 +1,11 @@
 "use client";
-import { BookOpen, GraduationCap, Code, Languages, Calculator, Palette, HelpCircle, type LucideIcon, Zap, CheckCircle, ChevronRight, Trophy, Volume2, Brain } from 'lucide-react';
+import { BookOpen, GraduationCap, Code, Languages, Calculator, Palette, HelpCircle, type LucideIcon, Zap, CheckCircle, ChevronRight, Trophy, Volume2, Brain, Music, Gamepad2, Sparkles } from 'lucide-react';
 import { getItems } from '@/lib/firestoreService';
 import { getLocalCourses } from '@/lib/localData';
 import { Course } from '@/types';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 const iconMap: Record<string, LucideIcon> = {
   "Trophy": Trophy,
@@ -13,7 +14,11 @@ const iconMap: Record<string, LucideIcon> = {
   "Languages": Languages,
   "Volume2": Volume2,
   "Brain": Brain,
-  "BookOpen": BookOpen
+  "BookOpen": BookOpen,
+  "Palette": Palette,
+  "Music": Music,
+  "Gamepad2": Gamepad2,
+  "Sparkles": Sparkles
 };
 
 const containerVariants: Variants = {
@@ -33,16 +38,32 @@ const itemVariants: Variants = {
   }
 };
 
+import { isKidsCourse } from '@/utils/courseUtils';
+
 const CoursesSection = () => {
-  let courses: Course[] = [];
-  try {
-    // Attempt to fetch, but we'll use localData as fallback or primary if needed
-    // For now, let's just use localData to be safe and fast
-    courses = getLocalCourses();
-  } catch (error) {
-    console.error("Failed to fetch courses for homepage:", error);
-    courses = getLocalCourses();
-  }
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const data = await getItems<Course>("courses");
+        if (data && data.length > 0) {
+          // Filter out kids courses from home page general section
+          const regularCourses = data.filter(c => !isKidsCourse(c));
+          setCourses(regularCourses);
+        } else {
+          setCourses(getLocalCourses().filter(c => !isKidsCourse(c)));
+        }
+      } catch (error) {
+        console.error("Failed to fetch courses for homepage:", error);
+        setCourses(getLocalCourses().filter(c => !isKidsCourse(c)));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
@@ -78,7 +99,7 @@ const CoursesSection = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {courses.slice(0, 6).map((course, idx) => {
-            const Icon = (course.icon && (iconMap as any)[course.icon]) || BookOpen;
+            const Icon = (course.icon && (iconMap as any)[course.icon]) ? (iconMap as any)[course.icon] : BookOpen;
             const cardColor = course.color || 'from-orange-400 to-pink-500';
             
             return (

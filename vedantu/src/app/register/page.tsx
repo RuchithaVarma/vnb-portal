@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
@@ -23,65 +23,10 @@ import Link from "next/link";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { getItems } from "@/lib/firestoreService";
+import { Course } from "@/types";
 
-const courses = [
-  {
-    id: "Class 7 & 8",
-    name: "Class 7 & 8",
-    price: 15000,
-    color: "from-fuchsia-500 to-indigo-600",
-    icon: "🎓",
-  },
-  {
-    id: "Class 5 & 6",
-    name: "Class 5 & 6",
-    price: 10000,
-    color: "from-sky-500 to-indigo-600",
-    icon: "🌟",
-  },
-  {
-    id: "Class 3 & 4",
-    name: "Class 3 & 4",
-    price: 8000,
-    color: "from-emerald-500 to-indigo-600",
-    icon: "📚",
-  },
-  {
-    id: "Vedic Maths",
-    name: "Vedic Maths",
-    price: 1500,
-    color: "from-amber-500 to-orange-600",
-    icon: "🧮",
-  },
-  {
-    id: "Abacus",
-    name: "Abacus Long Term",
-    price: 6000,
-    color: "from-rose-500 to-pink-600",
-    icon: "🧠",
-  },
-  {
-    id: "Phonics",
-    name: "Phonics (Kids)",
-    price: 10000,
-    color: "from-violet-500 to-purple-600",
-    icon: "🗣️",
-  },
-  {
-    id: "Telugu",
-    name: "Telugu (Basics & Adv)",
-    price: 4000,
-    color: "from-cyan-500 to-blue-600",
-    icon: "🗣️",
-  },
-  {
-    id: "Olympiad",
-    name: "Olympiad Prep",
-    price: 12000,
-    color: "from-red-500 to-orange-600",
-    icon: "🏆",
-  },
-];
+
 
 const timeSlots = [
   "🌅 Morning (10:00 AM - 12:00 PM)",
@@ -90,6 +35,7 @@ const timeSlots = [
 ];
 
 export default function RegisterPage() {
+  const [courses, setCourses] = useState<Course[]>([]);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     studentName: "",
@@ -104,6 +50,18 @@ export default function RegisterPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [registrationError, setRegistrationError] = useState("");
   const DEFAULT_PASSWORD = "Brilliant@123";
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const data = await getItems<Course>("courses");
+        setCourses(data);
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const selectedCourse = courses.find((c) => c.id === formData.course);
 
@@ -491,7 +449,7 @@ export default function RegisterPage() {
                       <button
                         key={course.id}
                         onClick={() =>
-                          setFormData({ ...formData, course: course.id })
+                          setFormData({ ...formData, course: course.id || "" })
                         }
                         className={`group p-4 rounded-2xl border transition-all text-left relative overflow-hidden ${
                           formData.course === course.id
@@ -502,7 +460,7 @@ export default function RegisterPage() {
                         <div className="flex flex-col gap-2 relative z-10">
                           <span className="text-lg">{course.icon}</span>
                           <span className="text-xs font-bold text-white tracking-tight">
-                            {course.name}
+                            {course.title}
                           </span>
                           <span className="text-[10px] text-gray-400">
                             Premium Curricula
@@ -588,7 +546,7 @@ export default function RegisterPage() {
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{selectedCourse?.icon}</span>
                         <p className="text-sm font-bold text-white">
-                          {selectedCourse?.name}
+                          {selectedCourse?.title}
                         </p>
                       </div>
                     </div>

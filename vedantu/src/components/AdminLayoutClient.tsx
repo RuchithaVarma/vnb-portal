@@ -14,15 +14,13 @@ import {
   X,
   Bell,
   Search,
+  PieChart,
 } from "lucide-react";
 import { handleLogout, handleNotification } from "@/utils/adminHandlers";
 
 const menuItems = [
-  // { id: "students", label: "Students", icon: Users, href: "/admin/students" },
-  { id: "teachers", label: "Teachers", icon: UserCheck, href: "/admin/teachers" },
   { id: "courses", label: "Courses", icon: BookOpen, href: "/admin/courses" },
-  // { id: "payments", label: "Payments", icon: CreditCard, href: "/admin/payments" },
-  // { id: "settings", label: "Settings", icon: Settings, href: "/admin/settings" },
+  { id: "teachers", label: "Teachers", icon: UserCheck, href: "/admin/teachers" },
 ];
 
 function AdminLayoutContent({
@@ -42,7 +40,7 @@ function AdminLayoutContent({
         className={`${sidebarOpen ? "w-64" : "w-20"} bg-white shadow-lg transition-all duration-300 flex flex-col`}
       >
         {/* Logo */}
-        <div className="p-4 border-b">
+        <Link href="/admin" className="p-4 border-b block hover:bg-gray-50 transition-colors">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">BR</span>
@@ -54,7 +52,7 @@ function AdminLayoutContent({
               </div>
             )}
           </div>
-        </div>
+        </Link>
 
         {/* Navigation */}
         <nav className="flex-1 p-4">
