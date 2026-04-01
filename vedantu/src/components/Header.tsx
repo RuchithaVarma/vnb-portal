@@ -19,7 +19,11 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { getItems } from "@/lib/firestoreService";
 import { Course } from "@/types";
-import { filterKidsCourses, shouldShowKidsCourses, isKidsCourse } from "@/utils/courseUtils";
+import {
+  filterKidsCourses,
+  shouldShowKidsCourses,
+  isKidsCourse,
+} from "@/utils/courseUtils";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -84,8 +88,8 @@ const Header = () => {
         courses: courses.filter(
           (course) =>
             (course.category === "academic" ||
-            course.title.toLowerCase().includes("class") ||
-            course.grades.toLowerCase().includes("class")) &&
+              course.title.toLowerCase().includes("class") ||
+              course.grades.toLowerCase().includes("class")) &&
             !isKidsCourse(course),
         ),
       },
@@ -95,9 +99,9 @@ const Header = () => {
         courses: courses.filter(
           (course) =>
             (course.category === "skill" ||
-            course.title.toLowerCase().includes("vedic") ||
-            course.title.toLowerCase().includes("abacus") ||
-            course.title.toLowerCase().includes("phonics")) &&
+              course.title.toLowerCase().includes("vedic") ||
+              course.title.toLowerCase().includes("abacus") ||
+              course.title.toLowerCase().includes("phonics")) &&
             !isKidsCourse(course),
         ),
       },
@@ -107,9 +111,9 @@ const Header = () => {
         courses: courses.filter(
           (course) =>
             (course.category === "languages" ||
-            course.title.toLowerCase().includes("telugu") ||
-            course.title.toLowerCase().includes("english") ||
-            course.title.toLowerCase().includes("language")) &&
+              course.title.toLowerCase().includes("telugu") ||
+              course.title.toLowerCase().includes("english") ||
+              course.title.toLowerCase().includes("language")) &&
             !isKidsCourse(course),
         ),
       },
@@ -119,9 +123,9 @@ const Header = () => {
         courses: courses.filter(
           (course) =>
             (course.category === "competitive" ||
-            course.title.toLowerCase().includes("olympiad") ||
-            course.title.toLowerCase().includes("jee") ||
-            course.title.toLowerCase().includes("neet")) &&
+              course.title.toLowerCase().includes("olympiad") ||
+              course.title.toLowerCase().includes("jee") ||
+              course.title.toLowerCase().includes("neet")) &&
             !isKidsCourse(course),
         ),
       },
@@ -233,23 +237,23 @@ const Header = () => {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 group cursor-pointer"
+            className="flex items-center gap-2 group cursor-pointer py-0.5"
           >
-            <div className="w-16 h-16 relative overflow-hidden group-hover:scale-110 transition-transform duration-300">
+            <div className="w-11 h-11 relative overflow-hidden group-hover:scale-105 transition-transform duration-300 rounded-lg flex items-center justify-center">
               <Image
-                src="/logo.jpeg"
+                src="/logo.svg"
                 alt="Brilliant Roots Logo"
                 fill
-                className="object-contain mix-blend-multiply"
+                className="object-contain"
               />
             </div>
-            <span className="text-xl font-bold gradient-text">
+            <span className="text-xl md:text-2xl font-black gradient-text leading-tight tracking-tight">
               Brilliant Roots
             </span>
           </Link>
 
           {/* Desktop Navigation - Single Line */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-5">
             {/* Courses Dropdown */}
             <div className="relative" ref={coursesRef}>
               <button
@@ -348,7 +352,7 @@ const Header = () => {
           </nav>
 
           {/* Actions */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-2">
             <Link
               href="/counseling"
               className="flex items-center gap-2 text-[var(--primary)] font-semibold hover:scale-105 transition-transform cursor-pointer text-sm"
@@ -396,7 +400,9 @@ const Header = () => {
 
                     <div className="py-1">
                       <Link
-                        href={user?.role === "admin" ? "/admin/courses" : "/courses"}
+                        href={
+                          user?.role === "admin" ? "/admin/courses" : "/courses"
+                        }
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                         onClick={() => setIsProfileOpen(false)}
                       >
@@ -501,7 +507,9 @@ const Header = () => {
                       </div>
                     </div>
                     <Link
-                      href={user?.role === "admin" ? "/admin/courses" : "/courses"}
+                      href={
+                        user?.role === "admin" ? "/admin/courses" : "/courses"
+                      }
                       className="text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       My Courses

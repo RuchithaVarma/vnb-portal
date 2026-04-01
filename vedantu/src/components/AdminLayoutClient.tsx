@@ -15,12 +15,14 @@ import {
   Bell,
   Search,
   PieChart,
+  MonitorPlay,
 } from "lucide-react";
 import { handleLogout, handleNotification } from "@/utils/adminHandlers";
 
 const menuItems = [
   { id: "courses", label: "Courses", icon: BookOpen, href: "/admin/courses" },
   { id: "teachers", label: "Teachers", icon: UserCheck, href: "/admin/teachers" },
+  { id: "hero", label: "Hero Banner", icon: MonitorPlay, href: "/admin/hero" },
 ];
 
 function AdminLayoutContent({

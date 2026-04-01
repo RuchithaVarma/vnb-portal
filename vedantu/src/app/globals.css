@@ -185,3 +185,26 @@ input[type="submit"]:disabled {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Complete transparency for all images */
+img {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Fix for Next.js Image components and SVG with white backgrounds */
+img[src*=".svg"],
+img[src*="data:image"],
+svg img,
+.image-container img,
+div[class*="relative"] img {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Remove any background from logo and containers */
+div[class*="overflow-hidden"] img[src*="logo"],
+.logo-container img {
+  background-color: transparent !important;
+  background: transparent !important;
+}

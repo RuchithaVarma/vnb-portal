@@ -112,3 +112,26 @@ export interface Topper {
   image: string;
   story: string;
 }
+
+export interface CarouselSlide {
+  id?: string;
+  bgImage?: string; 
+  badge?: string; 
+  title?: string;
+  titleHighlight?: string;
+  description?: string; 
+  image?: string; 
+  floatingBadge1?: string;
+  floatingBadge2?: string;
+  order?: number;
+}
+
+export interface HeroSlide {
+  id?: string;
+  bgImage: string;
+  badge: string;
+  title: string;
+  titleHighlights: string[];
+  desc: string;
+  order?: number;
+}
