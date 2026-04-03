@@ -20,6 +20,7 @@ import {
   Globe,
 } from "lucide-react";
 import Link from "next/link";
+import Script from "next/script";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -82,10 +83,7 @@ export default function RegisterPage() {
 
   const handleBack = () => setStep((prev) => prev - 1);
 
-  const handlePayment = async () => {
-    setIsProcessing(true);
-    setRegistrationError("");
-
+  const completeRegistration = async (paymentId?: string) => {
     let uid = "";
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -139,7 +137,8 @@ export default function RegisterPage() {
         parentPhone: formData.phone,
 
         // Payment Info
-        paymentStatus: "pending",
+        paymentStatus: paymentId ? "completed" : "pending",
+        paymentId: paymentId || null,
         paymentAmount: selectedCourse?.price || 0,
         courseFee: selectedCourse?.price || 0,
 
@@ -165,6 +164,7 @@ export default function RegisterPage() {
         password: DEFAULT_PASSWORD, // Store password for reference
         createdAt: serverTimestamp(),
         courseFee: selectedCourse?.price || 0,
+        paymentStatus: paymentId ? "completed" : "pending",
       });
     } catch (dbError) {
       console.warn("Firestore save failed:", dbError);
@@ -196,6 +196,94 @@ export default function RegisterPage() {
 
     setIsProcessing(false);
     setIsSuccess(true);
+  };
+
+  const handlePayment = async () => {
+    setIsProcessing(true);
+    setRegistrationError("");
+
+    if (!selectedCourse?.price) {
+      await completeRegistration();
+      return;
+    }
+
+    try {
+      const orderRes = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: selectedCourse.price,
+          notes: {
+            email: formData.email,
+            courseId: formData.course
+          }
+        })
+      });
+
+      if (!orderRes.ok) throw new Error("Failed to initialize payment");
+
+      const orderData = await orderRes.json();
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        amount: orderData.amount, 
+        currency: orderData.currency,
+        name: "Brilliant Roots",
+        description: `Enrollment for ${selectedCourse.title}`,
+        order_id: orderData.id, 
+        handler: async function (response: any) {
+          try {
+             // 3. Verify Payment
+             const verifyRes = await fetch("/api/razorpay/verify-payment", {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({
+                 razorpay_order_id: response.razorpay_order_id,
+                 razorpay_payment_id: response.razorpay_payment_id,
+                 razorpay_signature: response.razorpay_signature,
+               })
+             });
+
+             const verifyData = await verifyRes.json();
+
+             if (verifyData.verified) {
+               await completeRegistration(response.razorpay_payment_id);
+             } else {
+               setRegistrationError("Payment verification failed. Please contact support.");
+               setIsProcessing(false);
+             }
+          } catch(err) {
+             console.error(err);
+             setRegistrationError("Payment verification error.");
+             setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: formData.parentName,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: "#2563EB",
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        setRegistrationError("Payment failed: " + response.error.description);
+        setIsProcessing(false);
+      });
+      rzp.open();
+    } catch (error: any) {
+      console.error(error);
+      setRegistrationError(error.message || "Failed to process payment");
+      setIsProcessing(false);
+    }
   };
 
   const handleLocalBypass = async () => {
@@ -232,6 +320,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0c10] text-[#f8fafc] flex items-center justify-center p-4 py-20 relative font-sans">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       {/* Dynamic Background Elements */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
       <div
@@ -584,17 +673,16 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-orange-600/5 border border-orange-600/10 rounded-2xl flex items-center gap-4">
-                  <div className="w-10 h-10 bg-orange-600/20 rounded-xl flex items-center justify-center text-orange-500">
+                <div className="p-4 bg-emerald-600/5 border border-emerald-600/10 rounded-2xl flex items-center gap-4">
+                  <div className="w-10 h-10 bg-emerald-600/20 rounded-xl flex items-center justify-center text-emerald-500">
                     <ShieldCheck size={20} />
                   </div>
                   <div>
                     <h4 className="text-[10px] font-bold text-white uppercase tracking-widest">
-                      Security Protocol
+                      100% Secure Transaction
                     </h4>
                     <p className="text-[9px] text-gray-500">
-                      This is a secure sandbox environment. No actual funds will
-                      be transferred.
+                      Payments are processed securely via Razorpay PCI DSS compliant gateway.
                     </p>
                   </div>
                 </div>
