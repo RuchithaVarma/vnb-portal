@@ -32,16 +32,64 @@ export interface Client {
 
 interface ClientContextType {
   clients: Client[];
-  addClient: (client: Omit<Client, "id" | "date" | "status" | "commissionEarned" | "deduction" | "balanceDue" | "amountPaid" | "clientTransactionId" | "commissionReceived" | "commissionTransactionId" | "incentives" | "incentivesStatus">, commissionRate: number) => void;
-  updateClient: (id: string, data: Partial<Client>, commissionRate?: number) => void;
+  addClient: (
+    client: Omit<
+      Client,
+      | "id"
+      | "date"
+      | "status"
+      | "commissionEarned"
+      | "deduction"
+      | "balanceDue"
+      | "clientTransactionId"
+      | "commissionReceived"
+      | "commissionTransactionId"
+      | "incentives"
+      | "incentivesStatus"
+    >,
+    commissionRate: number,
+  ) => void;
+  updateClient: (
+    id: string,
+    data: Partial<Client>,
+    commissionRate?: number,
+  ) => void;
   deleteClient: (id: string) => void;
 }
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined);
 
 const INITIAL_CLIENTS: Client[] = [
-  { id: "CL001", name: "Modern Tech Solutions", contactPerson: "Rahul", email: "rahul@modern.com", phone: "9876543210", product: "Software", saleValue: 450000, commissionEarned: 47250, deduction: 2500, balanceDue: 44750, date: "22 Apr, 2024", status: "Active", partnerId: "p-001" },
-  { id: "CL002", name: "Green Valley Resort", contactPerson: "Priya", email: "priya@green.com", phone: "9876543211", product: "Consulting", saleValue: 280000, commissionEarned: 29400, deduction: 1500, balanceDue: 27900, date: "18 Apr, 2024", status: "Pending", partnerId: "p-001" },
+  {
+    id: "CL001",
+    name: "Modern Tech Solutions",
+    contactPerson: "Rahul",
+    email: "rahul@modern.com",
+    phone: "9876543210",
+    product: "Software",
+    saleValue: 450000,
+    commissionEarned: 47250,
+    deduction: 2500,
+    balanceDue: 44750,
+    date: "22 Apr, 2024",
+    status: "Active",
+    partnerId: "p-001",
+  },
+  {
+    id: "CL002",
+    name: "Green Valley Resort",
+    contactPerson: "Priya",
+    email: "priya@green.com",
+    phone: "9876543211",
+    product: "Consulting",
+    saleValue: 280000,
+    commissionEarned: 29400,
+    deduction: 1500,
+    balanceDue: 27900,
+    date: "18 Apr, 2024",
+    status: "Pending",
+    partnerId: "p-001",
+  },
 ];
 
 export function ClientProvider({ children }: { children: React.ReactNode }) {
@@ -66,7 +114,11 @@ export function ClientProvider({ children }: { children: React.ReactNode }) {
     const newClient: Client = {
       ...data,
       id: `CL${Math.floor(1000 + Math.random() * 9000)}`,
-      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      date: new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
       status: "Active",
       amountPaid,
       clientTransactionId: data.clientTransactionId || "",
@@ -84,20 +136,28 @@ export function ClientProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("vnb-clients", JSON.stringify(newClients));
   };
 
-  const updateClient = (id: string, data: Partial<Client>, commissionRate?: number) => {
-    const updatedClients = clients.map(c => {
+  const updateClient = (
+    id: string,
+    data: Partial<Client>,
+    commissionRate?: number,
+  ) => {
+    const updatedClients = clients.map((c) => {
       if (c.id === id) {
         const updated = { ...c, ...data };
-        
+
         // If amountPaid changed and we have a commissionRate, recalculate commission
         if (data.amountPaid !== undefined && commissionRate !== undefined) {
-          updated.commissionEarned = (updated.amountPaid * commissionRate) / 100;
+          updated.commissionEarned =
+            (updated.amountPaid * commissionRate) / 100;
           updated.deduction = updated.commissionEarned * 0.05; // 5% TDS
         }
 
         // Always re-calculate balance due
-        updated.balanceDue = (updated.commissionEarned || 0) - (updated.deduction || 0) - (updated.commissionReceived || 0);
-        
+        updated.balanceDue =
+          (updated.commissionEarned || 0) -
+          (updated.deduction || 0) -
+          (updated.commissionReceived || 0);
+
         return updated;
       }
       return c;
@@ -107,13 +167,15 @@ export function ClientProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteClient = (id: string) => {
-    const filtered = clients.filter(c => c.id !== id);
+    const filtered = clients.filter((c) => c.id !== id);
     setClients(filtered);
     localStorage.setItem("vnb-clients", JSON.stringify(filtered));
   };
 
   return (
-    <ClientContext.Provider value={{ clients, addClient, updateClient, deleteClient }}>
+    <ClientContext.Provider
+      value={{ clients, addClient, updateClient, deleteClient }}
+    >
       {children}
     </ClientContext.Provider>
   );
