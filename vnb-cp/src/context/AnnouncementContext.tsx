@@ -52,13 +52,15 @@ export function AnnouncementProvider({
   useEffect(() => {
     const saved = localStorage.getItem("vnb-announcements");
     if (saved) {
-      setAnnouncements(JSON.parse(saved));
+      setTimeout(() => setAnnouncements(JSON.parse(saved)), 0);
     } else {
-      setAnnouncements(INITIAL_ANNOUNCEMENTS);
-      localStorage.setItem(
-        "vnb-announcements",
-        JSON.stringify(INITIAL_ANNOUNCEMENTS),
-      );
+      setTimeout(() => {
+        setAnnouncements(INITIAL_ANNOUNCEMENTS);
+        localStorage.setItem(
+          "vnb-announcements",
+          JSON.stringify(INITIAL_ANNOUNCEMENTS),
+        );
+      }, 0);
     }
   }, []);
 
