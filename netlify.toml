@@ -1,5 +1,5 @@
 [build]
-  base = "vedantu/"
+  base = "vnb-cp/"
   command = "npm ci && npm run build"
   publish = "out"
   NPM_FLAGS = "--prefer-offline --no-audit"
@@ -9,11 +9,11 @@
 
 # Cache dependencies for faster builds
 [[build.cache]]
-  path = "vedantu/node_modules"
+  path = "vnb-cp/node_modules"
   name = "node_modules"
 
 [[build.cache]]
-  path = "vedantu/.next/cache"
+  path = "vnb-cp/.next/cache"
   name = "next_cache"
 
 [[redirects]]
