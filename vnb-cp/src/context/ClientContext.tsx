@@ -110,10 +110,12 @@ export function ClientProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedClients = localStorage.getItem("vnb-clients");
     if (savedClients) {
-      setClients(JSON.parse(savedClients));
+      setTimeout(() => setClients(JSON.parse(savedClients)), 0);
     } else {
-      setClients(INITIAL_CLIENTS);
-      localStorage.setItem("vnb-clients", JSON.stringify(INITIAL_CLIENTS));
+      setTimeout(() => {
+        setClients(INITIAL_CLIENTS);
+        localStorage.setItem("vnb-clients", JSON.stringify(INITIAL_CLIENTS));
+      }, 0);
     }
   }, []);
 
